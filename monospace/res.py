@@ -21,6 +21,8 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(dsdl.TextureRendererProcessor(), 1)
         w.add_processor(dsdl.ScreenClearerProcessor())
 
+        # w.add_processor(dsdl.FPSLoggerProcessor())
+
         # Create entities
         ship_pos = dsdl.Position(offset=dsdl.Offset.CENTER)
         ship_bbox = dsdl.BoundingBox(dsdl.Offset.CENTER, 64, 64)

@@ -77,6 +77,22 @@ class BoundingBoxProcessor(esper.Processor):
             bbox.y = pos.y - offset_y
 
 
+class FPSLoggerProcessor(esper.Processor):
+    """Log to stdout the current FPS."""
+
+    def __init__(self):
+        self._time = SDL_GetTicks()
+
+    def process(self, *args):
+        cur_time = SDL_GetTicks()
+        delta = cur_time - self._time
+        fps = 1000 / delta
+        print('FPS', fps)
+
+        self._time = cur_time
+
+
+
 class Offset(Enum):
     CENTER = 'center'
     ORIGIN = 'origin'

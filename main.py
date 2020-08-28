@@ -23,6 +23,8 @@ def main():
     display_mode = SDL_DisplayMode()
     SDL_GetCurrentDisplayMode(0, display_mode)
 
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, b'1')
+
     window = SDL_CreateWindow(b'monospace', SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED, display_mode.w,
                               display_mode.h, SDL_WINDOW_FULLSCREEN)
