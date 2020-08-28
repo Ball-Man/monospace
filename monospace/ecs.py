@@ -35,3 +35,12 @@ class Ship(desper.AbstractComponent):
             self._old_x, self._old_y = mouse_x.value, mouse_y.value
 
         self._old_pressing = pressing
+
+        if self.check_collisions(world):
+            print('colliding')
+
+    def check_collisions(self, world):
+        """Check for collisions with other bounding boxes."""
+        for _, bbox in world.get_component(dsdl.BoundingBox):
+            if bbox is not self.bbox and self.bbox.overlaps(bbox):
+                return True

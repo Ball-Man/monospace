@@ -116,7 +116,7 @@ class Velocity:
 class BoundingBox:
     """Rectangle representing a collision bounding box."""
 
-    def __init__(self, offset, w=0, h=0):
+    def __init__(self, offset=Offset.ORIGIN, w=0, h=0):
         self.x = 0
         self.y = 0
         self.w = w
