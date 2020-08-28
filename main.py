@@ -10,8 +10,8 @@ internal_storage = '.'
 image_file = 'rect.png'
 
 try:
-    from android.storage import app_storage_path
-    #
+    from android import loadingscreen
+    loadingscreen.hide_loading_screen()
 except ImportError:
     print('We are not on android(?)')
 
