@@ -6,9 +6,6 @@ import monospace
 import desper
 import dsdl
 
-internal_storage = '.'
-image_file = 'rect.png'
-
 try:
     from android import loadingscreen
     loadingscreen.hide_loading_screen()
@@ -26,7 +23,7 @@ def main():
     display_mode = SDL_DisplayMode()
     SDL_GetCurrentDisplayMode(0, display_mode)
 
-    window = SDL_CreateWindow(b'Test game', SDL_WINDOWPOS_CENTERED,
+    window = SDL_CreateWindow(b'monospace', SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED, display_mode.w,
                               display_mode.h, SDL_WINDOW_FULLSCREEN)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED
