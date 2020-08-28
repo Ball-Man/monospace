@@ -57,6 +57,26 @@ class VelocityProcessor(esper.Processor):
             pos.y += vel.y
 
 
+class BoundingBoxProcessor(esper.Processor):
+    """Processor that updates BoundingBox x and y, based on Position."""
+
+    def process(self, *args):
+        for _, (pos, bbox) in self.world.get_components(Position, BoundingBox):
+
+            # Calculate offset
+            offset_x = 0
+            offset_y = 0
+            if bbox.offset == Offset.CENTER:
+                offset_x = bbox.w // 2
+                offset_y = bbox.h // 2
+            elif isinstance(bbox.offset, (list, tuple)):
+                offset_x, offset_y = bbox.offset
+
+            # Update position of bbox
+            bbox.x = pos.x - offset_x
+            bbox.y = pos.y - offset_y
+
+
 class Offset(Enum):
     CENTER = 'center'
     ORIGIN = 'origin'
@@ -91,3 +111,28 @@ class Velocity:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
+
+
+class BoundingBox:
+    """Rectangle representing a collision bounding box."""
+
+    def __init__(self, offset, w=0, h=0):
+        self.x = 0
+        self.y = 0
+        self.w = w
+        self.h = h
+
+        if isinstance(offset, (list, tuple)) and len(offset) != 2:
+            raise TypeError('Please provide two values for an offset(x, y)')
+        elif not isinstance(offset, Offset):
+            raise TypeError('The given offset should be of type dsdl.Offset, \
+                             or of type list/tuple providing two values(x, y)')
+
+        self.offset = offset
+
+    def overlaps(self, bbox):
+        """Check for the collision between this box and a given one."""
+        if (bbox.x >= self.x + self.w or self.x >= bbox.x + bbox.w
+                or bbox.y >= self.y + self.h or self.y >= bbox.y + bbox.h):
+            return False
+        return True

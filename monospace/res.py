@@ -17,12 +17,14 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(dsdl.EventHandlerProcessor(), 10)
         w.add_processor(desper.AbstractProcessor(), 2)
         w.add_processor(dsdl.VelocityProcessor(), 2)
+        w.add_processor(dsdl.BoundingBoxProcessor(), 2)
         w.add_processor(dsdl.TextureRendererProcessor(), 1)
         w.add_processor(dsdl.ScreenClearerProcessor())
 
         # Create entities
         ship_pos = dsdl.Position(offset=dsdl.Offset.CENTER)
-        w.create_entity(monospace.Ship(ship_pos), ship_pos,
-                        self.res['text']['ship'].get())
+        ship_bbox = dsdl.BoundingBox(dsdl.Offset.CENTER, 64, 64)
+        w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
+                        ship_bbox, self.res['text']['ship'].get())
 
         return w
