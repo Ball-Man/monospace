@@ -1,6 +1,7 @@
 import ctypes
 import desper
 import esper
+import dsdl
 from sdl2 import *
 
 

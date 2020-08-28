@@ -1,4 +1,5 @@
 import ctypes
+from enum import Enum
 import esper
 from sdl2 import *
 
@@ -22,7 +23,16 @@ class TextureRendererProcessor(esper.Processor):
                 ctypes.POINTER(SDL_Texture), Position):
             w, h = ctypes.c_int(), ctypes.c_int()
             SDL_QueryTexture(tex, None, None, w, h)
-            dest = SDL_Rect(pos.x - pos.offset_x, pos.y - pos.offset_y,
+
+            offset_x = 0
+            offset_y = 0
+            if pos.offset == Offset.CENTER:
+                offset_x = w.value // 2
+                offset_y = h.value // 2
+            elif isinstance(pos.offset, (list, tuple)):
+                offset_x, offset_y = pos.offset
+
+            dest = SDL_Rect(pos.x - offset_x, pos.y - offset_y,
                             w.value, h.value)
 
             SDL_RenderCopy(model.renderer, tex, None, dest)
@@ -47,14 +57,28 @@ class VelocityProcessor(esper.Processor):
             pos.y += vel.y
 
 
-class Position:
-    """Positional component(used for rendering/collisions)."""
+class Offset(Enum):
+    CENTER = 'center'
+    ORIGIN = 'origin'
 
-    def __init__(self, x=0, y=0, offset_x=0, offset_y=0):
+
+class Position:
+    """Positional component(used for rendering/collisions).
+
+    Possible values for 'offset' come from
+    """
+
+    def __init__(self, x=0, y=0, offset=Offset.ORIGIN):
         self.x = x
         self.y = y
-        self.offset_x = offset_x
-        self.offset_y = offset_y
+
+        if isinstance(offset, (list, tuple)) and len(offset) != 2:
+            raise TypeError('Please provide two values for an offset(x, y)')
+        elif not isinstance(offset, Offset):
+            raise TypeError('The given offset should be of type dsdl.Offset, \
+                             or of type list/tuple providing two values(x, y)')
+
+        self.offset = offset
 
 
 class Velocity:
