@@ -2,3 +2,4 @@
 
 from .res import *
 from .ecs import *
+from .locale import *

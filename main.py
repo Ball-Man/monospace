@@ -9,6 +9,8 @@ import dsdl
 try:
     from android import loadingscreen
     loadingscreen.hide_loading_screen()
+
+    print('Android language:', monospace.current_lang)
 except ImportError:
     print('We are not on android(?)')
 
