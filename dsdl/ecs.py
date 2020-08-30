@@ -19,7 +19,7 @@ class TextureRendererProcessor(esper.Processor):
     """Processor that renders SDL_Textures(in pair with Position)."""
 
     def process(self, model, *args):
-        for _, (tex, pos) in self.world.get_components(
+        for en, (tex, pos) in self.world.get_components(
                 ctypes.POINTER(SDL_Texture), Position):
             w, h = ctypes.c_int(), ctypes.c_int()
             SDL_QueryTexture(tex, None, None, w, h)
@@ -35,10 +35,19 @@ class TextureRendererProcessor(esper.Processor):
             elif isinstance(pos.offset, (list, tuple)):
                 offset_x, offset_y = pos.offset
 
+            src = None
             dest = SDL_Rect(round(pos.x - offset_x), round(pos.y - offset_y),
                             w.value, h.value)
 
-            SDL_RenderCopy(model.renderer, tex, None, dest)
+            animation = self.world.try_component(en, Animation)
+            if animation is not None:
+                animation.update()
+                src = SDL_Rect(
+                    animation.cur_frame * w.value // animation.frames, 0,
+                    w.value // animation.frames, h)
+                dest.w = w.value // animation.frames
+
+            SDL_RenderCopy(model.renderer, tex, src, dest)
 
 
 class ScreenClearerProcessor(esper.Processor):
@@ -158,3 +167,25 @@ class BoundingBox:
                 or bbox.y >= self.y + self.h or self.y >= bbox.y + bbox.h):
             return False
         return True
+
+
+class Animation:
+    """Component that describes an animation.
+
+    This has to be coupled with an SDL_Texture that represents an
+    animation(horizontal spritesheet, borders/offsets in the sheet
+    aren't supported).
+    """
+
+    def __init__(self, frames=1, delay=1, start_frame=0):
+        self.frames = frames
+        self.delay = delay
+
+        self.cur_frame = start_frame
+        self._counter = delay
+
+    def update(self):
+        self._counter -= 1
+        if self._counter <= 0:
+            self._counter = self.delay
+            self.cur_frame = (self.cur_frame + 1) % self.frames
