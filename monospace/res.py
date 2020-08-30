@@ -30,6 +30,7 @@ class GameWorldHandle(desper.Handle):
                         ship_bbox, self.res['text']['ship'].get())
 
         w.create_entity(dsdl.Position(100, 100), dsdl.BoundingBox(w=50, h=50),
-                        self.res['text']['ship'].get())
+                        self.res['text']['enemies']['dot'].get(),
+                        dsdl.Animation(2, 60))
 
         return w
