@@ -113,9 +113,10 @@ class BoundingBoxRendererProcessor(esper.Processor):
     def process(self, model):
         for _, bbox in self.world.get_component(BoundingBox):
             SDL_SetRenderDrawColor(model.renderer, 255, 0, 0, 255)
-            rect = SDL_Rect(round(bbox.x), round(bbox.y), round(bbox.w),
-                            round(bbox.h))
-            SDL_RenderDrawRect(model.renderer, rect)
+            if bbox.x is not None and bbox.y is not None:
+                rect = SDL_Rect(round(bbox.x), round(bbox.y), round(bbox.w),
+                                round(bbox.h))
+                SDL_RenderDrawRect(model.renderer, rect)
 
 
 class Offset(Enum):
@@ -159,8 +160,8 @@ class BoundingBox:
     """Rectangle representing a collision bounding box."""
 
     def __init__(self, offset=Offset.ORIGIN, w=0, h=0):
-        self.x = 0
-        self.y = 0
+        self.x = None
+        self.y = None
         self.w = w
         self.h = h
 
@@ -175,6 +176,10 @@ class BoundingBox:
 
     def overlaps(self, bbox):
         """Check for the collision between this box and a given one."""
+        if (self.x is None or self.y is None or bbox.x is None
+                or bbox.y is None):
+            return False
+
         if (bbox.x >= self.x + self.w or self.x >= bbox.x + bbox.w
                 or bbox.y >= self.y + self.h or self.y >= bbox.y + bbox.h):
             return False

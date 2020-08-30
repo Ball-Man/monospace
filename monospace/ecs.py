@@ -7,7 +7,7 @@ from sdl2 import *
 
 
 DEFAULT_BULLET_SPEED = 15
-DEFAULT_BULLET_DELAY = 15
+DEFAULT_BULLET_DELAY = 20
 
 
 class GameProcessor(esper.Processor):
@@ -79,7 +79,7 @@ class Ship(desper.AbstractComponent):
                             dsdl.Position(self.position.x, self.position.y,
                                           dsdl.Offset.BOTTOM_CENTER),
                             dsdl.Velocity(0, -self.bullet_speed),
-                            ShipBullet(), dsdl.BoundingBox((5, -40), 10, 10)
+                            ShipBullet(), dsdl.BoundingBox((5, 40), 10, 10)
                             )
 
 

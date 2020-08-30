@@ -15,15 +15,15 @@ class GameWorldHandle(desper.Handle):
 
         # Add processors
         w.add_processor(dsdl.EventHandlerProcessor(), 10)
-        w.add_processor(dsdl.BoundingBoxProcessor(), 1)
         w.add_processor(dsdl.TextureRendererProcessor(), -1)
         w.add_processor(dsdl.ScreenClearerProcessor(), -2)
         w.add_processor(monospace.GameProcessor())
         w.add_processor(desper.AbstractProcessor())
         w.add_processor(dsdl.VelocityProcessor())
+        w.add_processor(dsdl.BoundingBoxProcessor())
 
-        # w.add_processor(dsdl.FPSLoggerProcessor())
-        w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
+        w.add_processor(dsdl.FPSLoggerProcessor())
+        #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
         # Create entities
         ship_pos = dsdl.Position(offset=dsdl.Offset.CENTER)
