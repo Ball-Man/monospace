@@ -1,0 +1,3 @@
+jnius
+Cython
+buildozer
