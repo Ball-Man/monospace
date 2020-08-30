@@ -107,6 +107,17 @@ class FPSLoggerProcessor(esper.Processor):
         self._time = cur_time
 
 
+class BoundingBoxRendererProcessor(esper.Processor):
+    """Show bounding boxes on screen."""
+
+    def process(self, model):
+        for _, bbox in self.world.get_component(BoundingBox):
+            SDL_SetRenderDrawColor(model.renderer, 255, 0, 0, 255)
+            rect = SDL_Rect(round(bbox.x), round(bbox.y), round(bbox.w),
+                            round(bbox.h))
+            SDL_RenderDrawRect(model.renderer, rect)
+
+
 class Offset(Enum):
     CENTER = 'center'
     ORIGIN = 'origin'
@@ -155,7 +166,8 @@ class BoundingBox:
 
         if isinstance(offset, (list, tuple)) and len(offset) != 2:
             raise TypeError('Please provide two values for an offset(x, y)')
-        elif not isinstance(offset, Offset):
+        elif not isinstance(offset, (list, tuple)) and not isinstance(offset,
+                                                                      Offset):
             raise TypeError('The given offset should be of type dsdl.Offset, \
                              or of type list/tuple providing two values(x, y)')
 

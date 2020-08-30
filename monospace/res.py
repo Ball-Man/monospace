@@ -15,13 +15,15 @@ class GameWorldHandle(desper.Handle):
 
         # Add processors
         w.add_processor(dsdl.EventHandlerProcessor(), 10)
-        w.add_processor(dsdl.BoundingBoxProcessor(), 3)
-        w.add_processor(desper.AbstractProcessor(), 2)
-        w.add_processor(dsdl.VelocityProcessor(), 2)
-        w.add_processor(dsdl.TextureRendererProcessor(), 1)
-        w.add_processor(dsdl.ScreenClearerProcessor())
+        w.add_processor(dsdl.BoundingBoxProcessor(), 1)
+        w.add_processor(dsdl.TextureRendererProcessor(), -1)
+        w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(monospace.GameProcessor())
+        w.add_processor(desper.AbstractProcessor())
+        w.add_processor(dsdl.VelocityProcessor())
 
         # w.add_processor(dsdl.FPSLoggerProcessor())
+        w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
         # Create entities
         ship_pos = dsdl.Position(offset=dsdl.Offset.CENTER)
@@ -29,8 +31,9 @@ class GameWorldHandle(desper.Handle):
         w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
                         ship_bbox, self.res['text']['ship'].get())
 
-        w.create_entity(dsdl.Position(100, 100), dsdl.BoundingBox(w=50, h=50),
+        enemy_bbox = dsdl.BoundingBox(w=50, h=50)
+        w.create_entity(dsdl.Position(100, 100), enemy_bbox,
                         self.res['text']['enemies']['dot'].get(),
-                        dsdl.Animation(2, 60))
+                        dsdl.Animation(2, 60), monospace.Enemy(enemy_bbox))
 
         return w
