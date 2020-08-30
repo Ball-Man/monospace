@@ -35,7 +35,7 @@ class TextureRendererProcessor(esper.Processor):
             elif isinstance(pos.offset, (list, tuple)):
                 offset_x, offset_y = pos.offset
 
-            dest = SDL_Rect(int(pos.x - offset_x), int(pos.y - offset_y),
+            dest = SDL_Rect(round(pos.x - offset_x), round(pos.y - offset_y),
                             w.value, h.value)
 
             SDL_RenderCopy(model.renderer, tex, None, dest)
