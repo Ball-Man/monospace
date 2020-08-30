@@ -29,10 +29,13 @@ class TextureRendererProcessor(esper.Processor):
             if pos.offset == Offset.CENTER:
                 offset_x = w.value // 2
                 offset_y = h.value // 2
+            if pos.offset == Offset.BOTTOM_CENTER:
+                offset_x = w.value // 2
+                offset_y = h.value - 1
             elif isinstance(pos.offset, (list, tuple)):
                 offset_x, offset_y = pos.offset
 
-            dest = SDL_Rect(pos.x - offset_x, pos.y - offset_y,
+            dest = SDL_Rect(int(pos.x - offset_x), int(pos.y - offset_y),
                             w.value, h.value)
 
             SDL_RenderCopy(model.renderer, tex, None, dest)
@@ -69,6 +72,9 @@ class BoundingBoxProcessor(esper.Processor):
             if bbox.offset == Offset.CENTER:
                 offset_x = bbox.w // 2
                 offset_y = bbox.h // 2
+            elif bbox.offset == Offset.BOTTOM_CENTER:
+                offset_x = bbox.w // 2
+                offset_y = bbox.h - 1
             elif isinstance(bbox.offset, (list, tuple)):
                 offset_x, offset_y = bbox.offset
 
@@ -92,10 +98,10 @@ class FPSLoggerProcessor(esper.Processor):
         self._time = cur_time
 
 
-
 class Offset(Enum):
     CENTER = 'center'
     ORIGIN = 'origin'
+    BOTTOM_CENTER = 'bottom_center'
 
 
 class Position:
