@@ -22,7 +22,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(dsdl.VelocityProcessor())
         w.add_processor(dsdl.BoundingBoxProcessor())
 
-        w.add_processor(dsdl.FPSLoggerProcessor())
+        #w.add_processor(dsdl.FPSLoggerProcessor())
         #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
         # Create entities
@@ -31,9 +31,9 @@ class GameWorldHandle(desper.Handle):
         w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
                         ship_bbox, self.res['text']['ship'].get())
 
-        enemy_bbox = dsdl.BoundingBox(w=50, h=50)
-        w.create_entity(dsdl.Position(100, 100), enemy_bbox,
-                        self.res['text']['enemies']['dot'].get(),
-                        dsdl.Animation(2, 60), monospace.Enemy(enemy_bbox))
+        # enemy_bbox = dsdl.BoundingBox(w=50, h=50)
+        # w.create_entity(dsdl.Position(100, 100), enemy_bbox,
+        #                 self.res['text']['enemies']['dot'].get(),
+        #                 dsdl.Animation(2, 60), monospace.Enemy(enemy_bbox))
 
         return w

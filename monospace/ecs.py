@@ -4,6 +4,7 @@ import esper
 import dsdl
 import monospace
 from sdl2 import *
+from sdl2.sdlttf import *
 
 
 DEFAULT_BULLET_SPEED = 15
@@ -15,8 +16,54 @@ class GameProcessor(esper.Processor):
     WAVE_THRESHOLDS = [50, 150, 300, 400]
     score = 0
 
+    def __init__(self):
+        self._cur_threshold = 0
+        self._cached_texture = None
+        self._cached_entity = None
+        self.model = None
+
     def process(self, model):
-        pass
+        if self.model is None:
+            self.model = model
+
+        if self._cached_entity is None:
+            self.score_up(0)
+
+    def score_up(self, value):
+        """Add some value to the current score.
+
+        This also invalidates the current cached texture.
+        """
+        self.score += value
+
+        # Cache texture and create a new entity
+        #
+        # Remove current entity
+        if self._cached_entity is not None:
+            self.world.delete_entity(self._cached_entity)
+
+        # Change wave if necessary
+        if self.score >= self.WAVE_THRESHOLDS[self._cur_threshold]:
+            self._cur_threshold += 1
+
+            # Free cached texture
+            if self._cached_texture is not None:
+                SDL_DestroyTexture(self._cached_texture)
+
+        # Create new texture
+        shown_score = self.WAVE_THRESHOLDS[self._cur_threshold] - self.score
+        text_surface = TTF_RenderText_Blended(
+            self.model.res['fonts']['timenspace'].get(),
+            str(shown_score).encode(), SDL_Color())
+        self._cached_texture = SDL_CreateTextureFromSurface(
+            self.model.renderer, text_surface)
+
+        # Add entity
+        self._cached_entity = self.world.create_entity(
+            self._cached_texture, dsdl.Position(30, 50))
+
+        # Cleanup
+        SDL_FreeSurface(text_surface)
 
 
 class Ship(desper.AbstractComponent):
@@ -102,6 +149,7 @@ class ShipBullet(desper.OnAttachListener):
 class Enemy(desper.AbstractComponent, desper.OnAttachListener):
     """Base component class for enemies."""
     total_life = 1
+    reward = 1
 
     def __init__(self, bbox):
         self.cur_life = self.total_life
@@ -129,3 +177,6 @@ class Enemy(desper.AbstractComponent, desper.OnAttachListener):
         Override to change the behaviour of the enemy.
         """
         self.world.delete_entity(self.entity)
+
+        game = self.world.get_processor(GameProcessor)
+        game.score_up(self.reward)

@@ -2,6 +2,7 @@ import __main__
 import os.path as pt
 from sdl2 import *
 from sdl2.sdlimage import *
+from sdl2.sdlttf import *
 import monospace
 import desper
 import dsdl
@@ -24,6 +25,7 @@ desper.options['resource_extensions'] = False
 def main():
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_PNG)
+    TTF_Init()
 
     monospace.init_screen_resolution()
 
@@ -40,10 +42,13 @@ def main():
 
     importer_dict = desper.importer_dict_builder \
         .add_rule(dsdl.get_texture_importer(), dsdl.TextureHandle) \
+        .add_rule(dsdl.get_font_importer(), dsdl.FontHandle) \
         .build()
 
     dirs = [pt.join(pt.dirname(pt.abspath(__main__.__file__)), 'res')]
     model = dsdl.SDLGameModel(dirs, importer_dict, window, renderer)
+
+    print(model.res['fonts']['timenspace'].get())
 
     model.res['game_world'] = monospace.GameWorldHandle(model.res)
     model.switch(model.res['game_world'])
