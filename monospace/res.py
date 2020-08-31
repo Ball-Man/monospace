@@ -21,6 +21,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(desper.AbstractProcessor())
         w.add_processor(dsdl.VelocityProcessor())
         w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(monospace.EntityCleanerProcessor())
 
         w.add_processor(dsdl.FPSLoggerProcessor())
         #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)

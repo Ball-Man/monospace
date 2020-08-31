@@ -83,6 +83,21 @@ class GameProcessor(esper.Processor):
             dsdl.Animation(2, 60), monospace.Enemy(enemy_bbox))
 
 
+class EntityCleanerProcessor(esper.Processor):
+    """Clean bullets and enemies from memory."""
+
+    def process(self, _):
+        for en, _ in self.world.get_component(ShipBullet):
+            position = self.world.component_for_entity(en, dsdl.Position)
+            if position.y <= 50:
+                self.world.delete_entity(en)
+
+        for en, _ in self.world.get_component(Enemy):
+            position = self.world.component_for_entity(en, dsdl.Position)
+            if position.y > monospace.LOGICAL_HEIGHT + 50:
+                self.world.delete_entity(en)
+
+
 class Ship(desper.AbstractComponent):
     """Main ship controller."""
 
