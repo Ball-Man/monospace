@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = Python app
+title = [monospace]
 
 # (str) Package name
-package.name = pythonapp
+package.name = monospace
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = org.ball
