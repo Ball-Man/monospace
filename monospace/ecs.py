@@ -22,12 +22,21 @@ class GameProcessor(esper.Processor):
         self._cached_entity = None
         self.model = None
 
+        self._timer = 0
+        self._delay = 120
+
     def process(self, model):
         if self.model is None:
             self.model = model
 
         if self._cached_entity is None:
             self.score_up(0)
+
+        # Spawn test enemies
+        self._timer += 1
+        if self._timer > self._delay:
+            self.spawn_test_dot()
+            self._timer = 0
 
     def score_up(self, value):
         """Add some value to the current score.
@@ -40,15 +49,15 @@ class GameProcessor(esper.Processor):
         #
         # Remove current entity
         if self._cached_entity is not None:
+            # SDL_DestroyTexture(self._cached_texture)
+            # Apparently this operation crashes on android. Looks like
+            # textures are freed when the entity is deleted.
+
             self.world.delete_entity(self._cached_entity)
 
         # Change wave if necessary
         if self.score >= self.WAVE_THRESHOLDS[self._cur_threshold]:
             self._cur_threshold += 1
-
-            # Free cached texture
-            if self._cached_texture is not None:
-                SDL_DestroyTexture(self._cached_texture)
 
         # Create new texture
         shown_score = self.WAVE_THRESHOLDS[self._cur_threshold] - self.score
@@ -64,6 +73,14 @@ class GameProcessor(esper.Processor):
 
         # Cleanup
         SDL_FreeSurface(text_surface)
+
+    def spawn_test_dot(self):
+        enemy_bbox = dsdl.BoundingBox(w=50, h=50)
+        self.world.create_entity(
+            dsdl.Position(monospace.LOGICAL_WIDTH / 2, -50),
+            enemy_bbox, dsdl.Velocity(0, 5),
+            self.model.res['text']['enemies']['dot'].get(),
+            dsdl.Animation(2, 60), monospace.Enemy(enemy_bbox))
 
 
 class Ship(desper.AbstractComponent):
