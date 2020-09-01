@@ -15,7 +15,7 @@ try:
 
     print('Android language:', monospace.current_lang)
 except ImportError:
-    window_style = SDL_WINDOW_FULLSCREEN
+    window_style = SDL_WINDOW_SHOWN
     print('We are not on android(?)')
 
 
@@ -31,9 +31,17 @@ def main():
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, b'1')
 
-    window = SDL_CreateWindow(b'monospace', SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_CENTERED, monospace.DISPLAY_MODE.w,
-                              monospace.DISPLAY_MODE.h, window_style)
+    if monospace.on_android:
+        window = SDL_CreateWindow(b'monospace', SDL_WINDOWPOS_UNDEFINED,
+                                  SDL_WINDOWPOS_UNDEFINED,
+                                  monospace.DISPLAY_MODE.w,
+                                  monospace.DISPLAY_MODE.h, window_style)
+    else:
+        window = SDL_CreateWindow(b'monospace', SDL_WINDOWPOS_CENTERED,
+                                  SDL_WINDOWPOS_CENTERED,
+                                  monospace.DISPLAY_MODE.w,
+                                  monospace.DISPLAY_MODE.h, window_style)
+
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED
                                               | SDL_RENDERER_PRESENTVSYNC)
 

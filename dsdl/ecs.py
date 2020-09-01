@@ -101,7 +101,7 @@ class FPSLoggerProcessor(esper.Processor):
     def process(self, *args):
         cur_time = SDL_GetTicks()
         delta = cur_time - self._time
-        fps = 1000 / delta
+        fps = 1000 / max(0.1, delta)
         print('FPS', fps)
 
         self._time = cur_time
