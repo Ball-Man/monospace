@@ -185,6 +185,9 @@ class ShipBullet(desper.OnAttachListener):
     """Base component for ship bullets."""
     damage = 1
 
+    def __init__(self):
+        self.hit = False    # Ignore multiple hits by setting hit to 1
+
     def on_attach(self, en, world):
         self.entity = en
         self.world = world
@@ -195,6 +198,7 @@ class ShipBullet(desper.OnAttachListener):
         Override to change the behaviour of the bullet.
         """
         self.world.delete_entity(self.entity)
+        self.hit = True
 
 
 class Enemy(desper.AbstractComponent, desper.OnAttachListener):
@@ -213,11 +217,14 @@ class Enemy(desper.AbstractComponent, desper.OnAttachListener):
     def update(self, entity, world, _):
         # Check for collision with a bullet
         for en, bullet in world.get_component(ShipBullet):
+            if bullet.hit:
+                continue
+
             bbox = world.component_for_entity(en, dsdl.BoundingBox)
 
             if bbox.overlaps(self.bbox):
                 self.cur_life -= bullet.damage
-                world.delete_entity(en)
+                bullet.die()
 
                 if self.cur_life <= 0:
                     self.die()
