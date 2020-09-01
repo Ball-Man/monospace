@@ -1,4 +1,5 @@
 import ctypes
+import random
 import desper
 import esper
 import dsdl
@@ -35,7 +36,7 @@ class GameProcessor(esper.Processor):
         # Spawn test enemies
         self._timer += 1
         if self._timer > self._delay:
-            self.spawn_test_dot()
+            self.spawn_dots(random.randint(1, 3), 1)
             self._timer = 0
 
     def score_up(self, value):
@@ -74,13 +75,31 @@ class GameProcessor(esper.Processor):
         # Cleanup
         SDL_FreeSurface(text_surface)
 
-    def spawn_test_dot(self):
+    def spawn_dot(self, x, y=-50):
         enemy_bbox = dsdl.BoundingBox(w=50, h=50)
         self.world.create_entity(
-            dsdl.Position(monospace.LOGICAL_WIDTH / 2, -50),
+            dsdl.Position(x, y),
             enemy_bbox, dsdl.Velocity(0, 5),
             self.model.res['text']['enemies']['dot'].get(),
             dsdl.Animation(2, 60), monospace.Enemy(enemy_bbox))
+
+    def spawn_dots(self, columns, rows):
+        """Spawn dot enemies in their infamous formation.
+
+        At random location horizontally.
+        """
+        base_x = (min(random.randrange(0, monospace.LOGICAL_WIDTH // 50),
+                      monospace.LOGICAL_WIDTH // 50 - columns) * 50)
+
+        y = -50
+        var_y = -50
+        var_x = 50
+        for i in range(rows):
+            x = base_x
+            for j in range(columns):
+                self.spawn_dot(x, y)
+                x += var_x
+            y -= var_y
 
 
 class EntityCleanerProcessor(esper.Processor):
