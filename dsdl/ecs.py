@@ -25,20 +25,14 @@ class TextureRendererProcessor(esper.Processor):
             w, h = ctypes.c_int(), ctypes.c_int()
             SDL_QueryTexture(tex, None, None, w, h)
 
-            offset_x = 0
-            offset_y = 0
-            if pos.offset == Offset.CENTER:
-                offset_x = w.value // 2
-                offset_y = h.value // 2
-            if pos.offset == Offset.BOTTOM_CENTER:
-                offset_x = w.value // 2
-                offset_y = h.value - 1
-            elif isinstance(pos.offset, (list, tuple)):
-                offset_x, offset_y = pos.offset
+            offset_x, offset_y = pos.get_offset(w.value * pos.size_x,
+                                                h.value * pos.size_y)
+            offset_x, offset_y = int(offset_x), int(offset_y)
 
             src = None
             dest = SDL_Rect(round(pos.x - offset_x), round(pos.y - offset_y),
-                            w.value, h.value)
+                            int(w.value * pos.size_x),
+                            int(h.value * pos.size_y))
 
             animation = self.world.try_component(en, Animation)
             if animation is not None:
@@ -164,15 +158,6 @@ class Offset(Enum):
     ORIGIN = 'origin'
     BOTTOM_CENTER = 'bottom_center'
 
-    def coordinates(self, w, h):
-        """Get a couple of values representing the punctual offset."""
-        if self == Offset.ORIGIN:
-            return 0, 0
-        elif self == Offset.CENTER:
-            return w // 2, h // 2
-        elif self == Offset.BOTTOM_CENTER:
-            return w.value // 2, h.value - 1
-
 
 class Position:
     """Positional component(used for rendering/collisions).
@@ -203,6 +188,21 @@ class Position:
 
         self.offset = offset
 
+    def get_offset(self, w, h):
+        """Get a couple of values representing the punctual offset.
+
+        This method is designed to be used when Position.offset is
+        an Offset instance. This will transform the given Offset type in
+        actual values, dynamically calculating them given the w and h.
+        """
+        if self.offset == Offset.ORIGIN:
+            return 0, 0
+        elif self.offset == Offset.CENTER:
+            return w // 2, h // 2
+        elif self.offset == Offset.BOTTOM_CENTER:
+            return w // 2, h - 1
+        elif isinstance(self.offset, (tuple, list)):
+            return self.offset
 
 class Velocity:
     """Velocity vector.
