@@ -1,4 +1,5 @@
 import ctypes
+import math
 from enum import Enum
 import esper
 from sdl2 import *
@@ -47,7 +48,12 @@ class TextureRendererProcessor(esper.Processor):
                     w.value // animation.frames, h)
                 dest.w = w.value // animation.frames
 
-            SDL_RenderCopy(model.renderer, tex, src, dest)
+            if pos.rot == 0:
+                SDL_RenderCopy(model.renderer, tex, src, dest)
+            else:
+                center = SDL_Point(offset_x, offset_y)
+                SDL_RenderCopyEx(model.renderer, tex, src, dest, pos.rot,
+                                 center, SDL_FLIP_NONE)
 
 
 class ScreenClearerProcessor(esper.Processor):
@@ -92,6 +98,40 @@ class BoundingBoxProcessor(esper.Processor):
             bbox.y = pos.y - offset_y
 
 
+class ParticleProcessor(esper.Processor):
+    """Processor that manages Particle components.
+
+    A particle will be recognized as such if the following components
+    are found: Particle, Position.
+
+    Optionally a Velocity component may be defined(will be updated
+    accordingly to the Particle component).
+    """
+
+    def process(self, *args):
+        for en, (part, pos, text) in self.world.get_component(
+                Particle, Position):
+
+            # Check for the particle's lifetime, destroy if dead
+            part.life_left -= 1
+            if part.life_left <= 0:
+                self.world.delete_entity(en)
+
+            # Apply size changes to the position
+            pos.size_x = max(0, pos.size_x + part.size_inc)
+            pos.size_y = max(0, pos.size_y + part.size_inc)
+
+            # Apply rotation changes to the position
+            pos.rot = (pos.rot + part.rot_inc) % 360
+
+            # Optionally update the velocity component
+            velocity = self.world.component_for_entity(en, Velocity)
+            if velocity is not None:
+                angle = math.atan2(velocity.y, velocity.x)
+                velocity.x += math.cos(angle) * part.vel_inc
+                velocity.y += math.sin(angle) * part.vel_inc
+
+
 class FPSLoggerProcessor(esper.Processor):
     """Log to stdout the current FPS."""
 
@@ -124,20 +164,40 @@ class Offset(Enum):
     ORIGIN = 'origin'
     BOTTOM_CENTER = 'bottom_center'
 
+    def coordinates(self, w, h):
+        """Get a couple of values representing the punctual offset."""
+        if self == Offset.ORIGIN:
+            return 0, 0
+        elif self == Offset.CENTER:
+            return w // 2, h // 2
+        elif self == Offset.BOTTOM_CENTER:
+            return w.value // 2, h.value - 1
+
 
 class Position:
     """Positional component(used for rendering/collisions).
 
-    Possible values for 'offset' come from
+    Possible values for 'offset' come from the Offset enum. Also a tuple
+    or list representing a couple of values is accepted.
+
+    size_x and size_y are multipliers for the texture dimensions(
+    relative to the offset).
+
+    rot is in degrees(clockwise).
     """
 
-    def __init__(self, x=0, y=0, offset=Offset.ORIGIN):
+    def __init__(self, x=0, y=0, offset=Offset.ORIGIN, size_x=1, size_y=1,
+                 rot=0):
         self.x = x
         self.y = y
+        self.size_x = size_x
+        self.size_y = size_y
+        self.rot = rot
 
         if isinstance(offset, (list, tuple)) and len(offset) != 2:
             raise TypeError('Please provide two values for an offset(x, y)')
-        elif not isinstance(offset, Offset):
+        elif not isinstance(offset, (list, tuple)) and not isinstance(offset,
+                                                                      Offset):
             raise TypeError('The given offset should be of type dsdl.Offset, \
                              or of type list/tuple providing two values(x, y)')
 
@@ -206,3 +266,15 @@ class Animation:
         if self._counter <= 0:
             self._counter = self.delay
             self.cur_frame = (self.cur_frame + 1) % self.frames
+
+
+class Particle:
+    """Particle component, defining particle ranges(size, rot, etc)."""
+
+    def __init__(self, lifetime, size_inc, vel_inc, rot_inc):
+        self.lifetime = lifetime
+        self.size_inc = size_inc
+        self.vel_inc = vel_inc
+        self. rot_inc = rot_inc
+
+        self.life_left = lifetime

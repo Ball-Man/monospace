@@ -27,7 +27,10 @@ class GameWorldHandle(desper.Handle):
         #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
         # Create entities
-        ship_pos = dsdl.Position(offset=dsdl.Offset.CENTER)
+        # Ship
+        ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 2,
+                                 monospace.LOGICAL_HEIGHT / 10 * 9,
+                                 offset=dsdl.Offset.CENTER)
         ship_bbox = dsdl.BoundingBox(dsdl.Offset.CENTER, 64, 64)
         w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
                         ship_bbox, self.res['text']['ship'].get())
