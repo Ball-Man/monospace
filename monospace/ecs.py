@@ -254,7 +254,7 @@ class DotEnemy(Enemy):
         texture = self.get(ctypes.POINTER(SDL_Texture))
         position = self.get(dsdl.Position)
         offset = position.get_offset(texture.w, texture.h)
-        for _ in range(10):
+        for _ in range(random.randrange(4, 8)):
             angle = math.radians(random.randrange(0, 360))
             mag = random.randrange(2, 4)
 
