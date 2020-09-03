@@ -103,7 +103,7 @@ class ParticleProcessor(esper.Processor):
     """
 
     def process(self, *args):
-        for en, (part, pos, text) in self.world.get_component(
+        for en, (part, pos) in self.world.get_components(
                 Particle, Position):
 
             # Check for the particle's lifetime, destroy if dead
@@ -119,7 +119,7 @@ class ParticleProcessor(esper.Processor):
             pos.rot = (pos.rot + part.rot_inc) % 360
 
             # Optionally update the velocity component
-            velocity = self.world.component_for_entity(en, Velocity)
+            velocity = self.world.try_component(en, Velocity)
             if velocity is not None:
                 angle = math.atan2(velocity.y, velocity.x)
                 velocity.x += math.cos(angle) * part.vel_inc
@@ -204,6 +204,7 @@ class Position:
         elif isinstance(self.offset, (tuple, list)):
             return self.offset
 
+
 class Velocity:
     """Velocity vector.
 
@@ -271,7 +272,7 @@ class Animation:
 class Particle:
     """Particle component, defining particle ranges(size, rot, etc)."""
 
-    def __init__(self, lifetime, size_inc, vel_inc, rot_inc):
+    def __init__(self, lifetime, size_inc=0, vel_inc=0, rot_inc=0):
         self.lifetime = lifetime
         self.size_inc = size_inc
         self.vel_inc = vel_inc

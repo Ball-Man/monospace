@@ -1,5 +1,6 @@
 import ctypes
 import random
+import math
 import desper
 import esper
 import dsdl
@@ -81,7 +82,7 @@ class GameProcessor(esper.Processor):
             dsdl.Position(x, y),
             enemy_bbox, dsdl.Velocity(0, 5),
             self.model.res['text']['enemies']['dot'].get(),
-            dsdl.Animation(2, 60), monospace.Enemy(enemy_bbox))
+            dsdl.Animation(2, 60), DotEnemy(enemy_bbox))
 
     def spawn_dots(self, columns, rows):
         """Spawn dot enemies in their infamous formation.
@@ -201,21 +202,22 @@ class ShipBullet(desper.OnAttachListener):
         self.hit = True
 
 
-class Enemy(desper.AbstractComponent, desper.OnAttachListener):
+class Enemy(desper.Controller):
     """Base component class for enemies."""
     total_life = 1
     reward = 1
 
     def __init__(self, bbox):
+        super().__init__()
         self.cur_life = self.total_life
         self.bbox = bbox
+        self.res = None
 
-    def on_attach(self, en, world):
-        self.entity = en
-        self.world = world
-
-    def update(self, entity, world, _):
+    def update(self, entity, world, model):
         # Check for collision with a bullet
+        if self.res is None:
+            self.res = model.res
+
         for en, bullet in world.get_component(ShipBullet):
             if bullet.hit:
                 continue
@@ -238,3 +240,30 @@ class Enemy(desper.AbstractComponent, desper.OnAttachListener):
 
         game = self.world.get_processor(GameProcessor)
         game.score_up(self.reward)
+        self.spawn_particles()
+
+    def spawn_particles(self):
+        pass
+
+
+class DotEnemy(Enemy):
+    """Dot enemy controller."""
+
+    def spawn_particles(self):
+        """Spawn death particles for the death."""
+        texture = self.get(ctypes.POINTER(SDL_Texture))
+        position = self.get(dsdl.Position)
+        offset = position.get_offset(texture.w, texture.h)
+        for _ in range(10):
+            angle = math.radians(random.randrange(0, 360))
+            mag = random.randrange(2, 4)
+
+            self.world.create_entity(
+                dsdl.Particle(30, -0.1 / 64, -0.002),
+                dsdl.Position(position.x - offset[0] + texture.w.value // 2,
+                              position.y - offset[1] + texture.h.value // 2,
+                              size_x=6 / 64, size_y=10 / 64,
+                              offset=dsdl.Offset.CENTER),
+                self.res['text']['part']['circle'].get(),
+                dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
+            )

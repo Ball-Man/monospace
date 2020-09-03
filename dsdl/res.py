@@ -1,7 +1,9 @@
 import json
+import ctypes
 import os.path as pt
 import desper
 import dsdl
+import sdl2
 import sdl2.sdlimage as image
 import sdl2.sdlttf as ttf
 
@@ -24,8 +26,17 @@ class TextureHandle(desper.Handle):
         self.filename = filename
 
     def _load(self):
-        return image.IMG_LoadTexture(dsdl.SDLGameModel.default_renderer,
+        text = image.IMG_LoadTexture(dsdl.SDLGameModel.default_renderer,
                                      self.filename.encode())
+
+        w, h = ctypes.c_int(), ctypes.c_int()
+        sdl2.SDL_QueryTexture(text, None, None, ctypes.byref(w),
+                              ctypes.byref(h))
+
+        text.w = w
+        text.h = h
+
+        return text
 
 
 class FontHandle(desper.Handle):
