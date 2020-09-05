@@ -155,6 +155,11 @@ class Ship(desper.AbstractComponent):
 
         self._old_pressing = pressing
 
+        # Don't move outside borders
+        self.position.x = max(min(self.position.x, monospace.LOGICAL_WIDTH), 0)
+        self.position.y = max(min(self.position.y, monospace.LOGICAL_HEIGHT),
+                              0)
+
         # Check collisions
         if self.check_collisions(world):
             print('colliding')
