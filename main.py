@@ -56,8 +56,6 @@ def main():
     dirs = [pt.join(pt.dirname(pt.abspath(__main__.__file__)), 'res')]
     model = dsdl.SDLGameModel(dirs, importer_dict, window, renderer)
 
-    print(model.res['fonts']['timenspace'].get())
-
     model.res['game_world'] = monospace.GameWorldHandle(model.res)
     model.switch(model.res['game_world'])
 
