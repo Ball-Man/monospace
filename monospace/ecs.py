@@ -82,7 +82,7 @@ class GameProcessor(esper.Processor):
             dsdl.Position(x, y),
             enemy_bbox, dsdl.Velocity(0, 5),
             self.model.res['text']['enemies']['dot'].get(),
-            dsdl.Animation(2, 60), DotEnemy(enemy_bbox))
+            dsdl.Animation(2, 60), DotEnemy())
 
     def spawn_dots(self, columns, rows):
         """Spawn dot enemies in their infamous formation.
@@ -212,10 +212,9 @@ class Enemy(desper.Controller):
     total_life = 1
     reward = 1
 
-    def __init__(self, bbox):
+    def __init__(self):
         super().__init__()
         self.cur_life = self.total_life
-        self.bbox = bbox
         self.res = None
 
     def update(self, entity, world, model):
@@ -229,7 +228,7 @@ class Enemy(desper.Controller):
 
             bbox = world.component_for_entity(en, dsdl.BoundingBox)
 
-            if bbox.overlaps(self.bbox):
+            if bbox.overlaps(self.get(dsdl.BoundingBox)):
                 self.cur_life -= bullet.damage
                 bullet.die()
 
@@ -265,10 +264,66 @@ class DotEnemy(Enemy):
 
             self.world.create_entity(
                 dsdl.Particle(30, -0.1 / 64, -0.002),
-                dsdl.Position(position.x - offset[0] + texture.w.value // 2,
-                              position.y - offset[1] + texture.h.value // 2,
+                dsdl.Position(position.x - offset[0] + texture.w // 2,
+                              position.y - offset[1] + texture.h // 2,
                               size_x=6 / 64, size_y=10 / 64,
                               offset=dsdl.Offset.CENTER),
                 self.res['text']['part']['circle'].get(),
                 dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
             )
+
+
+class RollEnemy(Enemy):
+    """Roll enemy controller."""
+    hor_speed = 6
+    total_life = 10000
+
+    def __init__(self):
+        super().__init__()
+
+        self.trigger = random.randint(30, 100)
+        self.timer = self.trigger
+        self.rotation_speed = 0
+        self._old_velocity = 0
+
+    def update(self, en, world, model):
+        super().update(en, world, model)
+
+        self.timer -= 1
+
+        position = self.get(dsdl.Position)
+        texture = self.get(ctypes.POINTER(SDL_Texture))
+        velocity = self.get(dsdl.Velocity)
+        offset = position.get_offset(texture.w, texture.h)
+
+        # Manage direction changes
+        # Change direction if hitting the screen border
+        if position.x - offset[0] + velocity.x < 0:
+            velocity.x = self.hor_speed
+        elif (position.x - offset[0] + velocity.x + texture.w
+              > monospace.LOGICAL_WIDTH):
+            velocity.x = -self.hor_speed
+        elif velocity.x == 0:
+            velocity.x = self.hor_speed
+        # Change direction if the timer says so
+        elif self.timer <= 0:
+            velocity.x = -velocity.x
+
+        if self.timer <= 0:
+            self.timer = self.trigger
+
+        if velocity.x != self._old_velocity:
+            # Rotate. Calculate the traversal width in order to make
+            # a complete rotation before changin direction.
+            if velocity.x > 0:
+                traversal_width = (monospace.LOGICAL_WIDTH - position.x
+                                   - offset[0] + texture.w)
+            elif velocity.x < 0:
+                traversal_width = (position.x - offset[0])
+
+            traversal_width = min(traversal_width, self.timer * self.hor_speed)
+            self.rotation_speed = (math.copysign(1, velocity.x) * 180
+                                   / (traversal_width / self.hor_speed))
+        position.rot += self.rotation_speed
+
+        self._old_velocity = velocity.x

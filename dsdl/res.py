@@ -33,8 +33,8 @@ class TextureHandle(desper.Handle):
         sdl2.SDL_QueryTexture(text, None, None, ctypes.byref(w),
                               ctypes.byref(h))
 
-        text.w = w
-        text.h = h
+        text.w = w.value
+        text.h = h.value
 
         return text
 
