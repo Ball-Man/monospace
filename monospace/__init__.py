@@ -3,6 +3,7 @@
 from .res import *
 from .ecs import *
 from .locale import *
+from .globals import *
 
 import sdl2 as _sdl
 

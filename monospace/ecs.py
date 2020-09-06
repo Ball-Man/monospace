@@ -118,10 +118,12 @@ class EntityCleanerProcessor(esper.Processor):
                 self.world.delete_entity(en)
 
 
-class Ship(desper.AbstractComponent):
+class Ship(desper.Controller):
     """Main ship controller."""
 
     def __init__(self, position, bbox):
+        super().__init__()
+
         self.position = position
         self.bbox = bbox
         self._old_x = position.x
@@ -129,9 +131,19 @@ class Ship(desper.AbstractComponent):
         self._old_pressing = False
         self._drag = False
 
-        self.bullet_delay = DEFAULT_BULLET_DELAY
-        self.bullet_speed = DEFAULT_BULLET_SPEED
         self._timer = 0
+
+        self.blasters = []
+
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+
+        self.blasters.append(Blaster(
+                                (0, 0), ShipBullet,
+                                monospace.model.res['text']['ship_bullet'].get(),
+                                DEFAULT_BULLET_DELAY,
+                                (0, -DEFAULT_BULLET_SPEED),
+                                (10, 10, (5, 40)), world))
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
@@ -164,11 +176,9 @@ class Ship(desper.AbstractComponent):
         if self.check_collisions(world):
             print('colliding')
 
-        # Shoot
-        self._timer += 1
-        if self._timer > self.bullet_delay:
-            self.shoot(model, world)
-            self._timer = 0
+        # Trigger blasters
+        for blaster in self.blasters:
+            blaster.shoot(self.position.x, self.position.y)
 
     def check_collisions(self, world):
         """Check for collisions with other bounding boxes."""
@@ -177,14 +187,46 @@ class Ship(desper.AbstractComponent):
         #         return True
         pass
 
-    def shoot(self, model, world):
-        """Create a new bullet."""
-        world.create_entity(model.res['text']['ship_bullet'].get(),
-                            dsdl.Position(self.position.x, self.position.y,
-                                          dsdl.Offset.BOTTOM_CENTER),
-                            dsdl.Velocity(0, -self.bullet_speed),
-                            ShipBullet(), dsdl.BoundingBox((5, 40), 10, 10)
-                            )
+
+class Blaster:
+    """Class that represents a bullet blaster."""
+
+    def __init__(self, offset, bullet_type, bullet_text, bullet_delay,
+                 bullet_velocity, bullet_bbox, world):
+        self.bullet_type = bullet_type
+        self.bullet_text = bullet_text
+        self.bullet_delay = bullet_delay
+        self.bullet_velocity = bullet_velocity
+        self.bullet_bbox = bullet_bbox
+        self.offset = offset
+        self.world = world
+
+        self._timer = bullet_delay
+
+    def shoot(self, x, y):
+        """Shoot a bullet of bullet_type, offsetted given x and y.
+
+        Attach to the bullet the given velocity component and buonding
+        box.
+        """
+        self._timer -= 1
+        if self._timer > 0:
+            return
+
+        # Restart timer and shoot
+        self._timer = self.bullet_delay
+
+        self.world.create_entity(dsdl.Position(
+                                    self.offset[0] + x, self.offset[1] + y,
+                                    offset=dsdl.Offset.BOTTOM_CENTER),
+                                 self.bullet_text,
+                                 dsdl.Velocity(*self.bullet_velocity),
+                                 dsdl.BoundingBox(
+                                    w=self.bullet_bbox[0],
+                                    h=self.bullet_bbox[1],
+                                    offset=self.bullet_bbox[2]),
+                                 self.bullet_type()
+                                 )
 
 
 class ShipBullet(desper.OnAttachListener):
