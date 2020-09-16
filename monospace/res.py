@@ -21,6 +21,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(desper.AbstractProcessor())
         w.add_processor(dsdl.VelocityProcessor())
         w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(dsdl.CollisionCircleProcessor())
         w.add_processor(monospace.EntityCleanerProcessor())
         w.add_processor(dsdl.ParticleProcessor())
 
@@ -42,5 +43,8 @@ class GameWorldHandle(desper.Handle):
                         monospace.RollEnemy(), dsdl.Velocity(0, 2),
                         dsdl.BoundingBox(w=50, h=50,
                                          offset=dsdl.Offset.CENTER))
+
+        w.create_entity(dsdl.CollisionCircle(100),
+                                 dsdl.Position(300, 300))
 
         return w

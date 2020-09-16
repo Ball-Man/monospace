@@ -1,7 +1,9 @@
 import ctypes
 import math
 from enum import Enum
+import dsdl
 import esper
+from sdl2.sdlgfx import *
 from sdl2 import *
 
 
@@ -73,7 +75,8 @@ class BoundingBoxProcessor(esper.Processor):
     """Processor that updates BoundingBox x and y, based on Position."""
 
     def process(self, *args):
-        for _, (pos, bbox) in self.world.get_components(Position, BoundingBox):
+        for _, (pos, bbox) in self.world.get_components(dsdl.Position,
+                                                        dsdl.BoundingBox):
 
             # Calculate offset
             offset_x = 0
@@ -90,6 +93,17 @@ class BoundingBoxProcessor(esper.Processor):
             # Update position of bbox
             bbox.x = pos.x - offset_x
             bbox.y = pos.y - offset_y
+
+
+class CollisionCircleProcessor(esper.Processor):
+    """Processor that updates CollisionCircle x and y, based on Position."""
+
+    def process(self, *args):
+        for _, (pos, circle) in self.world.get_components(
+                dsdl.Position, dsdl.CollisionCircle):
+            # Update position of bbox
+            circle.x = pos.x
+            circle.y = pos.y
 
 
 class ParticleProcessor(esper.Processor):
@@ -145,12 +159,17 @@ class BoundingBoxRendererProcessor(esper.Processor):
     """Show bounding boxes on screen."""
 
     def process(self, model):
-        for _, bbox in self.world.get_component(BoundingBox):
+        for _, bbox in self.world.get_component(dsdl.BoundingBox):
             SDL_SetRenderDrawColor(model.renderer, 255, 0, 0, 255)
             if bbox.x is not None and bbox.y is not None:
                 rect = SDL_Rect(round(bbox.x), round(bbox.y), round(bbox.w),
                                 round(bbox.h))
                 SDL_RenderDrawRect(model.renderer, rect)
+
+        for _, circle in self.world.get_component(dsdl.CollisionCircle):
+            if circle.x is not None and circle.y is not None:
+                aacircleRGBA(model.renderer, int(circle.x), int(circle.y), int(circle.rad),
+                             255, 0, 0, 255)
 
 
 class Offset(Enum):
@@ -215,36 +234,6 @@ class Velocity:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
-
-
-class BoundingBox:
-    """Rectangle representing a collision bounding box."""
-
-    def __init__(self, offset=Offset.ORIGIN, w=0, h=0):
-        self.x = None
-        self.y = None
-        self.w = w
-        self.h = h
-
-        if isinstance(offset, (list, tuple)) and len(offset) != 2:
-            raise TypeError('Please provide two values for an offset(x, y)')
-        elif not isinstance(offset, (list, tuple)) and not isinstance(offset,
-                                                                      Offset):
-            raise TypeError('The given offset should be of type dsdl.Offset, \
-                             or of type list/tuple providing two values(x, y)')
-
-        self.offset = offset
-
-    def overlaps(self, bbox):
-        """Check for the collision between this box and a given one."""
-        if (self.x is None or self.y is None or bbox.x is None
-                or bbox.y is None):
-            return False
-
-        if (bbox.x >= self.x + self.w or self.x >= bbox.x + bbox.w
-                or bbox.y >= self.y + self.h or self.y >= bbox.y + bbox.h):
-            return False
-        return True
 
 
 class Animation:

@@ -3,3 +3,4 @@
 from .res import *
 from .model import *
 from .ecs import *
+from .collisions import *
