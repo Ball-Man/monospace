@@ -39,6 +39,15 @@ class CollisionCircle:
         self.y = None
         self.rad = rad
 
+    def overlaps(self, circle):
+        """Check for the collision between this circle and another."""
+        if (self.x is None or self.y is None or circle.x is None
+                or circle.y is None):
+            return False
+
+        return ((self.x - circle.x) ** 2 + (self.y - circle.y) ** 2
+                <= (self.rad + circle.rad) ** 2)
+
 
 def bbox_to_bbox_collision(dic):
     """Check for collisions between to bbox(return a boolean).
@@ -60,7 +69,7 @@ def bbox_to_bbox_collision(dic):
 def bbox_to_circle_collision(dic):
     """Check for collisions between bbox and circle(return a boolean).
 
-    Accepts a dictionary in the form {class: (instance, )}
+    Accepts a dictionary in the form {class: (instance, )}.
     """
     bbox = dic[BoundingBox][0]
     circle = dic[CollisionCircle][0]
@@ -89,10 +98,26 @@ def bbox_to_circle_collision(dic):
     return dist2 <= circle.rad ** 2
 
 
+def circle_to_circle_collision(dic):
+    """Check for collisions between circle and circle(return a boolean).
+
+    Accepts a dictionary in the form {class: (instance, )}
+    """
+    circle1, circle2 = dic[CollisionCircle]
+
+    if (circle1.x is None or circle1.y is None or circle2.x is None
+            or circle2.y is None):
+        return False
+
+    return ((circle1.x - circle2.x) ** 2 + (circle1.y - circle2.y) ** 2
+                <= (circle1.rad + circle2.rad) ** 2)
+
+
 # Dictionary used to lookup collision functions
 collision_functions = {
     frozenset({BoundingBox}): bbox_to_bbox_collision,
-    frozenset({BoundingBox, CollisionCircle}): bbox_to_circle_collision
+    frozenset({BoundingBox, CollisionCircle}): bbox_to_circle_collision,
+    frozenset({CollisionCircle}): circle_to_circle_collision
 }
 
 

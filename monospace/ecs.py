@@ -138,6 +138,10 @@ class Ship(desper.Controller):
     def on_attach(self, en, world):
         super().on_attach(en, world)
 
+        # Test cicle to circle collisions
+        self.circle = dsdl.CollisionCircle(50)
+        world.add_component(en, self.circle)
+
         self.blasters.append(Blaster(
                                 (0, 0), ShipBullet,
                                 monospace.model.res['text']['ship_bullet'].get(),
@@ -173,8 +177,11 @@ class Ship(desper.Controller):
                               0)
 
         # Test new collision system
-        for _, circle in self.world.get_component(dsdl.CollisionCircle):
-            if dsdl.check_collisions(self.bbox, circle):
+        # for e, circle in self.world.get_component(dsdl.CollisionCircle):
+        #     if e != en and dsdl.check_collisions(self.bbox, circle):
+        #         self.processor(GameProcessor).score_up(1)
+        for e, circle in self.world.get_component(dsdl.CollisionCircle):
+            if e != en and dsdl.check_collisions(self.circle, circle):
                 self.processor(GameProcessor).score_up(1)
 
         # Trigger blasters
