@@ -44,7 +44,4 @@ class GameWorldHandle(desper.Handle):
                         dsdl.BoundingBox(w=50, h=50,
                                          offset=dsdl.Offset.CENTER))
 
-        w.create_entity(dsdl.CollisionCircle(100),
-                        dsdl.Position(300, 300))
-
         return w

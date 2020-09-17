@@ -24,8 +24,8 @@ class GameProcessor(esper.Processor):
         self._cached_entity = None
         self.model = None
 
-        self._timer = 0
-        self._delay = 120
+        self.waves = [monospace.DotsWave(), monospace.DotsWave(),
+                      monospace.DotsWave(), monospace.DotsWave()]
 
     def process(self, model):
         if self.model is None:
@@ -34,11 +34,7 @@ class GameProcessor(esper.Processor):
         if self._cached_entity is None:
             self.score_up(0)
 
-        # Spawn test enemies
-        self._timer += 1
-        if self._timer > self._delay:
-            self.spawn_dots(random.randint(1, 3), 1)
-            self._timer = 0
+        self.waves[self._cur_threshold].spawn(self.world)
 
     def score_up(self, value):
         """Add some value to the current score.
@@ -76,32 +72,6 @@ class GameProcessor(esper.Processor):
         # Cleanup
         SDL_FreeSurface(text_surface)
 
-    def spawn_dot(self, x, y=-50):
-        enemy_bbox = dsdl.BoundingBox(w=50, h=50)
-        self.world.create_entity(
-            dsdl.Position(x, y),
-            enemy_bbox, dsdl.Velocity(0, 5),
-            self.model.res['text']['enemies']['dot'].get(),
-            dsdl.Animation(2, 60), DotEnemy())
-
-    def spawn_dots(self, columns, rows):
-        """Spawn dot enemies in their infamous formation.
-
-        At random location horizontally.
-        """
-        base_x = (min(random.randrange(0, monospace.LOGICAL_WIDTH // 50),
-                      monospace.LOGICAL_WIDTH // 50 - columns) * 50)
-
-        y = -50
-        var_y = -50
-        var_x = 50
-        for i in range(rows):
-            x = base_x
-            for j in range(columns):
-                self.spawn_dot(x, y)
-                x += var_x
-            y -= var_y
-
 
 class EntityCleanerProcessor(esper.Processor):
     """Clean bullets and enemies from memory."""
@@ -138,10 +108,6 @@ class Ship(desper.Controller):
     def on_attach(self, en, world):
         super().on_attach(en, world)
 
-        # Test cicle to circle collisions
-        self.circle = dsdl.CollisionCircle(50)
-        world.add_component(en, self.circle)
-
         self.blasters.append(Blaster(
                                 (0, 0), ShipBullet,
                                 monospace.model.res['text']['ship_bullet'].get(),
@@ -175,14 +141,6 @@ class Ship(desper.Controller):
         self.position.x = max(min(self.position.x, monospace.LOGICAL_WIDTH), 0)
         self.position.y = max(min(self.position.y, monospace.LOGICAL_HEIGHT),
                               0)
-
-        # Test new collision system
-        # for e, circle in self.world.get_component(dsdl.CollisionCircle):
-        #     if e != en and dsdl.check_collisions(self.bbox, circle):
-        #         self.processor(GameProcessor).score_up(1)
-        for e, circle in self.world.get_component(dsdl.CollisionCircle):
-            if e != en and dsdl.check_collisions(self.circle, circle):
-                self.processor(GameProcessor).score_up(1)
 
         # Trigger blasters
         for blaster in self.blasters:

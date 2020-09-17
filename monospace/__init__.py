@@ -4,6 +4,7 @@ from .res import *
 from .ecs import *
 from .locale import *
 from .globals import *
+from .waves import *
 
 import sdl2 as _sdl
 
