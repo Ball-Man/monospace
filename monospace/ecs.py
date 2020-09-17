@@ -172,9 +172,10 @@ class Ship(desper.Controller):
         self.position.y = max(min(self.position.y, monospace.LOGICAL_HEIGHT),
                               0)
 
-        # Check collisions
-        if self.check_collisions(world):
-            print('colliding')
+        # Test new collision system
+        for _, circle in self.world.get_component(dsdl.CollisionCircle):
+            if dsdl.check_collisions(self.bbox, circle):
+                self.processor(GameProcessor).score_up(1)
 
         # Trigger blasters
         for blaster in self.blasters:

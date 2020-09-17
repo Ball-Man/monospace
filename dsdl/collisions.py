@@ -40,8 +40,13 @@ class CollisionCircle:
         self.rad = rad
 
 
-def bbox_to_bbox_collision(bbox1, bbox2):
-    """Check for collisions between to bbox(return a boolean)."""
+def bbox_to_bbox_collision(dic):
+    """Check for collisions between to bbox(return a boolean).
+
+    Accepts a dictionary in the form {class: (instance, )}.
+    """
+    bbox1, bbox2 = dic[BoundingBox]
+
     if (bbox1.x is None or bbox1.y is None or bbox2.x is None
             or bbox2.y is None):
         return False
@@ -52,8 +57,14 @@ def bbox_to_bbox_collision(bbox1, bbox2):
     return True
 
 
-def bbox_to_circle_collision(bbox, circle):
-    """Check for collisions between bbox and circle(return a boolean)."""
+def bbox_to_circle_collision(dic):
+    """Check for collisions between bbox and circle(return a boolean).
+
+    Accepts a dictionary in the form {class: (instance, )}
+    """
+    bbox = dic[BoundingBox][0]
+    circle = dic[CollisionCircle][0]
+
     if (bbox.x is None or bbox.y is None or circle.x is None
             or circle.y is None):
         return False
@@ -63,8 +74,15 @@ def bbox_to_circle_collision(bbox, circle):
     bbox_x2 = bbox.x + bbox.w
     bbox_y2 = bbox.y + bbox.h
 
-    test_x = (circle.x < bbox.x) * bbox.x + (circle.x > bbox_x2) * bbox_x2
-    test_y = (circle.y < bbox.y) * bbox.y + (circle.y > bbox_y2) * bbox_y2
+    if circle.x < bbox.x:
+        test_x = bbox.x
+    elif circle.x > bbox_x2:
+        test_x = bbox_x2
+
+    if circle.y < bbox.y:
+        test_y = bbox.y
+    elif circle.y > bbox_y2:
+        test_y = bbox_y2
 
     dist2 = (circle.x - test_x) ** 2 + (circle.y - test_y) ** 2
 
@@ -72,12 +90,21 @@ def bbox_to_circle_collision(bbox, circle):
 
 
 # Dictionary used to lookup collision functions
-# collision_functions = {
-#     frozenset({BoundingBox, BoundingBox}): bbox_to_bbox_collision,
-#     frozenset({BoundingBox, CollisionCircle}): bbox_to_circle_collision
-# }
+collision_functions = {
+    frozenset({BoundingBox}): bbox_to_bbox_collision,
+    frozenset({BoundingBox, CollisionCircle}): bbox_to_circle_collision
+}
 
 
-# def check_collisions(collider1, collider2):
-#     """Check collisions on the given colliders, based on their types."""
-#     pass
+def check_collisions(collider1, collider2):
+    """Check collisions on the given colliders, based on their types."""
+    dic = {}
+    type1, type2 = type(collider1), type(collider2)
+
+    if type1 is type2:
+        dic[type1] = collider1, collider2
+    else:
+        dic[type1] = (collider1, )
+        dic[type2] = (collider2, )
+
+    return collision_functions[frozenset((type1, type2))](dic)

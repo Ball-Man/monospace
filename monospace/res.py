@@ -45,6 +45,6 @@ class GameWorldHandle(desper.Handle):
                                          offset=dsdl.Offset.CENTER))
 
         w.create_entity(dsdl.CollisionCircle(100),
-                                 dsdl.Position(300, 300))
+                        dsdl.Position(300, 300))
 
         return w

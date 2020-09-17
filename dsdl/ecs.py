@@ -168,7 +168,8 @@ class BoundingBoxRendererProcessor(esper.Processor):
 
         for _, circle in self.world.get_component(dsdl.CollisionCircle):
             if circle.x is not None and circle.y is not None:
-                aacircleRGBA(model.renderer, int(circle.x), int(circle.y), int(circle.rad),
+                aacircleRGBA(model.renderer, int(circle.x), int(circle.y),
+                             int(circle.rad),
                              255, 0, 0, 255)
 
 
