@@ -24,7 +24,7 @@ class GameProcessor(esper.Processor):
         self._cached_entity = None
         self.model = None
 
-        self.waves = [monospace.DotsWave(), monospace.DotsWave(),
+        self.waves = [monospace.DotsWave(), monospace.SecondWave(),
                       monospace.DotsWave(), monospace.DotsWave()]
 
     def process(self, model):
@@ -108,12 +108,12 @@ class Ship(desper.Controller):
     def on_attach(self, en, world):
         super().on_attach(en, world)
 
-        self.blasters.append(Blaster(
-                                (0, 0), ShipBullet,
-                                monospace.model.res['text']['ship_bullet'].get(),
-                                DEFAULT_BULLET_DELAY,
-                                (0, -DEFAULT_BULLET_SPEED),
-                                (10, 10, (5, 40)), world))
+        self.blasters.append(
+            Blaster((0, 0), ShipBullet,
+                    monospace.model.res['text']['ship_bullet'].get(),
+                    DEFAULT_BULLET_DELAY,
+                    (0, -DEFAULT_BULLET_SPEED),
+                    (10, 10, (5, 40)), world))
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
@@ -284,7 +284,7 @@ class DotEnemy(Enemy):
 class RollEnemy(Enemy):
     """Roll enemy controller."""
     hor_speed = 6
-    total_life = 10000
+    total_life = 1
 
     def __init__(self):
         super().__init__()
@@ -335,3 +335,22 @@ class RollEnemy(Enemy):
         position.rot += self.rotation_speed
 
         self._old_velocity = velocity.x
+
+    def spawn_particles(self):
+        """Spawn death particles for the death."""
+        texture = self.get(ctypes.POINTER(SDL_Texture))
+        position = self.get(dsdl.Position)
+        offset = position.get_offset(texture.w, texture.h)
+        for _ in range(random.randrange(4, 8)):
+            angle = math.radians(random.randrange(0, 360))
+            mag = random.randrange(2, 4)
+
+            self.world.create_entity(
+                dsdl.Particle(30, -0.1 / 64, -0.002),
+                dsdl.Position(position.x - offset[0] + texture.w // 2,
+                              position.y - offset[1] + texture.h // 2,
+                              size_x=6 / 64, size_y=10 / 64,
+                              offset=dsdl.Offset.CENTER),
+                self.res['text']['part']['circle'].get(),
+                dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
+            )

@@ -20,14 +20,24 @@ class Wave:
 
         self.enemy_chances = [1]
 
+        self.enemy_threshold_range = 200, 300
+        self._enemy_timer = 0
+        self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+
     def spawn(self, world):
         """Main method that spawns enemies from this wave.
 
         If the extracted spawn function is None, spawn nothing.
         """
-        spawn_fun = random.choices(self.enemies, self.enemy_chances)[0]
-        if spawn_fun is not None:
-            spawn_fun(world)
+        self._enemy_timer += 1
+        if self._enemy_timer > self._enemy_threshold:
+            spawn_fun = random.choices(self.enemies, self.enemy_chances)[0]
+            if spawn_fun is not None:
+                spawn_fun(world)
+
+            # Reset timer
+            self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+            self._enemy_timer = 0
 
 
 class DotsWave(Wave):
@@ -48,10 +58,9 @@ class DotsWave(Wave):
 
     def spawn_dot(self, world, x, y=-50):
         """Spawn a dot enemy at given position."""
-        enemy_bbox = dsdl.BoundingBox(w=50, h=50)
         world.create_entity(
             dsdl.Position(x, y),
-            enemy_bbox, dsdl.Velocity(0, 5),
+            dsdl.BoundingBox(w=50, h=50), dsdl.Velocity(0, 5),
             monospace.model.res['text']['enemies']['dot'].get(),
             dsdl.Animation(2, 60), monospace.DotEnemy())
 
@@ -84,3 +93,35 @@ class DotsWave(Wave):
 
             self._dots_threshold = random.randint(*self.dots_threshold_range)
             self._dots_timer = 0
+
+
+class SecondWave(DotsWave):
+    """Custom wave for the second one of the game."""
+
+    def __init__(self):
+        super().__init__()
+
+        self.enemy_threshold_range = 200, 350
+        self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+        self.dots_threshold_range = 100, 170
+
+        self.enemies = [
+            lambda world: self.spawn_roll(world)]
+        self.enemy_chances = [1]
+
+    def spawn_dot(self, world, x, y=-50):
+        """Spawn a dot enemy at given position."""
+        world.create_entity(
+            dsdl.Position(x, y),
+            dsdl.BoundingBox(w=50, h=50), dsdl.Velocity(0, 7),
+            monospace.model.res['text']['enemies']['dot'].get(),
+            dsdl.Animation(2, 60), monospace.DotEnemy())
+
+    def spawn_roll(self, world):
+        text = monospace.model.res['text']['enemies']['roll'].get()
+        pos_x = random.randint(50, monospace.LOGICAL_WIDTH - text.w)
+        world.create_entity(
+            dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
+            dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
+            dsdl.Velocity(0, 3),
+            text, monospace.RollEnemy())

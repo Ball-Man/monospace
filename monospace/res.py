@@ -26,7 +26,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(dsdl.ParticleProcessor())
 
         #w.add_processor(dsdl.FPSLoggerProcessor())
-        w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
+        #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
         # Create entities
         # Ship
@@ -36,12 +36,5 @@ class GameWorldHandle(desper.Handle):
         ship_bbox = dsdl.BoundingBox(dsdl.Offset.CENTER, 64, 64)
         w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
                         ship_bbox, self.res['text']['ship'].get())
-
-        # Test roll enemy
-        w.create_entity(dsdl.Position(100, -50, offset=dsdl.Offset.CENTER),
-                        self.res['text']['enemies']['roll'].get(),
-                        monospace.RollEnemy(), dsdl.Velocity(0, 2),
-                        dsdl.BoundingBox(w=50, h=50,
-                                         offset=dsdl.Offset.CENTER))
 
         return w
