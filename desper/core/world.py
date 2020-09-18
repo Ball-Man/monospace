@@ -60,8 +60,11 @@ class Controller(AbstractComponent, OnAttachListener):
     `super` is required.
     For the :py:meth:`update` method no call to super is required.
 
-    Note that this class will only work if all the used components and
+    Note: This class will only work if all the used components and
     processors support weakrefs(e.g. builtin types don't).
+
+    Note: This class can't be used with pure ecs ``esper.World`` and
+    should instead be used with :class:`AbstractWorld` .
     """
 
     def __init__(self):
@@ -81,15 +84,13 @@ class Controller(AbstractComponent, OnAttachListener):
         of the given type, from the same entity containing this
         Controller component.
 
-        All subtypes of the given type will be searched(assuming we are
-        working in a :class:`AbstractWorld`. If using a normal ``esper.World``
-        only the exact type will be searched) but once a component is
-        found, querying the same type will always lead to the same
-        component(as long as the component is kept alive inside the
-        game). This means that if you want prioritize some types(e.g.
-        the base type over the subclasses) you should manually call the
-        :class:`AbstractWorld` methods using :py:attr:`world` and
-        :py:attr:`entity`.
+        All subtypes of the given type will be searched, but once a
+        component is found querying the same type will always lead to
+        the same component(as long as the component is kept alive inside
+        the game). This means that if you want prioritize some types
+        (e.g. the base type over the subclasses) you should manually
+        call the :class:`AbstractWorld` methods using :py:attr:`world`
+        and :py:attr:`entity`.
 
         :param component_type: The given component type to find inside
                                the entity.
@@ -350,7 +351,7 @@ class AbstractWorld(esper.World):
 
         raise KeyError
 
-    def add_component(self, entity, component_instance):
+    def add_component(self, entity, component_instance, on_attach=True):
         """Add a new Component instance to an Entity.
 
         Add a Component instance to an Entiy. If a Component of the same
@@ -365,6 +366,8 @@ class AbstractWorld(esper.World):
 
         :param entity: The Entity to associate the Component with.
         :param component_instance: A Component instance.
+        :param on_attach: Whether the on_attach event should be
+                          triggered.
         """
         component_type = type(component_instance)
 
@@ -379,5 +382,31 @@ class AbstractWorld(esper.World):
         self._entities[entity][component_type] = component_instance
         self.clear_cache()
 
-        if isinstance(component_instance, OnAttachListener):
+        if on_attach and isinstance(component_instance, OnAttachListener):
             component_instance.on_attach(entity, self)
+
+    def create_entity(self, *components, on_attach=True):
+        """Create a new Entity.
+        This method returns an Entity ID, which is just a plain integer.
+        You can optionally pass one or more Component instances to be
+        assigned to the Entity.
+        :param components: Optional components to be assigned to the
+               entity on creation.
+        :param on_attach: Whether the on_attach event should be
+                          triggered.
+        :return: The next Entity ID in sequence.
+        """
+        self._next_entity_id += 1
+
+        # TODO: duplicate add_component code here for performance
+        for component in components:
+            self.add_component(self._next_entity_id, component, False)
+
+        # Trigger on_attach event
+        if on_attach:
+            for component in components:
+                if isinstance(component, OnAttachListener):
+                    component.on_attach(self._next_entity_id, self)
+
+        # self.clear_cache()
+        return self._next_entity_id
