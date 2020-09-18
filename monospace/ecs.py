@@ -105,8 +105,12 @@ class Ship(desper.Controller):
 
         self.blasters = []
 
+        self.texture = None
+
     def on_attach(self, en, world):
         super().on_attach(en, world)
+
+        self.texture = self.get(ctypes.POINTER(SDL_Texture))
 
         self.blasters.append(
             Blaster((0, 0), ShipBullet,
@@ -223,6 +227,7 @@ class Enemy(desper.Controller):
     def __init__(self):
         super().__init__()
         self.cur_life = self.total_life
+        self.dead = False
         self.res = None
 
     def update(self, entity, world, model):
@@ -231,7 +236,7 @@ class Enemy(desper.Controller):
             self.res = model.res
 
         for en, bullet in world.get_component(ShipBullet):
-            if bullet.hit:
+            if bullet.hit or self.dead:
                 continue
 
             bbox = world.component_for_entity(en, dsdl.BoundingBox)
@@ -249,6 +254,7 @@ class Enemy(desper.Controller):
         Override to change the behaviour of the enemy.
         """
         self.world.delete_entity(self.entity)
+        self.dead = True
 
         game = self.world.get_processor(GameProcessor)
         game.score_up(self.reward)
@@ -354,3 +360,10 @@ class RollEnemy(Enemy):
                 self.res['text']['part']['circle'].get(),
                 dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
             )
+
+
+class PowerupBox:
+    """Proxy component for a power function."""
+
+    def __init__(self, powerup_applier):
+        self.powerup_applier = powerup_applier

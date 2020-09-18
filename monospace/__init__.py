@@ -5,6 +5,7 @@ from .ecs import *
 from .locale import *
 from .globals import *
 from .waves import *
+from .powerups import *
 
 import sdl2 as _sdl
 
