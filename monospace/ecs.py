@@ -1,4 +1,5 @@
 import ctypes
+import enum
 import random
 import math
 import desper
@@ -15,7 +16,7 @@ DEFAULT_BULLET_DELAY = 20
 
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
-    WAVE_THRESHOLDS = [50, 150, 300, 400]
+    WAVE_THRESHOLDS = [10, 150, 300, 400]
     score = 0
 
     def __init__(self):
@@ -24,7 +25,10 @@ class GameProcessor(esper.Processor):
         self._cached_entity = None
         self.model = None
 
-        self.waves = [monospace.DotsWave(), monospace.SecondWave(),
+        self._state = GameState.WAVE
+        self._powerup_coroutine = None
+
+        self.waves = [monospace.FirstWave(), monospace.SecondWave(),
                       monospace.DotsWave(), monospace.DotsWave()]
 
     def process(self, model):
@@ -34,7 +38,25 @@ class GameProcessor(esper.Processor):
         if self._cached_entity is None:
             self.score_up(0)
 
-        self.waves[self._cur_threshold].spawn(self.world)
+        # State machine
+        if self._state == GameState.WAVE:
+            self.waves[self._cur_threshold].spawn(self.world)
+        elif self._state == GameState.REWARD:
+            if self._powerup_coroutine is None:
+                # Clear all the enemies
+                for _, enemy in self.world.get_component(Enemy):
+                    enemy.die()
+
+                # Spawn rewards
+                self._powerup_coroutine = (
+                    self.world.get_processor(desper.CoroutineProcessor)
+                        .start(self.spawn_rewards())
+                    )
+
+    def spawn_rewards(self):
+        yield 120
+        self.waves[self._cur_threshold].spawn_rewards(self.world)
+        self._cur_threshold += 1
 
     def score_up(self, value):
         """Add some value to the current score.
@@ -53,12 +75,13 @@ class GameProcessor(esper.Processor):
 
             self.world.delete_entity(self._cached_entity)
 
-        # Change wave if necessary
+        # Change internal state if necessary
         if self.score >= self.WAVE_THRESHOLDS[self._cur_threshold]:
-            self._cur_threshold += 1
+            self._state = GameState.REWARD
 
         # Create new texture
-        shown_score = self.WAVE_THRESHOLDS[self._cur_threshold] - self.score
+        shown_score = max(
+            self.WAVE_THRESHOLDS[self._cur_threshold] - self.score, 0)
         text_surface = TTF_RenderText_Blended(
             self.model.res['fonts']['timenspace'].get(),
             str(shown_score).encode(), SDL_Color())
@@ -71,6 +94,12 @@ class GameProcessor(esper.Processor):
 
         # Cleanup
         SDL_FreeSurface(text_surface)
+
+
+class GameState(enum.Enum):
+    """Enumeration for the GameProcessor internal state machine."""
+    WAVE = 0
+    REWARD = 1
 
 
 class EntityCleanerProcessor(esper.Processor):

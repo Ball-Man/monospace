@@ -24,6 +24,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(dsdl.CollisionCircleProcessor())
         w.add_processor(monospace.EntityCleanerProcessor())
         w.add_processor(dsdl.ParticleProcessor())
+        w.add_processor(desper.CoroutineProcessor())
 
         #w.add_processor(dsdl.FPSLoggerProcessor())
         #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
@@ -38,8 +39,8 @@ class GameWorldHandle(desper.Handle):
                         ship_bbox, self.res['text']['ship'].get())
 
         # Test powerup
-        w.create_entity(monospace.PowerupBox(monospace.powerup_add_blaster),
-                        dsdl.Position(300, 300), dsdl.BoundingBox(w=50, h=50),
-                        self.res['text']['powerups']['blank'].get())
+        # w.create_entity(monospace.PowerupBox(monospace.powerup_add_blaster),
+        #                 dsdl.Position(300, 300), dsdl.BoundingBox(w=50, h=50),
+        #                 self.res['text']['powerups']['blank'].get())
 
         return w

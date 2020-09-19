@@ -1,4 +1,5 @@
 import random
+import itertools
 import monospace
 import dsdl
 
@@ -9,6 +10,9 @@ class Wave:
     It defines which enemies and with what probability can be spawned
     during a specific wave(and which rewards can be assigned).
 
+    It also defines which rewards are spawned at the end of the wave
+    (a pool, and a quantity of extracted elements from that pool).
+
     It's a base class and should be implemented to define the lists
     containing the possible spawn function and probabilities.
     """
@@ -17,8 +21,12 @@ class Wave:
         self.enemies = [None]
         # Functions that accept a single paramenter of type World, and
         # spawn a designed enemy when invoked.
-
         self.enemy_chances = [1]
+
+        self.rewards = []
+        # Powerup functions to be incapsulated into PowerupBox.
+        self.reward_chances = []
+        self.num_rewards = 0
 
         self.enemy_threshold_range = 200, 300
         self._enemy_timer = 0
@@ -38,6 +46,21 @@ class Wave:
             # Reset timer
             self._enemy_threshold = random.randint(*self.enemy_threshold_range)
             self._enemy_timer = 0
+
+    def spawn_rewards(self, world):
+        """Method that spawns rewards for the cleared wave(powerups)."""
+        if self.num_rewards > 0:
+            rewards = random.choice(tuple(itertools.combinations(self.rewards,
+                                                           self.num_rewards)))
+            for i, reward in enumerate(rewards):
+                x = monospace.LOGICAL_WIDTH // (self.num_rewards + 1) * (i + 1)
+                y = monospace.LOGICAL_HEIGHT // 2
+
+                world.create_entity(
+                    monospace.PowerupBox(reward),
+                    dsdl.Position(x, y, dsdl.Offset.CENTER),
+                    dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
+                    monospace.model.res['text']['powerups']['blank'].get())
 
 
 class DotsWave(Wave):
@@ -93,6 +116,16 @@ class DotsWave(Wave):
 
             self._dots_threshold = random.randint(*self.dots_threshold_range)
             self._dots_timer = 0
+
+
+class FirstWave(DotsWave):
+    """Custom wave for the first one of the game."""
+
+    def __init__(self):
+        super().__init__()
+
+        self.rewards = [monospace.powerup_add_blaster]
+        self.num_rewards = 1
 
 
 class SecondWave(DotsWave):
