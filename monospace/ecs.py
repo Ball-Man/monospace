@@ -118,6 +118,8 @@ class Ship(desper.Controller):
                     DEFAULT_BULLET_DELAY,
                     (0, -DEFAULT_BULLET_SPEED),
                     (10, 10, (5, 40)), world))
+        monospace.powerup_add_blaster(self)
+        monospace.powerup_double_blasters(self)
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()

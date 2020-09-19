@@ -19,3 +19,17 @@ def powerup_double_blasters(ship: monospace.Ship):
         blaster.offset = -blaster.offset[0], blaster.offset[1]
 
     ship.blasters += new_blasters
+
+
+def powerup_add_blaster(ship: monospace.Ship):
+    """Add a blaster to the ship."""
+    tot_width = ship.texture.w
+    tot_blasters = len(ship.blasters) + 1
+
+    ship.blasters.append(copy.copy(ship.blasters[0]))
+
+    # Relocate blasters
+    for i, blaster in enumerate(ship.blasters):
+        blaster.offset = ((i + 1) * tot_width // (tot_blasters + 1)
+                          - tot_width // 2,
+                          blaster.offset[1])
