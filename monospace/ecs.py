@@ -118,8 +118,8 @@ class Ship(desper.Controller):
                     DEFAULT_BULLET_DELAY,
                     (0, -DEFAULT_BULLET_SPEED),
                     (10, 10, (5, 40)), world))
-        monospace.powerup_add_blaster(self)
-        monospace.powerup_double_blasters(self)
+        # monospace.powerup_add_blaster(self)
+        # monospace.powerup_double_blasters(self)
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
@@ -152,12 +152,24 @@ class Ship(desper.Controller):
         for blaster in self.blasters:
             blaster.shoot(self.position.x, self.position.y)
 
-    def check_collisions(self, world):
-        """Check for collisions with other bounding boxes."""
-        # for _, bbox in world.get_component(dsdl.BoundingBox):
-        #     if bbox is not self.bbox and self.bbox.overlaps(bbox):
-        #         return True
-        pass
+        # Check collisions with powerups
+        powerup = self.check_collisions(PowerupBox)
+        if powerup is not None:
+            powerup.apply(self)
+
+    def check_collisions(self, component_type):
+        """Check for collisions with a component_type(bbox).
+
+        Return None if no collision is detected, return an instance of
+        component_type instead(the one colliding).
+        """
+        for en, comp in self.world.get_component(component_type):
+            bbox = self.world.try_component(en, dsdl.BoundingBox)
+
+            if bbox.overlaps(self.bbox):
+                return comp
+
+        return None
 
 
 class Blaster:
@@ -364,8 +376,27 @@ class RollEnemy(Enemy):
             )
 
 
-class PowerupBox:
+class PowerupBox(desper.OnAttachListener):
     """Proxy component for a power function."""
 
     def __init__(self, powerup_applier):
         self.powerup_applier = powerup_applier
+        self.applied = False
+
+    def on_attach(self, en, world):
+        self.world = world
+        self.en = en
+
+    def apply(self, ship):
+        """Apply the incapsulated powerup to the given ship.
+
+        After being applied, destroy it
+        """
+        if self.applied:
+            return
+
+        self.applied = True
+        self.powerup_applier(ship)
+
+        # Particles?
+        self.world.delete_entity(self.en)
