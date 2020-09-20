@@ -27,6 +27,8 @@ class GameProcessor(esper.Processor):
 
         self._state = GameState.WAVE
         self._powerup_coroutine = None
+        self._rewards_spawned = False
+        self._next_wave_coroutine = None
 
         self.waves = [monospace.FirstWave(), monospace.SecondWave(),
                       monospace.DotsWave(), monospace.DotsWave()]
@@ -38,6 +40,8 @@ class GameProcessor(esper.Processor):
         if self._cached_entity is None:
             self.score_up(0)
 
+        coroutines = self.world.get_processor(desper.CoroutineProcessor)
+
         # State machine
         if self._state == GameState.WAVE:
             self.waves[self._cur_threshold].spawn(self.world)
@@ -48,15 +52,26 @@ class GameProcessor(esper.Processor):
                     enemy.die()
 
                 # Spawn rewards
-                self._powerup_coroutine = (
-                    self.world.get_processor(desper.CoroutineProcessor)
-                        .start(self.spawn_rewards())
-                    )
+                self._powerup_coroutine = coroutines.start(
+                    self.spawn_rewards())
+
+            # When there are no rewards left, go to the next wave
+            rewards = tuple(self.world.get_component(PowerupBox))
+            if (self._rewards_spawned and len(rewards) == 0
+                    and self._next_wave_coroutine is None):
+                self._next_wave_coroutine = coroutines.start(
+                    self.next_wave())
 
     def spawn_rewards(self):
         yield 120
         self.waves[self._cur_threshold].spawn_rewards(self.world)
+        self._rewards_spawned = True
+
+    def next_wave(self):
+        yield 120
         self._cur_threshold += 1
+        self._state = GameState.WAVE
+        self._rewards_spawned = False
 
     def score_up(self, value):
         """Add some value to the current score.
