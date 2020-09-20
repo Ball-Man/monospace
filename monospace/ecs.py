@@ -420,6 +420,41 @@ class RollEnemy(Enemy):
             )
 
 
+class RocketEnemy(Enemy):
+    total_life = 4
+    reward = 2
+
+    def particles_coroutine(self):
+        texture = self.get(ctypes.POINTER(SDL_Texture))
+        position = self.get(dsdl.Position)
+        offset = position.get_offset(texture.w, texture.h)
+
+        # Spawn particles three times in time
+        for _ in range(3):
+            for _ in range(random.randrange(6, 9)):
+                angle = math.radians(random.randrange(0, 360))
+                mag = random.randrange(2, 3)
+                size = random.randrange(3, 4)
+
+                self.world.create_entity(
+                    dsdl.Particle(60, -0.1 / 40, -0.002),
+                    dsdl.Position(position.x - offset[0] + texture.w // 2,
+                                  position.y - offset[1] + texture.h // 2,
+                                  size_x=1 / size, size_y=1 / size,
+                                  offset=dsdl.Offset.CENTER),
+                    self.res['text']['part']['circle'].get(),
+                    dsdl.Velocity(x=math.cos(angle) * mag,
+                                  y=math.sin(angle) * mag)
+                )
+
+            yield 15
+
+    def spawn_particles(self):
+        """Spawn death particles for the death."""
+        self.processor(desper.CoroutineProcessor).start(
+            self.particles_coroutine())
+
+
 class PowerupBox(desper.OnAttachListener):
     """Proxy component for a power function."""
 

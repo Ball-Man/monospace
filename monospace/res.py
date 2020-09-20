@@ -38,9 +38,10 @@ class GameWorldHandle(desper.Handle):
         w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
                         ship_bbox, self.res['text']['ship'].get())
 
-        # Test powerup
-        # w.create_entity(monospace.PowerupBox(monospace.powerup_add_blaster),
-        #                 dsdl.Position(300, 300), dsdl.BoundingBox(w=50, h=50),
-        #                 self.res['text']['powerups']['blank'].get())
+        w.create_entity(dsdl.Position(400, -100),
+                        dsdl.Velocity(0, 7),
+                        monospace.RocketEnemy(),
+                        self.res['text']['enemies']['rocket'].get(),
+                        dsdl.BoundingBox(w=60, h=80))
 
         return w
