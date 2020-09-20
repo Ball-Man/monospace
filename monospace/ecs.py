@@ -8,6 +8,7 @@ import dsdl
 import monospace
 from sdl2 import *
 from sdl2.sdlttf import *
+from sdl2.sdlgfx import *
 
 
 DEFAULT_BULLET_SPEED = 15
@@ -340,7 +341,7 @@ class DotEnemy(Enemy):
                               position.y - offset[1] + texture.h // 2,
                               size_x=6 / 64, size_y=10 / 64,
                               offset=dsdl.Offset.CENTER),
-                self.res['text']['part']['circle'].get(),
+                monospace.model.res['text']['part']['circle'].get(),
                 dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
             )
 
@@ -415,7 +416,7 @@ class RollEnemy(Enemy):
                               position.y - offset[1] + texture.h // 2,
                               size_x=6 / 64, size_y=10 / 64,
                               offset=dsdl.Offset.CENTER),
-                self.res['text']['part']['circle'].get(),
+                monospace.model.res['text']['part']['circle'].get(),
                 dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
             )
 
@@ -442,7 +443,7 @@ class RocketEnemy(Enemy):
                                   position.y - offset[1] + texture.h // 2,
                                   size_x=1 / size, size_y=1 / size,
                                   offset=dsdl.Offset.CENTER),
-                    self.res['text']['part']['circle'].get(),
+                    monospace.model.res['text']['part']['circle'].get(),
                     dsdl.Velocity(x=math.cos(angle) * mag,
                                   y=math.sin(angle) * mag)
                 )
@@ -483,3 +484,37 @@ class PowerupBox(desper.OnAttachListener):
         for en, powerup in self.world.get_component(PowerupBox):
             powerup.applied = True      # Prevent anomalies
             self.world.delete_entity(en)
+
+
+class PowerShield(desper.Controller):
+    """Component that shields a hit from an enemy.
+
+    All the bullets from enemies are shielded without the shield
+    being destroyed.
+    """
+
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+
+        self.ship_pos = world.get_components(Ship, dsdl.Position)[0][1][1]
+
+    def update(self, en, world, _):
+        # Check collision with enemies
+        pos = self.get(dsdl.Position)
+        circle = self.get(dsdl.CollisionCircle)
+
+        # Follow player
+        pos.x = self.ship_pos.x
+        pos.y = self.ship_pos.y
+
+        # Render circle
+        filledCircleRGBA(monospace.model.renderer, int(pos.x), int(pos.y),
+                         circle.rad, 255, 255, 255, 70)
+
+        # Check collision
+        for entity, enemy in world.get_component(Enemy):
+            bbox = world.try_component(entity, dsdl.BoundingBox)
+
+            if dsdl.check_collisions(circle, bbox):
+                enemy.die()
+                world.delete_entity(en)
