@@ -44,8 +44,4 @@ class GameWorldHandle(desper.Handle):
         #                 self.res['text']['enemies']['rocket'].get(),
         #                 dsdl.BoundingBox(w=60, h=80))
 
-        w.create_entity(dsdl.Position(ship_pos.x, ship_pos.y),
-                        dsdl.CollisionCircle(70),
-                        monospace.PowerShield())
-
         return w

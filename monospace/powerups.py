@@ -1,6 +1,9 @@
 """Powerup functions, used inside PowerupBox instances."""
 import copy
+import dsdl
+import desper
 import monospace
+from sdl2.sdlgfx import *
 
 
 def powerup_double_blasters(ship: monospace.Ship):
@@ -33,3 +36,28 @@ def powerup_add_blaster(ship: monospace.Ship):
         blaster.offset = ((i + 1) * tot_width // (tot_blasters + 1)
                           - tot_width // 2,
                           blaster.offset[1])
+
+
+def powerup_shield(ship: monospace.Ship):
+    """Add a shield."""
+    shield_rad = 70
+
+    def shield_coroutine():
+        # Fill the circle over time
+        for angle in range(0, 180, 3):
+            filledPieRGBA(monospace.model.renderer, int(ship.position.x),
+                          int(ship.position.y), shield_rad, 90 - angle,
+                          90 + angle,
+                          255, 255, 255, 70)
+            yield
+
+        ship.world.create_entity(dsdl.Position(ship.position.x,
+                                               ship.position.y),
+                                 dsdl.CollisionCircle(shield_rad),
+                                 monospace.PowerShield())
+
+        filledCircleRGBA(monospace.model.renderer, int(ship.position.x),
+                         int(ship.position.y), shield_rad,
+                         255, 255, 255, 70)
+
+    ship.processor(desper.CoroutineProcessor).start(shield_coroutine())

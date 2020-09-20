@@ -124,7 +124,7 @@ class FirstWave(DotsWave):
     def __init__(self):
         super().__init__()
 
-        self.rewards = [monospace.powerup_add_blaster]
+        self.rewards = [monospace.powerup_shield]
         self.num_rewards = 1
 
 
