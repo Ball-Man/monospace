@@ -443,4 +443,8 @@ class PowerupBox(desper.OnAttachListener):
         self.powerup_applier(ship)
 
         # Particles?
-        self.world.delete_entity(self.en)
+
+        # Delete all powerup boxes on screen
+        for en, powerup in self.world.get_component(PowerupBox):
+            powerup.applied = True      # Prevent anomalies
+            self.world.delete_entity(en)
