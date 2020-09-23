@@ -12,7 +12,7 @@ from sdl2.sdlttf import *
 
 DEFAULT_BULLET_SPEED = 15
 DEFAULT_BULLET_DELAY = 20
-
+MIN_BULLET_DELAY = 7
 
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
@@ -163,7 +163,8 @@ class Ship(desper.Controller):
                     (0, -DEFAULT_BULLET_SPEED),
                     (10, 10, (5, 40)), world))
 
-        monospace.powerup_drift(self)
+        monospace.powerup_add_blaster(self)
+        monospace.powerup_delay1(self)
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()

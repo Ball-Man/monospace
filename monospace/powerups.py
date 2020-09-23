@@ -66,3 +66,11 @@ def powerup_drift(ship: monospace.Ship):
 
     for blaster in ship.blasters:
         blaster.bullet_type = monospace.DriftingShipBullet
+
+
+def powerup_delay1(ship: monospace.Ship):
+    """Powerup that speeds up the fire rate but only for one blaster."""
+
+    if len(ship.blasters) > 0:
+        ship.blasters[0].bullet_delay = max(
+            monospace.MIN_BULLET_DELAY, ship.blasters[0].bullet_delay // 3 * 2)
