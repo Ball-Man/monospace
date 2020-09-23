@@ -14,9 +14,10 @@ DEFAULT_BULLET_SPEED = 15
 DEFAULT_BULLET_DELAY = 20
 MIN_BULLET_DELAY = 7
 
+
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
-    WAVE_THRESHOLDS = [10, 150, 300, 400]
+    WAVE_THRESHOLDS = [50, 150, 300, 600, math.inf]
     score = 0
 
     def __init__(self):
