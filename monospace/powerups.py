@@ -22,6 +22,10 @@ def powerup_double_blasters(ship: monospace.Ship):
 
     ship.blasters += new_blasters
 
+    # Increase the delay for all the blasters
+    for blaster in ship.blasters:
+        blaster.bullet_delay *= 3 // 4
+
 
 def powerup_add_blaster(ship: monospace.Ship):
     """Add a blaster to the ship."""
