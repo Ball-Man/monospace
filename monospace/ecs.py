@@ -157,7 +157,7 @@ class Ship(desper.Controller):
         self.texture = self.get(ctypes.POINTER(SDL_Texture))
 
         self.blasters.append(
-            Blaster((0, 0), ShipBullet,
+            Blaster((0, 0), DriftingShipBullet,
                     monospace.model.res['text']['ship_bullet'].get(),
                     DEFAULT_BULLET_DELAY,
                     (0, -DEFAULT_BULLET_SPEED),
@@ -273,6 +273,26 @@ class ShipBullet(desper.OnAttachListener):
         """
         self.world.delete_entity(self.entity)
         self.hit = True
+
+
+class DriftingShipBullet(ShipBullet, desper.AbstractComponent):
+    """Special type of bullet for the ship.
+
+    This is actually a bit of code smell that could be sanitized with
+    an adpater/decorator/bridge like pattern. For the simplicity of this
+    small game, the smell is kept.
+    """
+
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+        self.position = world.try_component(en, dsdl.Position)
+        self.starting_x = self.position.x
+        self._drift_time = 0
+
+    def update(self, *args):
+        self._drift_time += 1
+        self.position.x = (self.starting_x + 40
+                           * math.sin(self._drift_time / 10))
 
 
 class Enemy(desper.Controller):
