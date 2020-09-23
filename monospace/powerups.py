@@ -59,3 +59,10 @@ def powerup_shield(ship: monospace.Ship):
             yield
 
     ship.processor(desper.CoroutineProcessor).start(shield_coroutine(position))
+
+
+def powerup_drift(ship: monospace.Ship):
+    """Make all the bullets shifty."""
+
+    for blaster in ship.blasters:
+        blaster.bullet_type = monospace.DriftingShipBullet

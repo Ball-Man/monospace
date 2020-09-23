@@ -157,11 +157,13 @@ class Ship(desper.Controller):
         self.texture = self.get(ctypes.POINTER(SDL_Texture))
 
         self.blasters.append(
-            Blaster((0, 0), DriftingShipBullet,
+            Blaster((0, 0), ShipBullet,
                     monospace.model.res['text']['ship_bullet'].get(),
                     DEFAULT_BULLET_DELAY,
                     (0, -DEFAULT_BULLET_SPEED),
                     (10, 10, (5, 40)), world))
+
+        monospace.powerup_drift(self)
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
