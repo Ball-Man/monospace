@@ -3,7 +3,6 @@ import math
 from enum import Enum
 import dsdl
 import esper
-from sdl2.sdlgfx import *
 from sdl2 import *
 
 
@@ -166,11 +165,11 @@ class BoundingBoxRendererProcessor(esper.Processor):
                                 round(bbox.h))
                 SDL_RenderDrawRect(model.renderer, rect)
 
-        for _, circle in self.world.get_component(dsdl.CollisionCircle):
-            if circle.x is not None and circle.y is not None:
-                aacircleRGBA(model.renderer, int(circle.x), int(circle.y),
-                             int(circle.rad),
-                             255, 0, 0, 255)
+        # for _, circle in self.world.get_component(dsdl.CollisionCircle):
+        #     if circle.x is not None and circle.y is not None:
+        #         aacircleRGBA(model.renderer, int(circle.x), int(circle.y),
+        #                      int(circle.rad),
+        #                      255, 0, 0, 255)
 
 
 class Offset(Enum):

@@ -8,7 +8,6 @@ import dsdl
 import monospace
 from sdl2 import *
 from sdl2.sdlttf import *
-from sdl2.sdlgfx import *
 
 
 DEFAULT_BULLET_SPEED = 15
@@ -504,10 +503,6 @@ class PowerShield(desper.Controller):
         # Follow player
         pos.x = self.ship_pos.x
         pos.y = self.ship_pos.y
-
-        # Render circle
-        filledCircleRGBA(monospace.model.renderer, int(pos.x), int(pos.y),
-                         circle.rad, 255, 255, 255, 70)
 
         # Check collision
         for entity, enemy in world.get_component(Enemy):
