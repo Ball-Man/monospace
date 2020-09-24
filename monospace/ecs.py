@@ -48,10 +48,6 @@ class GameProcessor(esper.Processor):
             self.waves[self._cur_threshold].spawn(self.world)
         elif self._state == GameState.REWARD:
             if self._powerup_coroutine is None:
-                # Clear all the enemies
-                for _, enemy in self.world.get_component(Enemy):
-                    enemy.die()
-
                 # Spawn rewards
                 self._powerup_coroutine = coroutines.start(
                     self.spawn_rewards())
@@ -73,6 +69,7 @@ class GameProcessor(esper.Processor):
         self._cur_threshold += 1
         self._state = GameState.WAVE
         self._rewards_spawned = False
+        self.score_up(0)
 
     def score_up(self, value):
         """Add some value to the current score.
@@ -93,7 +90,7 @@ class GameProcessor(esper.Processor):
 
         # Change internal state if necessary
         if self.score >= self.WAVE_THRESHOLDS[self._cur_threshold]:
-            self._state = GameState.REWARD
+            self.change_to_reward()
 
         # Create new texture
         shown_score = max(
@@ -110,6 +107,28 @@ class GameProcessor(esper.Processor):
 
         # Cleanup
         SDL_FreeSurface(text_surface)
+
+    def change_to_reward(self):
+        """Change state to REWARD, with consequences."""
+        if self._state == GameState.REWARD:
+            return
+
+        self._state = GameState.REWARD
+        self.clear_screen()
+
+    def clear_screen(self):
+        """Clear all the unwanted entities from the screen.
+
+        This clears all enemies and powerups.
+        """
+        # Clear all the enemies
+        for en, enemy in self.world.get_component(Enemy):
+            enemy.spawn_particles()
+            self.world.delete_entity(en)
+
+        # Clear all the bonuses
+        for en, _ in self.world.get_component(PowerupBox):
+            self.world.delete_entity(en)
 
 
 class GameState(enum.Enum):
@@ -151,6 +170,8 @@ class Ship(desper.Controller):
         self.blasters = []
 
         self.texture = None
+
+        self.bonuses = {}
 
     def on_attach(self, en, world):
         super().on_attach(en, world)
