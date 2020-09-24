@@ -11,7 +11,7 @@ from sdl2.sdlttf import *
 
 
 DEFAULT_BULLET_SPEED = 15
-DEFAULT_BULLET_DELAY = 20
+DEFAULT_BULLET_DELAY = 30
 MIN_BULLET_DELAY = 7
 
 
@@ -251,7 +251,7 @@ class Blaster:
     """Class that represents a bullet blaster."""
 
     def __init__(self, offset, bullet_type, bullet_text, bullet_delay,
-                 bullet_velocity, bullet_bbox, world):
+                 bullet_velocity, bullet_bbox, world, animation=None):
         self.bullet_type = bullet_type
         self.bullet_text = bullet_text
         self.bullet_delay = bullet_delay
@@ -259,6 +259,7 @@ class Blaster:
         self.bullet_bbox = bullet_bbox
         self.offset = offset
         self.world = world
+        self.animation = animation
 
         self._timer = bullet_delay
 
@@ -270,22 +271,30 @@ class Blaster:
         """
         self._timer -= 1
         if self._timer > 0:
-            return
+            return False
 
         # Restart timer and shoot
         self._timer = self.bullet_delay
+        components = [
+            dsdl.Position(self.offset[0] + x, self.offset[1] + y,
+                          offset=dsdl.Offset.BOTTOM_CENTER),
+            self.bullet_text,
+            dsdl.Velocity(*self.bullet_velocity),
+            dsdl.BoundingBox(w=self.bullet_bbox[0], h=self.bullet_bbox[1],
+                             offset=self.bullet_bbox[2]),
+            self.bullet_type()]
 
-        self.world.create_entity(dsdl.Position(
-                                    self.offset[0] + x, self.offset[1] + y,
-                                    offset=dsdl.Offset.BOTTOM_CENTER),
-                                 self.bullet_text,
-                                 dsdl.Velocity(*self.bullet_velocity),
-                                 dsdl.BoundingBox(
-                                    w=self.bullet_bbox[0],
-                                    h=self.bullet_bbox[1],
-                                    offset=self.bullet_bbox[2]),
-                                 self.bullet_type()
-                                 )
+        if self.animation is not None:
+            components.append(dsdl.Animation(*self.animation))
+
+        self.world.create_entity(*components)
+
+        return True
+
+
+class EnemyBullet:
+    """Class representing an opponent's bullet."""
+    pass
 
 
 class ShipBullet(desper.OnAttachListener):
@@ -504,6 +513,84 @@ class RocketEnemy(Enemy):
         """Spawn death particles for the death."""
         self.processor(desper.CoroutineProcessor).start(
             self.particles_coroutine())
+
+
+class ShooterEnemy(Enemy):
+    """An enemy that takes aim and shoots you."""
+    total_life = 2
+    HORIZONTAL_SPEED = 3
+
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+
+        self.target_x = world.get_component(Ship)[0][1].position.x
+        self.set_speed()
+        self.blaster = Blaster(
+            (0, 0), EnemyBullet,
+            monospace.model.res['text']['enemies']['bullet'].get(),
+            30, (0, 5), (10, 10, dsdl.Offset.BOTTOM_CENTER), world,
+            animation=(2, 5))
+
+        self._shooting = False
+        self._shot = False
+
+    def update(self, *args):
+        super().update(*args)
+
+        # If aligned with the ship horizontally, stop and start shooting
+        if (not self._shooting
+            and abs(self.get(dsdl.Position).x - self.target_x)
+                < self.HORIZONTAL_SPEED):
+            self.get(dsdl.Position).x = self.target_x
+            self.get(dsdl.Velocity).x = 0
+            self._shooting = True
+
+            anim = self.get(dsdl.Animation)
+            if anim.cur_frame == 0:
+                anim.run = True
+
+        if self._shooting and not self._shot:
+            pos = self.get(dsdl.Position)
+            self._shot = self.blaster.shoot(pos.x, pos.y)
+            if self._shot:
+                self.processor(desper.CoroutineProcessor).start(self.target())
+
+    def target(self):
+        """Coroutine that chooses a new target."""
+        yield 60
+
+        self.target_x = self.world.get_component(Ship)[0][1].position.x
+        self._shooting = False
+        self._shot = False
+        self.set_speed()
+
+    def set_speed(self):
+        try:
+            self.get(dsdl.Velocity).x = math.copysign(
+                self.HORIZONTAL_SPEED,
+                self.target_x - self.get(dsdl.Position).x)
+        except Exception:
+            pass
+
+    def spawn_particles(self):
+        """Spawn death particles for the death."""
+        texture = self.get(ctypes.POINTER(SDL_Texture))
+        position = self.get(dsdl.Position)
+        offset = position.get_offset(texture.w, texture.h)
+        for _ in range(random.randrange(4, 8)):
+            angle = math.radians(
+                random.randint(0, 1) * 180 - random.randint(-10, 10))
+            mag = random.randrange(2, 4)
+
+            self.world.create_entity(
+                dsdl.Particle(30, -0.1 / 64, -0.002),
+                dsdl.Position(position.x - offset[0] + texture.w // 2,
+                              position.y - offset[1] + texture.h // 2,
+                              size_x=6 / 64, size_y=10 / 64,
+                              offset=dsdl.Offset.CENTER),
+                monospace.model.res['text']['part']['circle'].get(),
+                dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
+            )
 
 
 class PowerupBox(desper.OnAttachListener):
