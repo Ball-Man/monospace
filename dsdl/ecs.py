@@ -26,8 +26,12 @@ class TextureRendererProcessor(esper.Processor):
             w, h = ctypes.c_int(), ctypes.c_int()
             SDL_QueryTexture(tex, None, None, w, h)
 
-            offset_x, offset_y = pos.get_offset(w.value * pos.size_x,
-                                                h.value * pos.size_y)
+            animation = self.world.try_component(en, Animation)
+            frames = 1 if animation is None else animation.frames
+
+            offset_x, offset_y = pos.get_offset(
+                w.value // frames * pos.size_x,
+                h.value * pos.size_y)
             offset_x, offset_y = int(offset_x), int(offset_y)
 
             src = None
@@ -35,7 +39,6 @@ class TextureRendererProcessor(esper.Processor):
                             int(w.value * pos.size_x),
                             int(h.value * pos.size_y))
 
-            animation = self.world.try_component(en, Animation)
             if animation is not None:
                 animation.update()
                 src = SDL_Rect(
@@ -74,20 +77,12 @@ class BoundingBoxProcessor(esper.Processor):
     """Processor that updates BoundingBox x and y, based on Position."""
 
     def process(self, *args):
-        for _, (pos, bbox) in self.world.get_components(dsdl.Position,
-                                                        dsdl.BoundingBox):
-
+        for en, (pos, bbox) in self.world.get_components(dsdl.Position,
+                                                         dsdl.BoundingBox):
             # Calculate offset
-            offset_x = 0
-            offset_y = 0
-            if bbox.offset == Offset.CENTER:
-                offset_x = bbox.w // 2
-                offset_y = bbox.h // 2
-            elif bbox.offset == Offset.BOTTOM_CENTER:
-                offset_x = bbox.w // 2
-                offset_y = bbox.h - 1
-            elif isinstance(bbox.offset, (list, tuple)):
-                offset_x, offset_y = bbox.offset
+            offset_x, offset_y = pos.get_offset(bbox.w * pos.size_x,
+                                                bbox.h * pos.size_y)
+            offset_x, offset_y = int(offset_x), int(offset_y)
 
             # Update position of bbox
             bbox.x = pos.x - offset_x
