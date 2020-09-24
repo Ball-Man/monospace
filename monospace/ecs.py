@@ -190,6 +190,8 @@ class Ship(desper.Controller):
                     (0, -DEFAULT_BULLET_SPEED),
                     (10, 10, (5, 40)), world))
 
+        monospace.powerup_shield(self)
+
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
         pressing = (SDL_GetMouseState(ctypes.byref(mouse_x),
@@ -226,6 +228,16 @@ class Ship(desper.Controller):
         if powerup is not None:
             powerup.apply(self)
 
+        # Check collisions with enemy bullets
+        enemy_bullet = self.check_collisions(EnemyBullet)
+        if enemy_bullet is not None:
+            try:
+                # If has shield, protect
+                self.get(PowerShield)
+            except KeyError:
+                # If no shield, defeat
+                die()
+
     def check_collisions(self, component_type):
         """Check for collisions with a component_type(bbox).
 
@@ -245,6 +257,9 @@ class Ship(desper.Controller):
         bonuses = list(self.bonuses)
         for bonus in bonuses:
             bonus.revert(self)
+
+    def die(self):
+        pass
 
 
 class Blaster:
@@ -292,9 +307,16 @@ class Blaster:
         return True
 
 
-class EnemyBullet:
+class EnemyBullet(desper.Controller):
     """Class representing an opponent's bullet."""
-    pass
+
+    def update(self, en, world, model):
+        # If a shield is found, self-destruct
+        for _, (circle, shield) \
+                in world.get_components(dsdl.CollisionCircle,
+                                        monospace.PowerShield):
+            if dsdl.check_collisions(circle, self.get(dsdl.BoundingBox)):
+                world.delete_entity(en)
 
 
 class ShipBullet(desper.OnAttachListener):
