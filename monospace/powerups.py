@@ -1,9 +1,12 @@
 """Powerup functions, used inside PowerupBox instances."""
 import copy
+import weakref
 import dsdl
 import desper
 import monospace
 
+
+# Rewards
 
 def powerup_double_blasters(ship: monospace.Ship):
     """Double blasters for the ship."""
@@ -78,3 +81,67 @@ def powerup_delay1(ship: monospace.Ship):
     if len(ship.blasters) > 0:
         ship.blasters[0].bullet_delay = max(
             monospace.MIN_BULLET_DELAY, ship.blasters[0].bullet_delay // 3 * 2)
+
+
+# Random bonus during the game
+class Bonus:
+    """Base class for real time bonuses.
+
+    A bonus is added to the ship when instantiated(in a specific set)
+    and removed when reverted.
+
+    The bonus is applied thanks to the __call__ method so that it can
+    blend with the other powerups(which often are simply functions).
+    """
+
+    def __call__(self, ship: monospace.Ship):
+        ship.bonuses.add(self)
+
+    def revert(self, ship: monospace.Ship):
+        ship.bonuses.remove(self)
+
+
+class BonusDelay(Bonus):
+    """Bonus that speeds up fire rate for a limited time."""
+    FACTOR = 2 / 3
+
+    def __init__(self):
+        self._original_delays = []
+        self._coroutine = None
+
+    def __call__(self, ship: monospace.Ship):
+        super().__call__(ship)
+
+        def bonus_coroutine(ship_ref):
+            # Save current speeds in order to revert
+            self._original_delays = [blaster.bullet_delay for blaster in
+                                     ship_ref().blasters]
+
+            # Increase speed
+            for blaster in ship_ref().blasters:
+                blaster.bullet_delay = max(
+                    monospace.MIN_BULLET_DELAY,
+                    int(blaster.bullet_delay * self.FACTOR))
+
+            yield 360
+
+            self.revert(ship_ref(), False)
+
+        self._coroutine = ship.processor(desper.CoroutineProcessor).start(
+            bonus_coroutine(weakref.ref(ship)))
+
+    def revert(self, ship: monospace.Ship, remove_coroutine=True):
+        """Revert the effect of this bonus on the given ship."""
+        super().revert(ship)
+
+        if ship is None:
+            return
+
+        # Kill coroutine manually if still alive, in order to stop it
+        # from reverting again
+        if self._coroutine is not None and remove_coroutine:
+            ship.processor(desper.CoroutineProcessor).kill(self._coroutine)
+            self._coroutine = None
+
+        for blaster, or_delay in zip(ship.blasters, self._original_delays):
+            blaster.bullet_delay = or_delay

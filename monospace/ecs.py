@@ -17,7 +17,8 @@ MIN_BULLET_DELAY = 7
 
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
-    WAVE_THRESHOLDS = [50, 150, 300, 600, math.inf]
+
+    WAVE_THRESHOLDS = [10, 150, 300, 600, math.inf]
     score = 0
 
     def __init__(self):
@@ -116,6 +117,10 @@ class GameProcessor(esper.Processor):
         self._state = GameState.REWARD
         self.clear_screen()
 
+        # Reset bonuses given to the ship
+        ship = self.world.get_component(Ship)[0][1]
+        ship.revert_bonuses()
+
     def clear_screen(self):
         """Clear all the unwanted entities from the screen.
 
@@ -171,7 +176,7 @@ class Ship(desper.Controller):
 
         self.texture = None
 
-        self.bonuses = {}
+        self.bonuses = set()
 
     def on_attach(self, en, world):
         super().on_attach(en, world)
@@ -184,9 +189,6 @@ class Ship(desper.Controller):
                     DEFAULT_BULLET_DELAY,
                     (0, -DEFAULT_BULLET_SPEED),
                     (10, 10, (5, 40)), world))
-
-        monospace.powerup_add_blaster(self)
-        monospace.powerup_delay1(self)
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
@@ -237,6 +239,12 @@ class Ship(desper.Controller):
                 return comp
 
         return None
+
+    def revert_bonuses(self):
+        """Revert the effect of all bonuses."""
+        bonuses = list(self.bonuses)
+        for bonus in bonuses:
+            bonus.revert(self)
 
 
 class Blaster:
