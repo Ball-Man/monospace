@@ -239,18 +239,27 @@ class Animation:
     aren't supported).
     """
 
-    def __init__(self, frames=1, delay=1, start_frame=0):
+    def __init__(self, frames=1, delay=1, start_frame=0, oneshot=False,
+                 run=True):
         self.frames = frames
         self.delay = delay
+        self.oneshot = oneshot
+        self.run = run
 
         self.cur_frame = start_frame
         self._counter = delay
 
     def update(self):
+        if not self.run:
+            return
+
         self._counter -= 1
         if self._counter <= 0:
             self._counter = self.delay
             self.cur_frame = (self.cur_frame + 1) % self.frames
+
+            if self.oneshot and self.cur_frame == self.frames - 1:
+                self.run = False
 
 
 class Particle:
