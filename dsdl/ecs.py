@@ -47,7 +47,7 @@ class TextureRendererProcessor(esper.Processor):
                 dest.w = w.value // animation.frames
 
             # Set alpha
-            SDL_SetTextureAlphaMod(tex, pos.alpha)
+            SDL_SetTextureAlphaMod(tex, int(pos.alpha))
 
             if pos.rot == 0:
                 SDL_RenderCopy(model.renderer, tex, src, dest)
