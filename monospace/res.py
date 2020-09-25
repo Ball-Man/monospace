@@ -27,7 +27,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(desper.CoroutineProcessor())
 
         #w.add_processor(dsdl.FPSLoggerProcessor())
-        #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
+        w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
         # Create entities
         # Ship

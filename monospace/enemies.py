@@ -290,3 +290,18 @@ class SphereEnemy(Enemy):
         self._sin_time += 1
         pos.alpha = (self.BASE_ALPHA + self.ALPHA_WIGGLE
                      * math.sin(self._sin_time * 1 / 50))
+
+    def spawn_particles(self):
+        pos = self.get(dsdl.Position)
+
+        sides = 5
+        mag = 3
+        base_angle = random.randrange(0, 360)
+        for i in range(sides):
+            angle = math.radians(base_angle + i * 360 // sides)
+
+            self.world.create_entity(
+                dsdl.Particle(60, -1 / 30, -mag / 60),
+                dsdl.Position(pos.x, pos.y),
+                monospace.model.res['text']['part']['circle'].get(),
+                dsdl.Velocity(math.cos(angle) * mag, math.sin(angle) * mag))

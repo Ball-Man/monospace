@@ -143,8 +143,10 @@ class ParticleProcessor(esper.Processor):
             velocity = self.world.try_component(en, Velocity)
             if velocity is not None:
                 angle = math.atan2(velocity.y, velocity.x)
-                velocity.x += math.cos(angle) * part.vel_inc
-                velocity.y += math.sin(angle) * part.vel_inc
+                velocity.x += (math.cos(angle) * part.vel_inc
+                               * math.copysign(1, velocity.x))
+                velocity.y += (math.sin(angle) * part.vel_inc
+                               * math.copysign(1, velocity.y))
 
 
 class FPSLoggerProcessor(esper.Processor):
