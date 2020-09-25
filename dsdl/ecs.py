@@ -86,9 +86,16 @@ class BoundingBoxProcessor(esper.Processor):
         for en, (pos, bbox) in self.world.get_components(dsdl.Position,
                                                          dsdl.BoundingBox):
             # Calculate offset
-            offset_x, offset_y = pos.get_offset(bbox.w * pos.size_x,
-                                                bbox.h * pos.size_y)
-            offset_x, offset_y = int(offset_x), int(offset_y)
+            offset_x = 0
+            offset_y = 0
+            if bbox.offset == Offset.CENTER:
+                offset_x = bbox.w // 2
+                offset_y = bbox.h // 2
+            elif bbox.offset == Offset.BOTTOM_CENTER:
+                offset_x = bbox.w // 2
+                offset_y = bbox.h - 1
+            elif isinstance(bbox.offset, (list, tuple)):
+                offset_x, offset_y = bbox.offset
 
             # Update position of bbox
             bbox.x = pos.x - offset_x
