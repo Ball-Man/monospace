@@ -46,12 +46,18 @@ class TextureRendererProcessor(esper.Processor):
                     w.value // animation.frames, h)
                 dest.w = w.value // animation.frames
 
+            # Set alpha
+            SDL_SetTextureAlphaMod(tex, pos.alpha)
+
             if pos.rot == 0:
                 SDL_RenderCopy(model.renderer, tex, src, dest)
             else:
                 center = SDL_Point(offset_x, offset_y)
                 SDL_RenderCopyEx(model.renderer, tex, src, dest, pos.rot,
                                  center, SDL_FLIP_NONE)
+
+            # Reset alpha
+            SDL_SetTextureAlphaMod(tex, 255)
 
 
 class ScreenClearerProcessor(esper.Processor):
@@ -183,15 +189,18 @@ class Position:
     relative to the offset).
 
     rot is in degrees(clockwise).
+
+    alpha is between 0(transparent) and 255(visible).
     """
 
     def __init__(self, x=0, y=0, offset=Offset.ORIGIN, size_x=1, size_y=1,
-                 rot=0):
+                 rot=0, alpha=255):
         self.x = x
         self.y = y
         self.size_x = size_x
         self.size_y = size_y
         self.rot = rot
+        self.alpha = alpha
 
         if isinstance(offset, (list, tuple)) and len(offset) != 2:
             raise TypeError('Please provide two values for an offset(x, y)')
