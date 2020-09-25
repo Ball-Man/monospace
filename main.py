@@ -51,6 +51,7 @@ def main():
     importer_dict = desper.importer_dict_builder \
         .add_rule(dsdl.get_texture_importer(), dsdl.TextureHandle) \
         .add_rule(dsdl.get_font_importer(), dsdl.FontHandle) \
+        .add_rule(dsdl.get_fontcache_importer(), dsdl.FontCacheHandle) \
         .build()
 
     dirs = [pt.join(pt.dirname(pt.abspath(__main__.__file__)), 'res')]

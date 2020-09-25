@@ -189,7 +189,9 @@ class Ship(desper.Controller):
                     (0, -DEFAULT_BULLET_SPEED),
                     (10, 10, (5, 40)), world))
 
-        monospace.powerup_shield(self)
+        world.create_entity(
+            monospace.model.res['str']['it'].get_texture('quit'),
+            dsdl.Position(300, 300))
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
