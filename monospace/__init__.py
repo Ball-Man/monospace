@@ -1,11 +1,12 @@
 """Subpackage containing specific features for the Monospace game."""
 
 from .res import *
-from .ecs import *
+from .game import *
 from .locale import *
 from .globals import *
 from .waves import *
 from .powerups import *
+from .enemies import *
 
 import sdl2 as _sdl
 
