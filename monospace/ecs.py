@@ -18,7 +18,7 @@ MIN_BULLET_DELAY = 7
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
 
-    WAVE_THRESHOLDS = [10, 150, 300, 600, math.inf]
+    WAVE_THRESHOLDS = [50, 150, 300, 600, math.inf]
     score = 0
 
     def __init__(self):
@@ -503,7 +503,7 @@ class RollEnemy(Enemy):
 
 
 class RocketEnemy(Enemy):
-    total_life = 4
+    total_life = 5
     reward = 2
 
     def particles_coroutine(self):
@@ -613,6 +613,34 @@ class ShooterEnemy(Enemy):
                 monospace.model.res['text']['part']['circle'].get(),
                 dsdl.Velocity(x=math.cos(angle) * mag, y=math.sin(angle) * mag)
             )
+
+
+class SphereEnemy(Enemy):
+    """Stealth enemy that is hard to spot."""
+    total_life = 4
+    reward = 2
+
+    BASE_ALPHA = 40
+    ALPHA_WIGGLE = 30
+
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+
+        self.get(dsdl.Position).alpha = self.BASE_ALPHA
+        self._sin_time = 0
+
+    def update(self, *args):
+        super().update(*args)
+
+        pos = self.get(dsdl.Position)
+
+        # Rotate
+        pos.rot = (pos.rot + 1) % 360
+
+        # Alpha oscillator
+        self._sin_time += 1
+        pos.alpha = (self.BASE_ALPHA + self.ALPHA_WIGGLE
+                     * math.sin(self._sin_time * 1 / 50))
 
 
 class PowerupBox(desper.OnAttachListener):

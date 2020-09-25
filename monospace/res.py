@@ -45,4 +45,11 @@ class GameWorldHandle(desper.Handle):
                         dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
                         dsdl.Animation(7, 2, oneshot=True, run=False))
 
+        w.create_entity(dsdl.Position(300, -25, dsdl.Offset.CENTER),
+                        dsdl.Velocity(0, 4),
+                        monospace.SphereEnemy(),
+                        self.res['text']['enemies']['sphere'].get(),
+                        dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
+                        )
+
         return w
