@@ -18,6 +18,9 @@ class Enemy(desper.Controller):
         self.dead = False
         self.res = None
 
+        self.bonuses = monospace.BonusDelay(), None
+        self.bonuses_chances = 1, 80
+
     def update(self, entity, world, model):
         # Check for collision with a bullet
         if self.res is None:
@@ -47,6 +50,27 @@ class Enemy(desper.Controller):
         game = self.world.get_processor(monospace.GameProcessor)
         game.score_up(self.reward)
         self.spawn_particles()
+
+        self.spawn_bonus()
+
+    def spawn_bonus(self):
+        """Spawn a bonus for the player, maybe."""
+        powerup = random.choices(self.bonuses, self.bonuses_chances)[0]
+        if powerup is None:
+            return
+
+        pos = self.get(dsdl.Position)
+        text = monospace.model.res['text']['powerups']['blank'].get()
+        offset = pos.get_offset(text.w, text.h)
+        enemy_text = self.get(ctypes.POINTER(SDL_Texture))
+        self.world.create_entity(
+            monospace.PowerupBox(powerup),
+            dsdl.Position(pos.x - offset[0] + enemy_text.w // 2,
+                          pos.y - offset[1] + enemy_text.h // 2,
+                          dsdl.Offset.CENTER),
+            text,
+            dsdl.Velocity(0, 2),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, text.w, text.h))
 
     def spawn_particles(self):
         pass

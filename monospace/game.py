@@ -387,6 +387,7 @@ class PowerShield(desper.Controller):
                 enemy.die()
                 world.delete_entity(en)
 
+
 class PowerupBox(desper.OnAttachListener):
     """Proxy component for a power function."""
 
@@ -415,4 +416,3 @@ class PowerupBox(desper.OnAttachListener):
         for en, powerup in self.world.get_component(PowerupBox):
             powerup.applied = True      # Prevent anomalies
             self.world.delete_entity(en)
-
