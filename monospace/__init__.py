@@ -23,7 +23,7 @@ def init_screen_resolution():
     if on_android:
         _sdl.SDL_GetCurrentDisplayMode(0, DISPLAY_MODE)
     else:
-        DISPLAY_MODE = SDL_DisplayMode(0, 600, 900)
+        DISPLAY_MODE = SDL_DisplayMode(0, 600, 1000)
 
     LOGICAL_WIDTH_RATIO = LOGICAL_WIDTH / DISPLAY_MODE.w
     LOGICAL_HEIGHT = int(LOGICAL_WIDTH_RATIO * DISPLAY_MODE.h)
