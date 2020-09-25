@@ -3,6 +3,35 @@ import dsdl
 import monospace
 
 
+class MenuWorldHandle(desper.Handle):
+    """Handle class that creates the main menu world."""
+
+    def __init__(self, res):
+        super().__init__()
+        self.res = res
+
+    def _load(self):
+        w = desper.AbstractWorld()
+
+        # Add processors
+        w.add_processor(dsdl.EventHandlerProcessor(), 10)
+        w.add_processor(dsdl.TextureRendererProcessor(), -1)
+        w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(monospace.ButtonProcessor())
+
+        w.add_processor(dsdl.BoundingBoxRendererProcessor())
+
+        # Create entities
+        w.create_entity(
+            monospace.Button(lambda: print('OK')),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=100, h=100),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, 100,
+                          dsdl.Offset.CENTER))
+
+        return w
+
+
 class GameWorldHandle(desper.Handle):
     """Handle class that creates the main game world."""
 

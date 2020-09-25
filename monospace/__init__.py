@@ -7,6 +7,7 @@ from .globals import *
 from .waves import *
 from .powerups import *
 from .enemies import *
+from .menu import *
 
 import sdl2 as _sdl
 
