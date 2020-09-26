@@ -21,16 +21,16 @@ class MenuWorldHandle(desper.Handle):
         w.add_processor(dsdl.ScreenClearerProcessor(), -2)
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(monospace.ButtonProcessor())
+        w.add_processor(desper.CoroutineProcessor())
 
-        w.add_processor(dsdl.BoundingBoxRendererProcessor())
+        #w.add_processor(dsdl.BoundingBoxRendererProcessor())
 
         # Create entities
         start_width = 400
         start_height = 100
         pos_y = 300
         w.create_entity(
-            monospace.Button(
-                lambda e, w, m: m.switch(self.res['game_world'])),
+            monospace.Button(monospace.start_action),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
                              h=start_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,

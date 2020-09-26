@@ -1,6 +1,8 @@
 import ctypes
+import copy
 import dsdl
 import monospace
+import desper
 import esper
 from sdl2 import *
 
@@ -47,3 +49,38 @@ class Button:
 
     def __init__(self, action):
         self.action = action
+
+
+def start_action(en, world: esper.World, model: desper.GameModel):
+    """Action for the game start Button."""
+    # Disable button
+    world.remove_component(en, Button)
+
+    # Remove rectangle, substitute with two split rectangles
+    rectangle = world.try_component(en, dsdl.FillRectangle)
+    # Setup splits
+    rec1 = copy.copy(rectangle)
+    rec1.h /= 2
+    rec2 = copy.copy(rectangle)
+    rec2.h /= 2
+    rec2.y += rec1.h
+    world.create_entity(rec1)
+    world.create_entity(rec2)
+    # Remove original
+    world.remove_component(en, dsdl.FillRectangle)
+
+    rec_speed = 20
+
+    def coroutine():
+        """Animation."""
+        while True:
+            rec1.x -= rec_speed
+            rec2.x += rec_speed
+
+            if rec2.x > monospace.LOGICAL_WIDTH:
+                yield 30
+                model.switch(model.res['game_world'], reset=True)
+
+            yield
+
+    world.get_processor(desper.CoroutineProcessor).start(coroutine())
