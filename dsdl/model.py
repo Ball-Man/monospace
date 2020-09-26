@@ -1,3 +1,4 @@
+import ctypes
 import desper
 from sdl2 import *
 
@@ -13,6 +14,15 @@ class SDLGameModel(desper.GameModel):
                                           SDL_RENDERER_ACCELERATED
                                           | SDL_RENDERER_PRESENTVSYNC)
         self.renderer = renderer
+
+        w, h = ctypes.c_int(), ctypes.c_int()
+        SDL_RenderGetLogicalSize(renderer, w, h)
+
+        # Setup buffer texture
+        self.window_texture = SDL_CreateTexture(
+            renderer, SDL_PIXELFORMAT_RGBA8888,
+            SDL_TEXTUREACCESS_TARGET, w, h)
+        SDL_SetRenderTarget(renderer, self.window_texture)
 
         if SDLGameModel.default_renderer is None:
             SDLGameModel.default_renderer = self.renderer

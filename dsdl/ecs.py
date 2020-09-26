@@ -64,7 +64,16 @@ class ScreenClearerProcessor(esper.Processor):
     """Processor that cleans the screen and renders the backbuffer."""
 
     def process(self, model, *args):
+        # Render to buffer
         SDL_RenderPresent(model.renderer)
+
+        # Render to screen
+        SDL_SetRenderTarget(model.renderer, None)
+        SDL_RenderCopy(model.renderer, model.window_texture, None, None)
+        SDL_RenderPresent(model.renderer)
+
+        # Back to buffer
+        SDL_SetRenderTarget(model.renderer, model.window_texture)
 
         SDL_SetRenderDrawColor(model.renderer, 0, 0, 0, 255)
         SDL_RenderClear(model.renderer)
