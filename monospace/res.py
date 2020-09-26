@@ -30,7 +30,7 @@ class MenuWorldHandle(desper.Handle):
         pos_y = 300
         w.create_entity(
             monospace.Button(
-                lambda: monospace.model.switch(self.res['game_world'])),
+                lambda e, w, m: m.switch(self.res['game_world'])),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
                              h=start_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,

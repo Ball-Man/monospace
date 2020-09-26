@@ -11,7 +11,7 @@ class ButtonProcessor(esper.Processor):
     def __init__(self):
         self._old_pressed = False
 
-    def process(self, _):
+    def process(self, model):
         mouse_x, mouse_y = ctypes.c_int(0), ctypes.c_int(0)
         if (SDL_GetMouseState(mouse_x, mouse_y)
                 & SDL_BUTTON(SDL_BUTTON_LEFT)):
@@ -22,7 +22,7 @@ class ButtonProcessor(esper.Processor):
         mouse_x = mouse_x.value * monospace.LOGICAL_WIDTH_RATIO
         mouse_y = mouse_y.value * monospace.LOGICAL_WIDTH_RATIO
 
-        for _, (bbox, button) in self.world.get_components(
+        for en, (bbox, button) in self.world.get_components(
                 dsdl.BoundingBox, Button):
 
             # Check if the the bounding box is hit
@@ -30,7 +30,7 @@ class ButtonProcessor(esper.Processor):
                 and bbox.y <= mouse_y <= (bbox.y + bbox.h)
                     and pressed and not self._old_pressed):
 
-                button.action()
+                button.action(en, self.world, model)
 
         self._old_pressed = pressed
 
@@ -40,6 +40,9 @@ class Button:
 
     It's designed to be used with BoundingBoxes. When the BoundingBox
     is pressed, the command contained in the button is fired.
+
+    action accepts 3 arguments, entity, world and model(similar to
+    desper.AbstractComponent).
     """
 
     def __init__(self, action):
