@@ -81,7 +81,6 @@ class FontCacheHandle(desper.Handle):
             string_dict = json.load(file)
 
         for key, dic in string_dict.items():
-            print(dic)
             if dic.get('color') is not None:
                 color = [int(dic['color'][i:i + 2], 16)
                          for i in range(0, len(dic['color']), 2)]

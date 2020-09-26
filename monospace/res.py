@@ -42,6 +42,12 @@ class MenuWorldHandle(desper.Handle):
                 .get_texture('start')
             )
 
+        # Ship
+        ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 2,
+                                 monospace.LOGICAL_HEIGHT / 10 * 9,
+                                 offset=dsdl.Offset.CENTER)
+        w.create_entity(ship_pos, self.res['text']['ship'].get())
+
         return w
 
 
@@ -69,7 +75,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(desper.CoroutineProcessor())
 
         #w.add_processor(dsdl.FPSLoggerProcessor())
-        w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
+        #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
         # Create entities
         # Ship
@@ -80,18 +86,18 @@ class GameWorldHandle(desper.Handle):
         w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
                         ship_bbox, self.res['text']['ship'].get())
 
-        w.create_entity(dsdl.Position(-25, 100, dsdl.Offset.CENTER),
-                        dsdl.Velocity(),
-                        monospace.ShooterEnemy(),
-                        self.res['text']['enemies']['shooter'].get(),
-                        dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
-                        dsdl.Animation(7, 2, oneshot=True, run=False))
+        # w.create_entity(dsdl.Position(-25, 100, dsdl.Offset.CENTER),
+        #                 dsdl.Velocity(),
+        #                 monospace.ShooterEnemy(),
+        #                 self.res['text']['enemies']['shooter'].get(),
+        #                 dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
+        #                 dsdl.Animation(7, 2, oneshot=True, run=False))
 
-        w.create_entity(dsdl.Position(300, -25, dsdl.Offset.CENTER),
-                        dsdl.Velocity(0, 4),
-                        monospace.SphereEnemy(),
-                        self.res['text']['enemies']['sphere'].get(),
-                        dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
-                        )
+        # w.create_entity(dsdl.Position(300, -25, dsdl.Offset.CENTER),
+        #                 dsdl.Velocity(0, 4),
+        #                 monospace.SphereEnemy(),
+        #                 self.res['text']['enemies']['sphere'].get(),
+        #                 dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
+        #                 )
 
         return w
