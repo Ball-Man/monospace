@@ -25,13 +25,22 @@ class MenuWorldHandle(desper.Handle):
         w.add_processor(dsdl.BoundingBoxRendererProcessor())
 
         # Create entities
+        start_width = 400
+        start_height = 100
+        pos_y = 300
         w.create_entity(
-            monospace.Button(lambda: print('OK')),
-            dsdl.BoundingBox(dsdl.Offset.CENTER, w=100, h=100),
-            dsdl.Position(monospace.LOGICAL_WIDTH // 2, 100,
+            monospace.Button(
+                lambda: monospace.model.switch(self.res['game_world'])),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
+                             h=start_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
                           dsdl.Offset.CENTER),
-            dsdl.FillRectangle(monospace.LOGICAL_WIDTH // 2 - 50,
-                               50, 100, 100, SDL_Color()))
+            dsdl.FillRectangle(monospace.LOGICAL_WIDTH // 2 - start_width / 2,
+                               pos_y - start_height / 2, start_width,
+                               start_height, SDL_Color()),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('start')
+            )
 
         return w
 
