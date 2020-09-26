@@ -1,6 +1,7 @@
 import desper
 import dsdl
 import monospace
+from sdl2 import *
 
 
 class MenuWorldHandle(desper.Handle):
@@ -15,6 +16,7 @@ class MenuWorldHandle(desper.Handle):
 
         # Add processors
         w.add_processor(dsdl.EventHandlerProcessor(), 10)
+        w.add_processor(dsdl.FillRectangleRenderProcessor(), -0.5)
         w.add_processor(dsdl.TextureRendererProcessor(), -1)
         w.add_processor(dsdl.ScreenClearerProcessor(), -2)
         w.add_processor(dsdl.BoundingBoxProcessor())
@@ -27,7 +29,9 @@ class MenuWorldHandle(desper.Handle):
             monospace.Button(lambda: print('OK')),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=100, h=100),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, 100,
-                          dsdl.Offset.CENTER))
+                          dsdl.Offset.CENTER),
+            dsdl.FillRectangle(monospace.LOGICAL_WIDTH // 2 - 50,
+                               50, 100, 100, SDL_Color()))
 
         return w
 

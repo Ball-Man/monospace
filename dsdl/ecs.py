@@ -149,6 +149,27 @@ class ParticleProcessor(esper.Processor):
                                * math.copysign(1, velocity.y))
 
 
+class FillRectangleRenderProcessor(esper.Processor):
+    """Render filled rectangles."""
+
+    def process(self, model):
+        r, g, b, a = (ctypes.c_ubyte(), ctypes.c_ubyte(), ctypes.c_ubyte(),
+                      ctypes.c_ubyte())
+        SDL_GetRenderDrawColor(model.renderer, ctypes.byref(r),
+                               ctypes.byref(g), ctypes.byref(b),
+                               ctypes.byref(a))
+
+        for _, rect in self.world.get_component(FillRectangle):
+            SDL_SetRenderDrawColor(model.renderer, rect.color.r, rect.color.g,
+                                   rect.color.b, rect.color.a)
+
+            sdl_rect = SDL_Rect(int(rect.x), int(rect.y), int(rect.w),
+                                int(rect.h))
+            SDL_RenderFillRect(model.renderer, sdl_rect)
+
+        SDL_SetRenderDrawColor(model.renderer, r, g, b, a)
+
+
 class FPSLoggerProcessor(esper.Processor):
     """Log to stdout the current FPS."""
 
@@ -290,3 +311,14 @@ class Particle:
         self. rot_inc = rot_inc
 
         self.life_left = lifetime
+
+
+class FillRectangle:
+    """Renderized filled rectangle."""
+
+    def __init__(self, x, y, w, h, color):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.color = color
