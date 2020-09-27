@@ -75,10 +75,16 @@ class FontCacheHandle(desper.Handle):
         super().__init__()
         self.filename = filename
         self.res = res
+        self._fallback = None   # Relative path to the handler to be
+                                # used when a key isn't found in this
+                                # one.
 
     def _load(self):
         with open(self.filename) as file:
-            string_dict = json.load(file)
+            tot_dict = json.load(file)
+
+        self._fallback = tot_dict.get('fallback')
+        string_dict = tot_dict['strings']
 
         for key, dic in string_dict.items():
             if dic.get('color') is not None:
@@ -100,4 +106,23 @@ class FontCacheHandle(desper.Handle):
         """Get a cached texture, given the key."""
         value = self.get()
 
+        # Fallback
+        if value.get(key) is None and self._fallback is not None:
+            fallback = _res_from_path(self.res, self._fallback)
+            return fallback.get_texture(key)
+
+        # This will raise a KeyError if both the fallback
+        # is None and the key doesn't exist
         return value[key]['texture']
+
+
+def _res_from_path(res, path):
+    """Get a resource from the given dict and path(/ divided)."""
+    if not desper.options['resource_extensions']:
+        path = pt.splitext(path)[0]
+
+    dic = res
+    for part in path.split('/'):
+        dic = dic[part]
+
+    return dic
