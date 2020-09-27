@@ -88,8 +88,11 @@ def start_action(en, world: esper.World, model: desper.GameModel):
 
 def pause_game(en, world: esper.World, model: desper.GameModel):
     """Action for the game pause button."""
-    world.get_component(monospace.Ship)[0][1]._drag = False
-    model.switch(model.res['pause_world'])
+    try:
+        world.get_component(monospace.Ship)[0][1]._drag = False
+        model.switch(model.res['pause_world'])
+    except IndexError:
+        pass
 
 
 def resume_game(en, world: esper.World, model: desper.GameModel):

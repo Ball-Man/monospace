@@ -1,4 +1,5 @@
 import ctypes
+import random
 import enum
 import math
 import desper
@@ -233,7 +234,11 @@ class Ship(desper.Controller):
                 self.get(PowerShield)
             except KeyError:
                 # If no shield, defeat
-                die()
+                self.die()
+
+        enemy = self.check_collisions(monospace.Enemy)
+        if enemy is not None:
+            self.die()
 
     def check_collisions(self, component_type):
         """Check for collisions with a component_type(bbox).
@@ -256,7 +261,75 @@ class Ship(desper.Controller):
             bonus.revert(self)
 
     def die(self):
-        pass
+        """Death animation and world change."""
+        self.world.remove_component(self.entity, Ship)
+
+        def coroutine():
+            """Spawn particles."""
+            texture = self.get(ctypes.POINTER(SDL_Texture))
+            position = self.get(dsdl.Position)
+            offset = position.get_offset(texture.w, texture.h)
+            position.alpha = 70
+
+            for i in range(10):
+                x = random.randint(int(position.x - offset[0]),
+                                   int(position.x - offset[0] + texture.w))
+                y = random.randint(int(position.y - offset[1]),
+                                   int(position.y - offset[1] + texture.h))
+
+                # Big burst
+                for _ in range(random.randrange(10, 15)):
+                    angle = math.radians(random.randrange(0, 360))
+                    mag = random.randrange(1, 3)
+
+                    self.world.create_entity(
+                        dsdl.Particle(20, -0.1 / 64, -0.002),
+                        dsdl.Position(x, y,
+                                      size_x=20 / 64, size_y=20 / 64,
+                                      offset=dsdl.Offset.CENTER),
+                        monospace.model.res['text']['part']['quad'].get(),
+                        dsdl.Velocity(x=math.cos(angle) * mag,
+                                      y=math.sin(angle) * mag)
+                    )
+
+                # Small burst
+                for _ in range(random.randrange(4, 10)):
+                    angle = math.radians(random.randrange(0, 360))
+                    mag = random.randrange(1, 2)
+
+                    self.world.create_entity(
+                        dsdl.Particle(30),
+                        dsdl.Position(x, y,
+                                      size_x=5 / 64, size_y=5 / 64,
+                                      offset=dsdl.Offset.CENTER),
+                        monospace.model.res['text']['part']['quad'].get(),
+                        dsdl.Velocity(x=math.cos(angle) * mag,
+                                      y=math.sin(angle) * mag)
+                    )
+
+                yield 10
+
+            self.world.delete_entity(self.entity)
+
+            # Final big burst
+            x = position.x - offset[0] + texture.w / 2
+            y = position.y - offset[1] + texture.h / 2
+            for _ in range(random.randrange(40, 60)):
+                angle = math.radians(random.randrange(0, 360))
+                mag = random.randrange(1, 3)
+                size = random.randint(10, 30)
+
+                self.world.create_entity(
+                    dsdl.Particle(160, -1 / (160 * 3)),
+                    dsdl.Position(x, y,
+                                  size_x=size / 64, size_y=size / 64,
+                                  offset=dsdl.Offset.CENTER),
+                    monospace.model.res['text']['part']['quad'].get(),
+                    dsdl.Velocity(x=math.cos(angle) * mag,
+                                  y=math.sin(angle) * mag)
+                )
+
+        self.processor(desper.CoroutineProcessor).start(coroutine())
 
 
 class Blaster:
