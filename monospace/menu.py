@@ -90,3 +90,33 @@ def pause_game(en, world: esper.World, model: desper.GameModel):
     """Action for the game pause button."""
     world.get_component(monospace.Ship)[0][1]._drag = False
     model.switch(model.res['pause_world'])
+
+
+def resume_game(en, world: esper.World, model: desper.GameModel):
+    """Action for the game resumed button."""
+    world.delete_entity(en)
+
+    def coroutine():
+        """Countdown."""
+        count_en = world.create_entity(
+            dsdl.Position(monospace.LOGICAL_WIDTH / 2,
+                          monospace.LOGICAL_HEIGHT / 2,
+                          dsdl.Offset.CENTER))
+
+        for i in range(3, 0, -1):
+            try:
+                world.remove_component(count_en, ctypes.POINTER(SDL_Texture))
+            except KeyError:
+                pass
+
+            world.add_component(
+                count_en,
+                model.res['str'][monospace.current_lang].get_texture(str(i)))
+
+            yield 60
+
+        model.switch(model.res['game_world'], True)
+
+    world.get_processor(desper.CoroutineProcessor).start(
+        coroutine()
+        )

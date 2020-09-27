@@ -1,4 +1,7 @@
 {
   "start": { "text": "start", "font": "timenspace", "color": "000000ff" },
-  "quit": { "text": "esci", "font": "timenspace", "color": "000000ff" }
+  "quit": { "text": "esci", "font": "timenspace", "color": "000000ff" },
+  "3": {"text": "3", "font": "timenspace"},
+  "2": {"text": "2", "font": "timenspace"},
+  "1": {"text": "1", "font": "timenspace"}
 }

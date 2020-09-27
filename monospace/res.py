@@ -121,9 +121,7 @@ class PauseWorldHandle(desper.Handle):
         # Entities
         resume_text = self.res['text']['resume'].get()
         w.create_entity(resume_text,
-                        monospace.Button(
-                            lambda e, w, m: m.switch(self.res['game_world'],
-                                                     True)),
+                        monospace.Button(monospace.resume_game),
                         dsdl.BoundingBox(dsdl.Offset.CENTER,
                                          w=resume_text.w * 1.5,
                                          h=resume_text.h * 1.5),
