@@ -60,6 +60,7 @@ def main():
 
     model.res['game_world'] = monospace.GameWorldHandle(model.res)
     model.res['menu_world'] = monospace.MenuWorldHandle(model.res)
+    model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
     model.switch(model.res['menu_world'])
 
     model.loop()
