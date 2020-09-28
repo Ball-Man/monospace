@@ -60,6 +60,9 @@ class MenuWorldHandle(desper.Handle):
                                  offset=dsdl.Offset.CENTER)
         w.create_entity(ship_pos, self.res['text']['ship'].get())
 
+        # Apply options
+        monospace.apply_options(self.res['db']['main'].get())
+
         return w
 
 

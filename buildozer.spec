@@ -13,7 +13,7 @@ package.domain = org.ball
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,json,ttf,db
+source.include_exts = py,png,json,ttf,db,ogg
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png

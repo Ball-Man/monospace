@@ -9,6 +9,7 @@ from sdl2 import *
 from sdl2.sdlmixer import *
 
 
+OPTIONS_GET_ALL_QUERY = 'SELECT * FROM `options`'
 OPTION_GET_QUERY = 'SELECT `value` FROM `options` WHERE `option_name`=?'
 OPTION_UPDATE_QUERY = 'UPDATE `options` SET `value`=? WHERE `option_name`=?'
 
@@ -231,6 +232,13 @@ class OptionToggler:
             self._coroutine = proc.start(coroutine_toggle_on())
         else:
             self._coroutine = proc.start(coroutine_toggle_off())
+
+
+def apply_options(db):
+    """Apply all options from the db. Useful at startup."""
+    c = db.cursor()
+    for name, value in c.execute(OPTIONS_GET_ALL_QUERY):
+        OPTIONS_SETTERS[name](value)
 
 
 def set_music(val):
