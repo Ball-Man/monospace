@@ -6,6 +6,7 @@ import dsdl
 import sdl2
 import sdl2.sdlimage as image
 import sdl2.sdlttf as ttf
+import sdl2.sdlmixer as mix
 
 
 def log_importer(root, rel, res):
@@ -34,6 +35,14 @@ def get_fontcache_importer():
         return ret
 
     return decorated_lambda
+
+
+def get_chunk_importer():
+    return desper.get_resource_importer('chunks', ('.ogg'))
+
+
+def get_mus_importer():
+    return desper.get_resource_importer('mus', ('.ogg'))
 
 
 class TextureHandle(desper.Handle):
@@ -119,6 +128,28 @@ class FontCacheHandle(desper.Handle):
         # This will raise a KeyError if both the fallback
         # is None and the key doesn't exist
         return value[key]['texture']
+
+
+class ChunkHandle(desper.Handle):
+    """Handle for a SDL audio chunk."""
+
+    def __init__(self, filename):
+        super().__init__()
+        self.filename = filename
+
+    def _load(self):
+        return mix.Mix_LoadWAV(self.filename.encode())
+
+
+class MusicHandle(desper.Handle):
+    """Handle for a SDL music file."""
+
+    def __init__(self, filename):
+        super().__init__()
+        self.filename = filename
+
+    def _load(self):
+        return mix.Mix_LoadMUS(self.filename.encode())
 
 
 def _res_from_path(res, path):

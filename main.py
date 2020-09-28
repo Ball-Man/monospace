@@ -3,6 +3,7 @@ import os.path as pt
 from sdl2 import *
 from sdl2.sdlimage import *
 from sdl2.sdlttf import *
+from sdl2.sdlmixer import *
 import monospace
 import desper
 import dsdl
@@ -25,7 +26,10 @@ desper.options['resource_extensions'] = False
 def main():
     SDL_Init(SDL_INIT_VIDEO)
     IMG_Init(IMG_INIT_PNG)
+    Mix_Init(MIX_INIT_OGG)
     TTF_Init()
+
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048)
 
     monospace.init_screen_resolution()
 
@@ -53,6 +57,8 @@ def main():
         .add_rule(dsdl.get_font_importer(), dsdl.FontHandle) \
         .add_rule(dsdl.get_fontcache_importer(), dsdl.FontCacheHandle) \
         .add_rule(monospace.get_db_importer(), monospace.DBHandle) \
+        .add_rule(dsdl.get_chunk_importer(), dsdl.ChunkHandle) \
+        .add_rule(dsdl.get_mus_importer(), dsdl.MusicHandle) \
         .build()
 
     dirs = [pt.join(pt.dirname(pt.abspath(__main__.__file__)), 'res')]
@@ -64,6 +70,8 @@ def main():
     model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
     model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
     model.switch(model.res['menu_world'])
+
+    Mix_PlayMusic(model.res['mus']['too_much'].get(), -1)
 
     model.loop()
 
