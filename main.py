@@ -1,4 +1,5 @@
 import __main__
+import shutil
 import os.path as pt
 from sdl2 import *
 from sdl2.sdlimage import *
@@ -21,6 +22,12 @@ except ImportError:
 
 
 desper.options['resource_extensions'] = False
+
+
+CURRENT_DB_NAME = 'current.db'
+CURRENT_DB_RES = 'current'
+
+APP_DB_PATH = android.app_storage_path() if monospace.on_android else None
 
 
 def main():
@@ -72,6 +79,20 @@ def main():
     model.switch(model.res['menu_world'])
 
     Mix_PlayMusic(model.res['mus']['too_much'].get(), -1)
+
+    # Generate db if empty or version is obsolete
+    if model.res['db'].get('current') is None:
+        print('Current db not found, instantiating')
+        db_filename = model.res['db']['main'].filename
+        db_dirname = pt.dirname(db_filename)
+        if APP_DB_PATH is None:
+            new_db_filename = pt.join(db_dirname, CURRENT_DB_NAME)
+        else:
+            new_db_filename = pt.join(APP_DB_PATH, CURRENT_DB_NAME)
+
+        shutil.copy2(db_filename, new_db_filename)
+
+        model.res['db'][CURRENT_DB_RES] = monospace.DBHandle(new_db_filename)
 
     model.loop()
 

@@ -143,7 +143,7 @@ class Option(desper.OnAttachListener):
 
     def on_attach(self, en, world):
         res = monospace.model.res
-        c = res['db']['main'].get().cursor()
+        c = res['db']['current'].get().cursor()
 
         c.execute(OPTION_GET_QUERY, (self.option_name,))
         value = next(c)[0]
@@ -179,7 +179,7 @@ class OptionToggler:
         if self._coroutine is not None:
             return
 
-        db = model.res['db']['main'].get()
+        db = model.res['db']['current'].get()
         c = db.cursor()
         c.execute(OPTION_GET_QUERY, (self.option_name,))
 
