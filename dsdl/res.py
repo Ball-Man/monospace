@@ -98,6 +98,11 @@ class FontCacheHandle(desper.Handle):
             dic['texture'] = sdl2.SDL_CreateTextureFromSurface(
                 dsdl.SDLGameModel.default_renderer, surface)
 
+            w, h = ctypes.c_int(), ctypes.c_int()
+            sdl2.SDL_QueryTexture(dic['texture'], None, None, w, h)
+            dic['texture'].w = w.value
+            dic['texture'].h = h.value
+
             sdl2.SDL_FreeSurface(surface)
 
         return string_dict
