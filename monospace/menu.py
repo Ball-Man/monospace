@@ -51,39 +51,42 @@ class Button:
         self.action = action
 
 
-def start_action(en, world: esper.World, model: desper.GameModel):
-    """Action for the game start Button."""
-    # Disable button
-    world.remove_component(en, Button)
+def split_button_action(world_handle, speed=30):
+    """Split button animation and change world with the given world."""
 
-    # Remove rectangle, substitute with two split rectangles
-    rectangle = world.try_component(en, dsdl.FillRectangle)
-    # Setup splits
-    rec1 = copy.copy(rectangle)
-    rec1.h /= 2
-    rec2 = copy.copy(rectangle)
-    rec2.h /= 2
-    rec2.y += rec1.h
-    world.create_entity(rec1)
-    world.create_entity(rec2)
-    # Remove original
-    world.remove_component(en, dsdl.FillRectangle)
+    def start_action(en, world: esper.World, model: desper.GameModel):
+        """Action for the game start Button."""
+        # Disable button
+        world.remove_component(en, Button)
 
-    rec_speed = 20
+        # Remove rectangle, substitute with two split rectangles
+        rectangle = world.try_component(en, dsdl.FillRectangle)
+        # Setup splits
+        rec1 = copy.copy(rectangle)
+        rec1.h /= 2
+        rec2 = copy.copy(rectangle)
+        rec2.h /= 2
+        rec2.y += rec1.h
+        world.create_entity(rec1)
+        world.create_entity(rec2)
+        # Remove original
+        world.remove_component(en, dsdl.FillRectangle)
 
-    def coroutine():
-        """Animation."""
-        while True:
-            rec1.x -= rec_speed
-            rec2.x += rec_speed
+        def coroutine():
+            """Animation."""
+            while True:
+                rec1.x -= speed
+                rec2.x += speed
 
-            if rec2.x > monospace.LOGICAL_WIDTH:
-                yield 30
-                model.switch(model.res['game_world'], reset=True)
+                if rec2.x > monospace.LOGICAL_WIDTH:
+                    yield 30
+                    model.switch(world_handle, reset=True)
 
-            yield
+                yield
 
-    world.get_processor(desper.CoroutineProcessor).start(coroutine())
+        world.get_processor(desper.CoroutineProcessor).start(coroutine())
+
+    return start_action
 
 
 def pause_game(en, world: esper.World, model: desper.GameModel):
@@ -123,3 +126,7 @@ def resume_game(en, world: esper.World, model: desper.GameModel):
     world.get_processor(desper.CoroutineProcessor).start(
         coroutine()
         )
+
+
+def toggle_option(option_name):
+    pass

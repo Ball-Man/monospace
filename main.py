@@ -52,6 +52,7 @@ def main():
         .add_rule(dsdl.get_texture_importer(), dsdl.TextureHandle) \
         .add_rule(dsdl.get_font_importer(), dsdl.FontHandle) \
         .add_rule(dsdl.get_fontcache_importer(), dsdl.FontCacheHandle) \
+        .add_rule(monospace.get_db_importer(), monospace.DBHandle) \
         .build()
 
     dirs = [pt.join(pt.dirname(pt.abspath(__main__.__file__)), 'res')]
@@ -61,7 +62,8 @@ def main():
     model.res['game_world'] = monospace.GameWorldHandle(model.res)
     model.res['menu_world'] = monospace.MenuWorldHandle(model.res)
     model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
-    model.switch(model.res['menu_world'])
+    model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
+    model.switch(model.res['options_world'])
 
     model.loop()
 

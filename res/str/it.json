@@ -1,6 +1,9 @@
 {
   "fallback": "str/en.json",
   "strings": {
-    "quit": { "text": "esci", "font": "timenspace", "color": "000000ff" }
+    "quit": { "text": "esci", "font": "timenspace", "color": "000000ff" },
+    "music": {"text": "musica", "font": "timenspace"},
+    "sfx": {"text": "suoni", "font": "timenspace"},
+    "save": {"text": "salva", "font": "timenspace", "color": "000000ff"}
   }
 }

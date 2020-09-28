@@ -4,6 +4,11 @@
     "quit": { "text": "quit", "font": "timenspace", "color": "000000ff" },
     "3": {"text": "3", "font": "timenspace"},
     "2": {"text": "2", "font": "timenspace"},
-    "1": {"text": "1", "font": "timenspace"}
+    "1": {"text": "1", "font": "timenspace"},
+    "music": {"text": "music", "font": "timenspace"},
+    "sfx": {"text": "sfx", "font": "timenspace"},
+    "on": {"text": "on", "font": "timenspace"},
+    "off": {"text": "off", "font": "timenspace"},
+    "save": {"text": "save", "font": "timenspace", "color": "000000ff"}
   }
 }

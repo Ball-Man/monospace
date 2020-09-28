@@ -1,3 +1,4 @@
+import sqlite3
 import desper
 import dsdl
 import monospace
@@ -30,7 +31,8 @@ class MenuWorldHandle(desper.Handle):
         start_height = 100
         pos_y = 300
         w.create_entity(
-            monospace.Button(monospace.start_action),
+            monospace.Button(
+                monospace.split_button_action(self.res['game_world'])),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
                              h=start_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
@@ -130,3 +132,66 @@ class PauseWorldHandle(desper.Handle):
                                       dsdl.Offset.CENTER)
                         )
         return w
+
+
+class OptionsWorldHandle(desper.Handle):
+    """Handle for the options world."""
+
+    def __init__(self, res):
+        super().__init__()
+        self.res = res
+
+    def _load(self):
+        w = desper.AbstractWorld()
+
+        # Processors
+        w.add_processor(dsdl.EventHandlerProcessor(), 10)
+        w.add_processor(dsdl.FillRectangleRenderProcessor(), -0.5)
+        w.add_processor(dsdl.TextureRendererProcessor(), -1)
+        w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(monospace.ButtonProcessor())
+        w.add_processor(desper.CoroutineProcessor())
+
+        offset_x = 30
+
+        # Entities
+        # Music setting
+        w.create_entity(
+            dsdl.Position(offset_x, 100),
+            self.res['str'][monospace.current_lang].get_texture('music'))
+
+        # Sfx setting
+        w.create_entity(
+            dsdl.Position(offset_x, 200),
+            self.res['str'][monospace.current_lang].get_texture('sfx'))
+
+        save_text = self.res['str'][monospace.current_lang].get_texture('save')
+        save_width = save_text.w + 30
+        save_height = save_text.h + 30
+        w.create_entity(
+            monospace.Button(
+                monospace.split_button_action(self.res['menu_world'])),
+            dsdl.Position(offset_x + save_width / 2, 300 + save_height / 2,
+                          offset=dsdl.Offset.CENTER),
+            save_text,
+            dsdl.FillRectangle(offset_x, 300, save_width, save_height,
+                               SDL_Color()),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, save_width, save_height)
+            )
+
+        return w
+
+
+def get_db_importer():
+    return desper.get_resource_importer('db', ('.db'))
+
+
+class DBHandle(desper.Handle):
+
+    def __init__(self, filename):
+        super().__init__()
+        self.filename = filename
+
+    def _load(self):
+        return sqlite3.connect(self.filename)
