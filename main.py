@@ -12,6 +12,7 @@ import dsdl
 try:
     window_style = SDL_WINDOW_FULLSCREEN
 
+    from android.storage import app_storage_path
     from android import loadingscreen
     loadingscreen.hide_loading_screen()
 
@@ -27,7 +28,7 @@ desper.options['resource_extensions'] = False
 CURRENT_DB_NAME = 'current.db'
 CURRENT_DB_RES = 'current'
 
-APP_DB_PATH = android.app_storage_path() if monospace.on_android else None
+APP_DB_PATH = app_storage_path() if monospace.on_android else None
 
 
 def main():
@@ -81,18 +82,18 @@ def main():
     Mix_PlayMusic(model.res['mus']['too_much'].get(), -1)
 
     # Generate db if empty or version is obsolete
-    if model.res['db'].get('current') is None:
-        print('Current db not found, instantiating')
+    if monospace.on_android:
+        new_db_filename = pt.join(APP_DB_PATH, CURRENT_DB_NAME)
+    else:
         db_filename = model.res['db']['main'].filename
         db_dirname = pt.dirname(db_filename)
-        if APP_DB_PATH is None:
-            new_db_filename = pt.join(db_dirname, CURRENT_DB_NAME)
-        else:
-            new_db_filename = pt.join(APP_DB_PATH, CURRENT_DB_NAME)
+        new_db_filename = pt.join(db_dirname, CURRENT_DB_NAME)
 
+    if not pt.isfile(new_db_filename):
+        print('Current db not found, instantiating')
         shutil.copy2(db_filename, new_db_filename)
 
-        model.res['db'][CURRENT_DB_RES] = monospace.DBHandle(new_db_filename)
+    model.res['db'][CURRENT_DB_RES] = monospace.DBHandle(new_db_filename)
 
     model.loop()
 
