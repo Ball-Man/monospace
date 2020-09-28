@@ -161,6 +161,12 @@ class OptionsWorldHandle(desper.Handle):
             dsdl.Position(offset_x, 100),
             self.res['str'][monospace.current_lang].get_texture('music'))
 
+        w.create_entity(
+            dsdl.Position(0, 0),
+            dsdl.BoundingBox(w=200, h=200),
+            dsdl.FillRectangle(0, 0, 200, 200, SDL_Color()),
+            monospace.Button(monospace.toggle_option('music')))
+
         # Sfx setting
         w.create_entity(
             dsdl.Position(offset_x, 200),

@@ -129,4 +129,14 @@ def resume_game(en, world: esper.World, model: desper.GameModel):
 
 
 def toggle_option(option_name):
-    pass
+
+    def toggle(en, world: esper.World, model: desper.GameModel):
+        c = model.res['db']['main'].get().cursor()
+        c.execute('SELECT `value` FROM `options` WHERE `option_name`=?',
+                  (option_name,))
+
+        value = next(c)[0]
+        print('music', value)
+
+
+    return toggle
