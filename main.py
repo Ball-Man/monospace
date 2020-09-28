@@ -95,6 +95,9 @@ def main():
 
     model.res['db'][CURRENT_DB_RES] = monospace.DBHandle(new_db_filename)
 
+    # Apply options
+    monospace.apply_options(model.res['db'][CURRENT_DB_RES].get())
+
     model.loop()
 
 
