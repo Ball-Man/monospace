@@ -1,10 +1,15 @@
 import ctypes
+import math
 import copy
 import dsdl
 import monospace
 import desper
 import esper
 from sdl2 import *
+
+
+OPTION_GET_QUERY = 'SELECT `value` FROM `options` WHERE `option_name`=?'
+OPTION_UPDATE_QUERY = 'UPDATE `options` SET `value`=? WHERE `option_name`=?'
 
 
 class ButtonProcessor(esper.Processor):
@@ -128,15 +133,94 @@ def resume_game(en, world: esper.World, model: desper.GameModel):
         )
 
 
-def toggle_option(option_name):
+class Option(desper.OnAttachListener):
+    """Set the option initial state, queried from the db."""
 
-    def toggle(en, world: esper.World, model: desper.GameModel):
-        c = model.res['db']['main'].get().cursor()
-        c.execute('SELECT `value` FROM `options` WHERE `option_name`=?',
-                  (option_name,))
+    def __init__(self, option_name):
+        self.option_name = option_name
 
+    def on_attach(self, en, world):
+        res = monospace.model.res
+        c = res['db']['main'].get().cursor()
+
+        c.execute(OPTION_GET_QUERY, (self.option_name,))
         value = next(c)[0]
-        print('music', value)
+
+        comps = []
+        if value:
+            bbox = world.try_component(en, dsdl.BoundingBox)
+            pos = world.try_component(en, dsdl.Position)
+            offset = pos.get_offset(bbox.w, bbox.h)
+            comps.append(res['str'][monospace.current_lang].get_texture('on'))
+            comps.append(dsdl.FillRectangle(pos.x - offset[0],
+                                            pos.y - offset[1], bbox.w, bbox.h,
+                                            SDL_Color()))
+        else:
+            comps.append(res['str'][monospace.current_lang].get_texture('off'))
+
+        for comp in comps:
+            world.add_component(en, comp)
 
 
-    return toggle
+class OptionToggler:
+    """Callable instances used as actions for Buttons."""
+
+    def __init__(self, option_name):
+        self.option_name = option_name
+        self._coroutine = None
+
+    def __call__(self, en, world: esper.World, model: desper.GameModel):
+        # Do nothing if something is an operation is already in progress
+        if self._coroutine is not None:
+            return
+
+        db = model.res['db']['main'].get()
+        c = db.cursor()
+        c.execute(OPTION_GET_QUERY, (self.option_name,))
+
+        value = not next(c)[0]
+        c.execute(OPTION_UPDATE_QUERY, (value, self.option_name))
+        db.commit()
+
+        # Used by coroutines
+        res = model.res
+        speed = 10
+        bbox = world.try_component(en, dsdl.BoundingBox)
+        pos = world.try_component(en, dsdl.Position)
+        offset = pos.get_offset(bbox.w, bbox.h)
+
+        def coroutine_toggle_on():
+            """Create the rectangle."""
+            world.add_component(
+                en, res['str'][monospace.current_lang].get_texture('on'))
+            rect = dsdl.FillRectangle(pos.x - offset[0],
+                                      pos.y - offset[1] + bbox.h, bbox.w, 0,
+                                      SDL_Color())
+            world.add_component(en, rect)
+
+            while rect.h < bbox.h:
+                rect.h += min(bbox.h - rect.h, speed)
+                rect.y = pos.y - offset[1] + bbox.h - rect.h
+                yield
+
+            self._coroutine = None
+
+        def coroutine_toggle_off():
+            """Collapse the rectangle."""
+            world.add_component(
+                en, res['str'][monospace.current_lang].get_texture('off'))
+            rect = world.try_component(en, dsdl.FillRectangle)
+
+            while rect.h > 0:
+                rect.h -= min(rect.h, speed)
+                rect.y = pos.y - offset[1] + bbox.h - rect.h
+                yield
+
+            world.remove_component(en, dsdl.FillRectangle)
+            self._coroutine = None
+
+        proc = world.get_processor(desper.CoroutineProcessor)
+        if value:
+            self._coroutine = proc.start(coroutine_toggle_on())
+        else:
+            self._coroutine = proc.start(coroutine_toggle_off())

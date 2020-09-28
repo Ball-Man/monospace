@@ -154,6 +154,8 @@ class OptionsWorldHandle(desper.Handle):
         w.add_processor(desper.CoroutineProcessor())
 
         offset_x = 30
+        off_text = \
+            self.res['str'][monospace.current_lang].get_texture('off')
 
         # Entities
         # Music setting
@@ -162,15 +164,23 @@ class OptionsWorldHandle(desper.Handle):
             self.res['str'][monospace.current_lang].get_texture('music'))
 
         w.create_entity(
-            dsdl.Position(0, 0),
-            dsdl.BoundingBox(w=200, h=200),
-            dsdl.FillRectangle(0, 0, 200, 200, SDL_Color()),
-            monospace.Button(monospace.toggle_option('music')))
+            dsdl.Position(monospace.LOGICAL_WIDTH - offset_x - off_text.w / 2,
+                          100 + off_text.h / 2, dsdl.Offset.CENTER),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=off_text.w, h=off_text.h),
+            monospace.Button(monospace.OptionToggler('music')),
+            monospace.Option('music'))
 
         # Sfx setting
         w.create_entity(
             dsdl.Position(offset_x, 200),
             self.res['str'][monospace.current_lang].get_texture('sfx'))
+
+        w.create_entity(
+            dsdl.Position(monospace.LOGICAL_WIDTH - offset_x - off_text.w / 2,
+                          200 + off_text.h / 2, dsdl.Offset.CENTER),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=off_text.w, h=off_text.h),
+            monospace.Button(monospace.OptionToggler('sfx')),
+            monospace.Option('sfx'))
 
         save_text = self.res['str'][monospace.current_lang].get_texture('save')
         save_width = save_text.w + 30

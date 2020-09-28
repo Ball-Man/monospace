@@ -7,7 +7,7 @@
     "1": {"text": "1", "font": "timenspace"},
     "music": {"text": "music", "font": "timenspace"},
     "sfx": {"text": "sfx", "font": "timenspace"},
-    "on": {"text": "on", "font": "timenspace"},
+    "on": {"text": "on", "font": "timenspace", "color": "000000ff"},
     "off": {"text": "off", "font": "timenspace"},
     "save": {"text": "save", "font": "timenspace", "color": "000000ff"}
   }
