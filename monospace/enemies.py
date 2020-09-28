@@ -214,19 +214,30 @@ class ShooterEnemy(Enemy):
     total_life = 2
     HORIZONTAL_SPEED = 3
 
+    def __init__(self):
+        super().__init__()
+        self._shooting = False
+        self._shot = False
+        self.target_x = 0
+
     def on_attach(self, en, world):
         super().on_attach(en, world)
 
-        self.target_x = world.get_component(monospace.Ship)[0][1].position.x
+        try:
+            self.target_x = \
+                self.world.get_component(monospace.Ship)[0][1].position.x
+        except IndexError:
+            self.target_x = random.randrange(0, monospace.LOGICAL_WIDTH)
+
+        self._shooting = False
+        self._shot = False
         self.set_speed()
+
         self.blaster = monospace.Blaster(
             (0, 0), monospace.EnemyBullet,
             monospace.model.res['text']['enemies']['bullet'].get(),
             30, (0, 5), (10, 10, dsdl.Offset.BOTTOM_CENTER), world,
             animation=(2, 5))
-
-        self._shooting = False
-        self._shot = False
 
     def update(self, *args):
         super().update(*args)
@@ -253,8 +264,12 @@ class ShooterEnemy(Enemy):
         """Coroutine that chooses a new target."""
         yield 60
 
-        self.target_x = \
-            self.world.get_component(monospace.Ship)[0][1].position.x
+        try:
+            self.target_x = \
+                self.world.get_component(monospace.Ship)[0][1].position.x
+        except IndexError:
+            self.target_x = random.randrange(0, monospace.LOGICAL_WIDTH)
+
         self._shooting = False
         self._shot = False
         self.set_speed()
