@@ -1,11 +1,12 @@
 import ctypes
-import math
+import functools
 import copy
 import dsdl
 import monospace
 import desper
 import esper
 from sdl2 import *
+from sdl2.sdlmixer import *
 
 
 OPTION_GET_QUERY = 'SELECT `value` FROM `options` WHERE `option_name`=?'
@@ -161,6 +162,9 @@ class Option(desper.OnAttachListener):
         for comp in comps:
             world.add_component(en, comp)
 
+        # Actually apply option
+        OPTIONS_SETTERS[self.option_name](value)
+
 
 class OptionToggler:
     """Callable instances used as actions for Buttons."""
@@ -188,6 +192,9 @@ class OptionToggler:
         bbox = world.try_component(en, dsdl.BoundingBox)
         pos = world.try_component(en, dsdl.Position)
         offset = pos.get_offset(bbox.w, bbox.h)
+
+        # Actually apply option
+        OPTIONS_SETTERS[self.option_name](value)
 
         def coroutine_toggle_on():
             """Create the rectangle."""
@@ -224,3 +231,16 @@ class OptionToggler:
             self._coroutine = proc.start(coroutine_toggle_on())
         else:
             self._coroutine = proc.start(coroutine_toggle_off())
+
+
+def set_music(val):
+    """Toggle music, val is a boolean."""
+    Mix_VolumeMusic(0 * (1 - val) + MIX_MAX_VOLUME * val)
+
+
+def set_sfx(val):
+    """Toggle sfx, val is a boolean."""
+    Mix_Volume(-1, 0 * (1 - val) + MIX_MAX_VOLUME * val)
+
+
+OPTIONS_SETTERS = {'music': set_music, 'sfx': set_sfx}
