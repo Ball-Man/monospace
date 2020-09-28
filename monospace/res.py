@@ -44,6 +44,16 @@ class MenuWorldHandle(desper.Handle):
                 .get_texture('start')
             )
 
+        w.create_entity(
+            monospace.Button(lambda e, w, m: m.switch(m.res['options_world'])),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
+                             h=start_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, 400,
+                          dsdl.Offset.CENTER),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('options')
+            )
+
         # Ship
         ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 2,
                                  monospace.LOGICAL_HEIGHT / 10 * 9,
@@ -187,7 +197,7 @@ class OptionsWorldHandle(desper.Handle):
         save_height = save_text.h + 30
         w.create_entity(
             monospace.Button(
-                monospace.split_button_action(self.res['menu_world'])),
+                monospace.split_button_action(self.res['menu_world'], wait=0)),
             dsdl.Position(offset_x + save_width / 2, 300 + save_height / 2,
                           offset=dsdl.Offset.CENTER),
             save_text,

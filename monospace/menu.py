@@ -56,7 +56,7 @@ class Button:
         self.action = action
 
 
-def split_button_action(world_handle, speed=30):
+def split_button_action(world_handle, speed=30, wait=30):
     """Split button animation and change world with the given world."""
 
     def start_action(en, world: esper.World, model: desper.GameModel):
@@ -84,7 +84,7 @@ def split_button_action(world_handle, speed=30):
                 rec2.x += speed
 
                 if rec2.x > monospace.LOGICAL_WIDTH:
-                    yield 30
+                    yield wait
                     model.switch(world_handle, reset=True)
 
                 yield

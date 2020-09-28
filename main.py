@@ -63,7 +63,7 @@ def main():
     model.res['menu_world'] = monospace.MenuWorldHandle(model.res)
     model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
     model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
-    model.switch(model.res['options_world'])
+    model.switch(model.res['menu_world'])
 
     model.loop()
 

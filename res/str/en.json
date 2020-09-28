@@ -9,6 +9,7 @@
     "sfx": {"text": "sfx", "font": "timenspace"},
     "on": {"text": "on", "font": "timenspace", "color": "000000ff"},
     "off": {"text": "off", "font": "timenspace"},
-    "save": {"text": "save", "font": "timenspace", "color": "000000ff"}
+    "save": {"text": "save", "font": "timenspace", "color": "000000ff"},
+    "options": {"text": "options", "font": "timenspace"}
   }
 }
