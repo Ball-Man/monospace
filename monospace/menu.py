@@ -79,6 +79,9 @@ def split_button_action(world_handle, speed=30, wait=30):
         # Remove original
         world.remove_component(en, dsdl.FillRectangle)
 
+        # Sound feedback
+        Mix_PlayChannel(-1, model.res['chunks']['button'].get(), 0)
+
         def coroutine():
             """Animation."""
             while True:
@@ -100,6 +103,8 @@ def pause_game(en, world: esper.World, model: desper.GameModel):
     """Action for the game pause button."""
     try:
         world.get_component(monospace.Ship)[0][1]._drag = False
+        # Sound feedback
+        Mix_PlayChannel(-1, model.res['chunks']['button'].get(), 0)
         model.switch(model.res['pause_world'])
     except IndexError:
         pass
@@ -108,6 +113,9 @@ def pause_game(en, world: esper.World, model: desper.GameModel):
 def resume_game(en, world: esper.World, model: desper.GameModel):
     """Action for the game resumed button."""
     world.delete_entity(en)
+
+    # Sound feedback
+    Mix_PlayChannel(-1, model.res['chunks']['button'].get(), 0)
 
     def coroutine():
         """Countdown."""
@@ -128,6 +136,8 @@ def resume_game(en, world: esper.World, model: desper.GameModel):
 
             yield 60
 
+        # Sound feedback
+        Mix_PlayChannel(-1, model.res['chunks']['button'].get(), 0)
         model.switch(model.res['game_world'], True)
 
     world.get_processor(desper.CoroutineProcessor).start(

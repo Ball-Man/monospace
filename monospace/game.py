@@ -351,6 +351,12 @@ class Ship(desper.Controller):
 
             yield 210
 
+            # Sound feedback
+            Mix_PlayChannel(
+                -1,
+                monospace.model.res['chunks']['enemies']['shot'].get(),
+                0)
+
             # Change room
             # Set temporary score for next room
             monospace.score.temp_score = self.processor(GameProcessor).score
