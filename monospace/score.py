@@ -56,16 +56,17 @@ class DeathScoreManager(desper.OnAttachListener):
         print('highscore', highscore)
         print('score', temp_score)
 
+        # Render current score
+        score_surf = TTF_RenderUTF8_Blended(
+            res['fonts']['timenspace'].get(), str(temp_score).encode(),
+            SDL_Color())
+        score_texture = SDL_CreateTextureFromSurface(
+            monospace.model.renderer, score_surf)
+        SDL_FreeSurface(score_surf)
+
         # Configure deathscreen based on the record(have you beat it?)
         if temp_score <= highscore:    # Not beaten
-            # Render current score
-            score_surf = TTF_RenderUTF8_Blended(
-                res['fonts']['timenspace'].get(), str(temp_score).encode(),
-                SDL_Color())
-            score_texture = SDL_CreateTextureFromSurface(
-                monospace.model.renderer, score_surf)
-            SDL_FreeSurface(score_surf)
-
+            # Add current score
             world.create_entity(dsdl.Position(30, 30), score_texture)
 
             highscore_y = 130
@@ -97,6 +98,14 @@ class DeathScoreManager(desper.OnAttachListener):
         else:       # Beaten
             # Update highscore
             set_high_score(db, int(temp_score))
+
+            # NEW RECORD text
+            world.create_entity(
+                res['str'][monospace.current_lang].get_texture('newrecord'),
+                dsdl.Position(30, 30))
+
+            # Add current score
+            world.create_entity(dsdl.Position(30, 130), score_texture)
 
         # Update total score and reset temp
         add_total_score(db, int(temp_score))
