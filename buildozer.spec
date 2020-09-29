@@ -88,7 +88,7 @@ android.presplash_color = #FFFFFF
 # android.permissions = INTERNET
 
 # (int) Target Android API, should be as high as possible.
-android.api = 27
+android.api = 29
 
 # (int) Minimum API your APK will support.
 android.minapi = 21
@@ -97,7 +97,7 @@ android.minapi = 21
 android.sdk = 20
 
 # (str) Android NDK version to use
-android.ndk = 19b
+android.ndk = 21
 
 # (int) Android NDK API to use. This is the minimum API your app will support, it should usually match android.minapi.
 android.ndk_api = 21
