@@ -37,7 +37,7 @@ def main():
     Mix_Init(MIX_INIT_OGG)
     TTF_Init()
 
-    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 512)
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 256)
 
     monospace.init_screen_resolution()
 
