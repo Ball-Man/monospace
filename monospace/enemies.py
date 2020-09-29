@@ -5,6 +5,7 @@ import monospace
 import dsdl
 import desper
 from sdl2 import *
+from sdl2.sdlmixer import *
 
 
 class Enemy(desper.Controller):
@@ -15,6 +16,8 @@ class Enemy(desper.Controller):
     def __init__(self):
         super().__init__()
         self.cur_life = self.total_life
+        self.death_sound = \
+            monospace.model.res['chunks']['enemies']['death1'].get()
         self.dead = False
         self.res = None
 
@@ -50,6 +53,10 @@ class Enemy(desper.Controller):
         game = self.world.get_processor(monospace.GameProcessor)
         game.score_up(self.reward)
         self.spawn_particles()
+
+        # Feedback sound
+        if self.death_sound is not None:
+            Mix_PlayChannel(-1, self.death_sound, 0)
 
         self.spawn_bonus()
 
@@ -178,6 +185,11 @@ class RocketEnemy(Enemy):
     total_life = 5
     reward = 2
 
+    def __init__(self):
+        super().__init__()
+        self.death_sound = \
+            monospace.model.res['chunks']['enemies']['death2'].get()
+
     def particles_coroutine(self):
         texture = self.get(ctypes.POINTER(SDL_Texture))
         position = self.get(dsdl.Position)
@@ -216,6 +228,8 @@ class ShooterEnemy(Enemy):
 
     def __init__(self):
         super().__init__()
+        self.death_sound = \
+            monospace.model.res['chunks']['enemies']['death2'].get()
         self._shooting = False
         self._shot = False
         self.target_x = 0
@@ -259,6 +273,10 @@ class ShooterEnemy(Enemy):
             self._shot = self.blaster.shoot(pos.x, pos.y)
             if self._shot:
                 self.processor(desper.CoroutineProcessor).start(self.target())
+                # Feedback sound
+                Mix_PlayChannel(
+                    -1, monospace.model.res['chunks']['enemies']['shot'].get(),
+                    0)
 
     def target(self):
         """Coroutine that chooses a new target."""
@@ -313,6 +331,8 @@ class SphereEnemy(Enemy):
 
     def on_attach(self, en, world):
         super().on_attach(en, world)
+        self.death_sound = \
+            monospace.model.res['chunks']['enemies']['death3'].get()
 
         self.get(dsdl.Position).alpha = self.BASE_ALPHA
         self._sin_time = 0

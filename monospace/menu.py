@@ -197,6 +197,9 @@ class OptionToggler:
         # Actually apply option
         OPTIONS_SETTERS[self.option_name](value)
 
+        # Feedback sound
+        Mix_PlayChannel(-1, res['chunks']['toggle'].get(), 0)
+
         def coroutine_toggle_on():
             """Create the rectangle."""
             world.add_component(

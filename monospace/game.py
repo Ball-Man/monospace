@@ -8,6 +8,7 @@ import dsdl
 import monospace
 from sdl2 import *
 from sdl2.sdlttf import *
+from sdl2.sdlmixer import *
 
 
 DEFAULT_BULLET_SPEED = 15
@@ -219,12 +220,19 @@ class Ship(desper.Controller):
 
         # Trigger blasters
         for blaster in self.blasters:
-            blaster.shoot(self.position.x, self.position.y)
+            if blaster.shoot(self.position.x, self.position.y):
+                # Feedback sound
+                Mix_PlayChannel(-1,
+                                monospace.model.res['chunks']['shot'].get(),
+                                0)
 
         # Check collisions with powerups
         powerup = self.check_collisions(PowerupBox)
         if powerup is not None:
             powerup.apply(self)
+            # Feedback sound
+            Mix_PlayChannel(-1, monospace.model.res['chunks']['powerup'].get(),
+                            0)
 
         # Check collisions with enemy bullets
         enemy_bullet = self.check_collisions(EnemyBullet)
@@ -307,6 +315,14 @@ class Ship(desper.Controller):
                                       y=math.sin(angle) * mag)
                     )
 
+                # Feedback sound
+                if i % 2:
+                    sound = monospace.model.res['chunks']['death1'].get()
+                else:
+                    sound = monospace.model.res['chunks']['death2'].get()
+
+                Mix_PlayChannel(-1, sound, 0)
+
                 yield 10
 
             # Final big burst
@@ -326,6 +342,10 @@ class Ship(desper.Controller):
                     dsdl.Velocity(x=math.cos(angle) * mag,
                                   y=math.sin(angle) * mag)
                 )
+
+            # Feedback sound
+            Mix_PlayChannel(-1, monospace.model.res['chunks']['death3'].get(),
+                            0)
 
             self.world.delete_entity(self.entity)
 
