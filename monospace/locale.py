@@ -6,9 +6,15 @@ try:
 except ImportError:
     on_android = False
 
+# List of supported languages. If the found locale isn't one of these,
+# fallback to en.
+supported_languages = ['en', 'it']
+
 current_locale = None
 current_lang = 'en'
 if on_android:
     _java_util_locale = jnius.autoclass('java.util.Locale')
     current_locale = _java_util_locale.getDefault()
-    current_lang = str(current_locale.language)
+    java_locale = str(current_locale.language)
+    current_lang = (java_locale if java_locale in supported_languages
+                    else current_lang)
