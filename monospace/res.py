@@ -61,7 +61,7 @@ class MenuWorldHandle(desper.Handle):
         w.create_entity(ship_pos, self.res['text']['ship'].get())
 
         # Apply options
-        monospace.apply_options(self.res['db']['main'].get())
+        monospace.apply_options(self.res['db']['current'].get())
 
         return w
 
@@ -237,7 +237,7 @@ class DeathWorldHandle(desper.Handle):
         # Retry button
         retry_width = 400
         retry_height = 100
-        pos_y = monospace.LOGICAL_HEIGHT - retry_height - 130
+        pos_y = monospace.LOGICAL_HEIGHT - retry_height - 150
         w.create_entity(
             monospace.Button(
                 monospace.split_button_action(self.res['game_world'])),
@@ -250,6 +250,24 @@ class DeathWorldHandle(desper.Handle):
                                retry_height, SDL_Color()),
             monospace.model.res['str'][monospace.current_lang] \
                 .get_texture('retry')
+            )
+
+        # Menu button
+        menu_width = 400
+        menu_height = 100
+        pos_y = monospace.LOGICAL_HEIGHT - menu_height - 30
+        w.create_entity(
+            monospace.Button(
+                monospace.split_button_action(self.res['menu_world'])),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=menu_width,
+                             h=menu_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
+                          dsdl.Offset.CENTER),
+            dsdl.FillRectangle(monospace.LOGICAL_WIDTH // 2 - menu_width / 2,
+                               pos_y - menu_height / 2, menu_width,
+                               menu_height, SDL_Color()),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('menu')
             )
 
         w.create_entity(monospace.DeathScoreManager())
