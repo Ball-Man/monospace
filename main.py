@@ -78,7 +78,6 @@ def main():
     model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
     model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
     model.res['death_world'] = monospace.DeathWorldHandle(model.res)
-    model.switch(model.res['menu_world'])
 
     Mix_PlayMusic(model.res['mus']['too_much'].get(), -1)
 
@@ -98,6 +97,7 @@ def main():
 
     # Apply options
     monospace.apply_options(model.res['db'][CURRENT_DB_RES].get())
+    model.switch(model.res['menu_world']) 
 
     model.loop()
 
