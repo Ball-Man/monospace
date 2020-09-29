@@ -309,8 +309,6 @@ class Ship(desper.Controller):
 
                 yield 10
 
-            self.world.delete_entity(self.entity)
-
             # Final big burst
             x = position.x - offset[0] + texture.w / 2
             y = position.y - offset[1] + texture.h / 2
@@ -328,6 +326,16 @@ class Ship(desper.Controller):
                     dsdl.Velocity(x=math.cos(angle) * mag,
                                   y=math.sin(angle) * mag)
                 )
+
+            self.world.delete_entity(self.entity)
+
+            yield 210
+
+            # Change room
+            # Set temporary score for next room
+            monospace.score.temp_score = self.processor(GameProcessor).score
+            model = monospace.model
+            model.switch(model.res['death_world'], True)
 
         self.processor(desper.CoroutineProcessor).start(coroutine())
 

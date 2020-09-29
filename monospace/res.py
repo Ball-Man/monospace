@@ -212,6 +212,51 @@ class OptionsWorldHandle(desper.Handle):
         return w
 
 
+class DeathWorldHandle(desper.Handle):
+    """Handle for the death screen."""
+
+    def __init__(self, res):
+        super().__init__()
+        self.res = res
+
+    def _load(self):
+        w = desper.AbstractWorld()
+
+        # Processors
+        w.add_processor(dsdl.EventHandlerProcessor(), 10)
+        w.add_processor(dsdl.FillRectangleRenderProcessor(), -0.5)
+        w.add_processor(dsdl.TextureRendererProcessor(), -1)
+        w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(monospace.ButtonProcessor())
+        w.add_processor(desper.CoroutineProcessor())
+
+        # Entities
+        # Create entities
+
+        # Retry button
+        retry_width = 400
+        retry_height = 100
+        pos_y = monospace.LOGICAL_HEIGHT - retry_height - 130
+        w.create_entity(
+            monospace.Button(
+                monospace.split_button_action(self.res['game_world'])),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=retry_width,
+                             h=retry_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
+                          dsdl.Offset.CENTER),
+            dsdl.FillRectangle(monospace.LOGICAL_WIDTH // 2 - retry_width / 2,
+                               pos_y - retry_height / 2, retry_width,
+                               retry_height, SDL_Color()),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('retry')
+            )
+
+        w.create_entity(monospace.DeathScoreManager())
+
+        return w
+
+
 def get_db_importer():
     return desper.get_resource_importer('db', ('.db'))
 

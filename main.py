@@ -77,6 +77,7 @@ def main():
     model.res['menu_world'] = monospace.MenuWorldHandle(model.res)
     model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
     model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
+    model.res['death_world'] = monospace.DeathWorldHandle(model.res)
     model.switch(model.res['menu_world'])
 
     Mix_PlayMusic(model.res['mus']['too_much'].get(), -1)

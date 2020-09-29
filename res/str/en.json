@@ -10,6 +10,10 @@
     "on": {"text": "on", "font": "timenspace", "color": "000000ff"},
     "off": {"text": "off", "font": "timenspace"},
     "save": {"text": "save", "font": "timenspace", "color": "000000ff"},
-    "options": {"text": "options", "font": "timenspace"}
+    "options": {"text": "options", "font": "timenspace"},
+    "retry": {"text": "retry", "font": "timenspace", "color": "000000ff"},
+    "menu": {"text": "menu", "font": "timenspace", "color": "000000ff"},
+    "highscore": {"text": "high score:", "font": "timenspace"},
+    "newrecord": {"text": "new record!", "font": "timenspace"}
   }
 }

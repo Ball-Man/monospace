@@ -5,6 +5,9 @@
     "music": {"text": "musica", "font": "timenspace"},
     "sfx": {"text": "suoni", "font": "timenspace"},
     "save": {"text": "salva", "font": "timenspace", "color": "000000ff"},
-    "options": {"text": "opzioni", "font": "timenspace"}
+    "options": {"text": "opzioni", "font": "timenspace"},
+    "retry": {"text": "riprova", "font": "timenspace", "color": "000000ff"},
+    "highscore": {"text": "high score:", "font": "timenspace"},
+    "newrecord": {"text": "nuovo record!", "font": "timenspace"}
   }
 }

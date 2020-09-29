@@ -8,6 +8,7 @@ from .waves import *
 from .powerups import *
 from .enemies import *
 from .menu import *
+from .score import *
 
 import sdl2 as _sdl
 
