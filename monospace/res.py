@@ -112,26 +112,26 @@ class GameWorldHandle(desper.Handle):
                         monospace.Button(monospace.pause_game)
                         )
 
-        w.create_entity(dsdl.Position(-25, 100, dsdl.Offset.CENTER),
-                        dsdl.Velocity(),
-                        monospace.ShooterEnemy(),
-                        self.res['text']['enemies']['shooter'].get(),
-                        dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
-                        dsdl.Animation(7, 2, oneshot=True, run=False))
+        # w.create_entity(dsdl.Position(-25, 100, dsdl.Offset.CENTER),
+        #                 dsdl.Velocity(),
+        #                 monospace.ShooterEnemy(),
+        #                 self.res['text']['enemies']['shooter'].get(),
+        #                 dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
+        #                 dsdl.Animation(7, 2, oneshot=True, run=False))
 
-        w.create_entity(dsdl.Position(300, -25, dsdl.Offset.CENTER),
-                        dsdl.Velocity(0, 4),
-                        monospace.SphereEnemy(),
-                        self.res['text']['enemies']['sphere'].get(),
-                        dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
-                        )
+        # w.create_entity(dsdl.Position(300, -25, dsdl.Offset.CENTER),
+        #                 dsdl.Velocity(0, 4),
+        #                 monospace.SphereEnemy(),
+        #                 self.res['text']['enemies']['sphere'].get(),
+        #                 dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
+        #                 )
 
-        w.create_entity(dsdl.Position(200, -25, dsdl.Offset.CENTER),
-                        dsdl.Velocity(0, 4),
-                        monospace.RocketEnemy(),
-                        self.res['text']['enemies']['rocket'].get(),
-                        dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
-                        )
+        # w.create_entity(dsdl.Position(200, -25, dsdl.Offset.CENTER),
+        #                 dsdl.Velocity(0, 4),
+        #                 monospace.RocketEnemy(),
+        #                 self.res['text']['enemies']['rocket'].get(),
+        #                 dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
+        #                 )
 
         return w
 
