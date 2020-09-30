@@ -205,18 +205,20 @@ class Ship(desper.Controller):
         self.texture = None
 
         self.bonuses = set()
+        self.default_blaster = None
 
     def on_attach(self, en, world):
         super().on_attach(en, world)
 
         self.texture = self.get(ctypes.POINTER(SDL_Texture))
 
-        self.blasters.append(
-            Blaster((0, 0), ShipBullet,
-                    monospace.model.res['text']['ship_bullet'].get(),
-                    DEFAULT_BULLET_DELAY,
-                    (0, -DEFAULT_BULLET_SPEED),
-                    (10, 10, (5, 40)), world))
+        self.default_blaster = Blaster(
+            (0, 0), ShipBullet,
+            monospace.model.res['text']['ship_bullet'].get(),
+            DEFAULT_BULLET_DELAY,
+            (0, -DEFAULT_BULLET_SPEED),
+            (10, 10, (5, 40)), world)
+        self.blasters.append(copy.copy(self.default_blaster))
 
     def update(self, en, world, model):
         mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()

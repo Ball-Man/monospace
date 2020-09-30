@@ -4,6 +4,7 @@ import weakref
 import dsdl
 import desper
 import monospace
+from functools import reduce
 
 
 # Rewards
@@ -27,7 +28,7 @@ def powerup_double_blasters(ship: monospace.Ship):
 
     # Increase the delay for all the blasters
     for blaster in ship.blasters:
-        blaster.bullet_delay *= 3 // 4
+        blaster.bullet_delay = int(blaster.bullet_delay * 4 / 3)
 
 
 def powerup_add_blaster(ship: monospace.Ship):
@@ -35,7 +36,7 @@ def powerup_add_blaster(ship: monospace.Ship):
     tot_width = ship.texture.w
     tot_blasters = len(ship.blasters) + 1
 
-    ship.blasters.append(copy.copy(ship.blasters[0]))
+    ship.blasters.append(copy.copy(ship.default_blaster))
 
     # Relocate blasters
     for i, blaster in enumerate(ship.blasters):
@@ -77,10 +78,12 @@ def powerup_drift(ship: monospace.Ship):
 
 def powerup_delay1(ship: monospace.Ship):
     """Powerup that speeds up the fire rate but only for one blaster."""
-
     if len(ship.blasters) > 0:
-        ship.blasters[0].bullet_delay = max(
-            monospace.MIN_BULLET_DELAY, ship.blasters[0].bullet_delay // 3 * 2)
+        min_blaster = reduce(
+            lambda m, b: max(m, b, key=lambda bl: bl.bullet_delay),
+            ship.blasters)
+        min_blaster.bullet_delay = max(
+            monospace.MIN_BULLET_DELAY, min_blaster.bullet_delay // 3 * 2)
 
 
 # Random bonus during the game
