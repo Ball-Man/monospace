@@ -497,12 +497,25 @@ class PowerupBox(desper.OnAttachListener):
     """Proxy component for a power function."""
 
     def __init__(self, powerup_applier):
+        # Bound specific powerup appliers to specific textures
+        # If an applier isn't found in the dict, change to the blank.
+        self.powerup_texture_names = {
+            monospace.BonusDelay: 'speed',
+            monospace.powerup_drift: 'drift',
+            monospace.powerup_double_blasters: 'double_blasters',
+            monospace.powerup_shield: 'shield_',
+            monospace.powerup_delay1: 'delay1',
+            monospace.powerup_add_blaster: 'add_blaster',
+        }
+
         self.powerup_applier = powerup_applier
         self.applied = False
 
     def on_attach(self, en, world):
         self.world = world
         self.en = en
+
+        self.apply_texture()
 
     def apply(self, ship):
         """Apply the incapsulated powerup to the given ship.
@@ -521,3 +534,16 @@ class PowerupBox(desper.OnAttachListener):
         for en, powerup in self.world.get_component(PowerupBox):
             powerup.applied = True      # Prevent anomalies
             self.world.delete_entity(en)
+
+    def apply_texture(self):
+        """Select the correct texture for this powerup."""
+        text_name = self.powerup_texture_names.get(self.powerup_applier)
+        if text_name is None:
+            text_name = \
+                self.powerup_texture_names.get(type(self.powerup_applier))
+
+        text_name = 'blank' if text_name is None else text_name
+
+        self.world.add_component(
+            self.en,
+            monospace.model.res['text']['powerups'][text_name].get())
