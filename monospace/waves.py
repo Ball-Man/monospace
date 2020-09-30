@@ -2,6 +2,7 @@ import random
 import itertools
 import monospace
 import dsdl
+from sdl2 import SDL_Color
 
 
 class Wave:
@@ -16,6 +17,7 @@ class Wave:
     It's a base class and should be implemented to define the lists
     containing the possible spawn function and probabilities.
     """
+    bg_color = SDL_Color(0, 0, 0, 255)
 
     def __init__(self):
         self.enemies = [None]
@@ -50,8 +52,7 @@ class Wave:
     def spawn_rewards(self, world):
         """Method that spawns rewards for the cleared wave(powerups)."""
         if self.num_rewards > 0:
-            rewards = random.choice(tuple(itertools.combinations(self.rewards,
-                                                           self.num_rewards)))
+            rewards = random.sample(self.rewards, self.num_rewards)
             for i, reward in enumerate(rewards):
                 x = monospace.LOGICAL_WIDTH // (self.num_rewards + 1) * (i + 1)
                 y = monospace.LOGICAL_HEIGHT // 2
@@ -77,6 +78,7 @@ class DotsWave(Wave):
         self.dots_threshold_range = 100, 200   # In frames
         self._dots_threshold = random.randint(*self.dots_threshold_range)
         self.dots_rows = 1
+        self.dots_columns_range = 1, 3
         self._dots_timer = 0
 
     def spawn_dot(self, world, x, y=-50):
@@ -112,7 +114,8 @@ class DotsWave(Wave):
         self._dots_timer += 1
         if self._dots_timer > self._dots_threshold:
             # By default, columns are random from 1 to 3
-            self.spawn_dots(world, random.randint(1, 3), self.dots_rows)
+            self.spawn_dots(world, random.randint(*self.dots_columns_range),
+                            self.dots_rows)
 
             self._dots_threshold = random.randint(*self.dots_threshold_range)
             self._dots_timer = 0
@@ -124,23 +127,30 @@ class FirstWave(DotsWave):
     def __init__(self):
         super().__init__()
 
-        self.rewards = [monospace.powerup_shield]
+        self.rewards = [monospace.powerup_shield, monospace.powerup_drift]
         self.num_rewards = 1
 
 
-class SecondWave(DotsWave):
+class SecondWaveRoll(DotsWave):
     """Custom wave for the second one of the game."""
+    bg_color = SDL_Color(0, 13, 45, 255)
 
     def __init__(self):
         super().__init__()
 
-        self.enemy_threshold_range = 200, 350
+        self.enemy_threshold_range = 100, 350
         self._enemy_threshold = random.randint(*self.enemy_threshold_range)
-        self.dots_threshold_range = 100, 170
+        self.dots_threshold_range = 70, 160
+        self.dots_columns_range = 1, 4
 
         self.enemies = [
             lambda world: self.spawn_roll(world)]
         self.enemy_chances = [1]
+
+        self.rewards = [monospace.powerup_add_blaster,
+                        monospace.powerup_delay1,
+                        monospace.powerup_double_blasters]
+        self.num_rewards = 1
 
     def spawn_dot(self, world, x, y=-50):
         """Spawn a dot enemy at given position."""
@@ -152,9 +162,50 @@ class SecondWave(DotsWave):
 
     def spawn_roll(self, world):
         text = monospace.model.res['text']['enemies']['roll'].get()
-        pos_x = random.randint(50, monospace.LOGICAL_WIDTH - text.w)
+        pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
         world.create_entity(
             dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
             dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
             dsdl.Velocity(0, 3),
             text, monospace.RollEnemy())
+
+
+class SecondWaveShooter(DotsWave):
+    """Custom wave for the second one of the game."""
+    bg_color = SDL_Color(0, 35, 13, 255)
+
+    def __init__(self):
+        super().__init__()
+
+        self.enemy_threshold_range = 100, 350
+        self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+        self.dots_threshold_range = 70, 160
+        self.dots_columns_range = 1, 4
+
+        self.enemies = [
+            lambda world: self.spawn_shooter(world)]
+        self.enemy_chances = [1]
+
+        self.rewards = [monospace.powerup_add_blaster,
+                        monospace.powerup_delay1,
+                        monospace.powerup_double_blasters]
+        self.num_rewards = 2
+
+    def spawn_dot(self, world, x, y=-50):
+        """Spawn a dot enemy at given position."""
+        world.create_entity(
+            dsdl.Position(x, y),
+            dsdl.BoundingBox(w=50, h=50), dsdl.Velocity(0, 7),
+            monospace.model.res['text']['enemies']['dot'].get(),
+            dsdl.Animation(2, 60), monospace.DotEnemy())
+
+    def spawn_shooter(self, world):
+        text = monospace.model.res['text']['enemies']['shooter'].get()
+        pos_x = random.choice((-60, monospace.LOGICAL_WIDTH + 60))
+        pos_y = random.randint(text.h, monospace.LOGICAL_HEIGHT // 3)
+        world.create_entity(
+            dsdl.Position(pos_x, pos_y, offset=dsdl.Offset.CENTER),
+            dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
+            dsdl.Velocity(),
+            text, monospace.ShooterEnemy(),
+            dsdl.Animation(7, 2, oneshot=True, run=False))

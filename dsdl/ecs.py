@@ -63,10 +63,14 @@ class TextureRendererProcessor(esper.Processor):
 class ScreenClearerProcessor(esper.Processor):
     """Processor that cleans the screen and renders the backbuffer."""
 
+    def __init__(self):
+        self.color = SDL_Color(0, 0, 0, 255)
+
     def process(self, model, *args):
         SDL_RenderPresent(model.renderer)
 
-        SDL_SetRenderDrawColor(model.renderer, 0, 0, 0, 255)
+        SDL_SetRenderDrawColor(model.renderer, self.color.r,
+                               self.color.g, self.color.b, self.color.a)
         SDL_RenderClear(model.renderer)
 
 

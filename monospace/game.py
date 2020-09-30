@@ -1,4 +1,5 @@
 import ctypes
+import copy
 import random
 import enum
 import math
@@ -19,7 +20,7 @@ MIN_BULLET_DELAY = 7
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
 
-    WAVE_THRESHOLDS = [50, 150, 300, 600, math.inf]
+    WAVE_THRESHOLDS = [1, 10, 300, 600, math.inf]
     score = 0
 
     def __init__(self):
@@ -33,7 +34,9 @@ class GameProcessor(esper.Processor):
         self._rewards_spawned = False
         self._next_wave_coroutine = None
 
-        self.waves = [monospace.FirstWave(), monospace.SecondWave(),
+        self.waves = [monospace.FirstWave(),
+                      random.choice((monospace.SecondWaveShooter(),
+                                     monospace.SecondWaveRoll())),
                       monospace.DotsWave(), monospace.DotsWave()]
 
     def process(self, model):
@@ -69,9 +72,33 @@ class GameProcessor(esper.Processor):
     def next_wave(self):
         yield 120
         self._cur_threshold += 1
-        self._state = GameState.WAVE
         self._rewards_spawned = False
         self.score_up(0)
+        self._powerup_coroutine = None
+        self._next_wave_coroutine = None
+        self._state = GameState.WAVE
+
+        def change_color_coroutine():
+            proc = self.world.get_processor(dsdl.ScreenClearerProcessor)
+            start_color = copy.copy(proc.color)
+            dst_color = self.waves[self._cur_threshold].bg_color
+            time = 120
+
+            for prog in range(time):
+                proc.color.r = int(
+                    start_color.r + (dst_color.r - start_color.r)
+                    * prog / time)
+                proc.color.g = int(
+                    start_color.g + (dst_color.g - start_color.g)
+                    * prog / time)
+                proc.color.b = int(
+                    start_color.b + (dst_color.b - start_color.b)
+                    * prog / time)
+
+                yield
+
+        self.world.get_processor(desper.CoroutineProcessor).start(
+            change_color_coroutine())
 
     def score_up(self, value):
         """Add some value to the current score.
