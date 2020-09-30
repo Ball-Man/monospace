@@ -82,10 +82,10 @@ def main():
     Mix_PlayMusic(model.res['mus']['too_much'].get(), -1)
 
     # Generate db if empty or version is obsolete
+    db_filename = model.res['db']['main'].filename
     if monospace.on_android:
         new_db_filename = pt.join(APP_DB_PATH, CURRENT_DB_NAME)
     else:
-        db_filename = model.res['db']['main'].filename
         db_dirname = pt.dirname(db_filename)
         new_db_filename = pt.join(db_dirname, CURRENT_DB_NAME)
 
