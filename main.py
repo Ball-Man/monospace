@@ -37,7 +37,8 @@ def main():
     Mix_Init(MIX_INIT_OGG)
     TTF_Init()
 
-    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 256)
+    chunk_size = 256 if monospace.on_android else 1024
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, chunk_size)
 
     monospace.init_screen_resolution()
 
@@ -78,8 +79,6 @@ def main():
     model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
     model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
     model.res['death_world'] = monospace.DeathWorldHandle(model.res)
-
-    Mix_PlayMusic(model.res['mus']['too_much'].get(), -1)
 
     # Generate db if empty or version is obsolete
     db_filename = model.res['db']['main'].filename

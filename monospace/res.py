@@ -61,6 +61,7 @@ class MenuWorldHandle(desper.Handle):
         w.create_entity(ship_pos, self.res['text']['ship'].get())
 
         # Apply options
+        w.create_entity(monospace.HaltMusic())
         monospace.apply_options(self.res['db']['current'].get())
 
         return w
@@ -133,6 +134,8 @@ class GameWorldHandle(desper.Handle):
         #                 dsdl.BoundingBox(dsdl.Offset.CENTER, w=50, h=50),
         #                 )
 
+        w.create_entity(monospace.PlayMusic())
+
         return w
 
 
@@ -165,6 +168,9 @@ class PauseWorldHandle(desper.Handle):
                                       monospace.LOGICAL_HEIGHT / 2,
                                       dsdl.Offset.CENTER)
                         )
+
+        w.create_entity(monospace.PauseMusic())
+
         return w
 
 
@@ -291,6 +297,7 @@ class DeathWorldHandle(desper.Handle):
                 .get_texture('menu')
             )
 
+        w.create_entity(monospace.FadeOutMusic())
         w.create_entity(monospace.DeathScoreManager())
 
         return w

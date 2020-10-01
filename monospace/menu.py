@@ -14,6 +14,40 @@ OPTION_GET_QUERY = 'SELECT `value` FROM `options` WHERE `option_name`=?'
 OPTION_UPDATE_QUERY = 'UPDATE `options` SET `value`=? WHERE `option_name`=?'
 
 
+class HaltMusic(desper.OnAttachListener):
+    """Halt music on attach."""
+
+    def on_attach(self, *args):
+        Mix_HaltMusic()
+
+
+class PlayMusic(desper.OnAttachListener):
+    """Play music on attach, if not playing already. Resumes if paused."""
+
+    def on_attach(self, *args):
+        if Mix_PausedMusic():
+            Mix_ResumeMusic()
+        elif not Mix_PlayingMusic():
+            Mix_PlayMusic(monospace.model.res['mus']['too_much'].get(), -1)
+
+
+class FadeOutMusic(desper.OnAttachListener):
+    """Fade out music on attach."""
+
+    def __init__(self, ms=300):
+        self.ms = ms
+
+    def on_attach(self, *args):
+        Mix_FadeOutMusic(int(self.ms))
+
+
+class PauseMusic(desper.OnAttachListener):
+    """Pause music on attach."""
+
+    def on_attach(self, *args):
+        Mix_PauseMusic()
+
+
 class ButtonProcessor(esper.Processor):
     """Processor that manages button presses."""
 
@@ -135,6 +169,10 @@ def resume_game(en, world: esper.World, model: desper.GameModel):
                 model.res['str'][monospace.current_lang].get_texture(str(i)))
 
             yield 60
+
+        # Unpause music
+        if Mix_PausedMusic():
+            Mix_ResumeMusic()
 
         # Sound feedback
         Mix_PlayChannel(-1, model.res['chunks']['button'].get(), 0)
