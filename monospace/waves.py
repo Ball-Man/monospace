@@ -288,3 +288,28 @@ class FifthWave(DotsWave):
                         monospace.powerup_double_blasters,
                         monospace.powerup_drift]
         self.num_rewards = 2
+
+
+class InfWave(DotsWave):
+    """Custom wave for the second one of the game."""
+    bg_color = SDL_Color(0, 0, 0, 255)
+
+    def __init__(self):
+        super().__init__()
+
+        self.enemy_threshold_range = 80, 120
+        self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+        self.dots_threshold_range = 50, 100
+        self.dots_rows = 3
+        self.dots_columns_range = 2, 4
+        self.dots_speed = 9
+
+        self.enemies = [
+            lambda world: monospace.spawn_roll(world, 3),
+            monospace.spawn_shooter,
+            lambda world: monospace.spawn_rocket(world, 4),
+            lambda world: monospace.spawn_sphere(world, 4)]
+        self.enemy_chances = [1, 1, 1, 1]
+
+        self.rewards = [monospace.powerup_add_blaster]
+        self.num_rewards = 1
