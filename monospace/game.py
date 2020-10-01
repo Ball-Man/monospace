@@ -37,7 +37,7 @@ class GameProcessor(esper.Processor):
         self.waves = [monospace.FirstWave(),
                       random.choice((monospace.SecondWaveShooter(),
                                      monospace.SecondWaveRoll())),
-                      monospace.DotsWave(), monospace.DotsWave()]
+                      monospace.ThirdWave(), monospace.DotsWave()]
 
     def process(self, model):
         if self.model is None:
