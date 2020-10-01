@@ -400,3 +400,14 @@ def spawn_rocket(world, speed):
         dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
         dsdl.Velocity(0, speed),
         text, monospace.RocketEnemy())
+
+
+def spawn_sphere(world, speed):
+    """Spawn a sphere enemy with the given vertical speed."""
+    text = monospace.model.res['text']['enemies']['sphere'].get()
+    pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
+    world.create_entity(
+        dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
+        dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
+        dsdl.Velocity(0, speed),
+        text, monospace.SphereEnemy())
