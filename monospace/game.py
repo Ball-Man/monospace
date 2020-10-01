@@ -20,7 +20,7 @@ MIN_BULLET_DELAY = 7
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
 
-    WAVE_THRESHOLDS = [50, 100, 300, 600, math.inf]
+    WAVE_THRESHOLDS = [50, 100, 250, 500, math.inf]
     score = 0
 
     def __init__(self):
@@ -37,7 +37,9 @@ class GameProcessor(esper.Processor):
         self.waves = [monospace.FirstWave(),
                       random.choice((monospace.SecondWaveShooter(),
                                      monospace.SecondWaveRoll())),
-                      monospace.ThirdWave(), monospace.DotsWave()]
+                      random.choice((monospace.ThirdWave(),
+                                     monospace.ThirdWaveRocket())),
+                      monospace.DotsWave()]
 
     def process(self, model):
         if self.model is None:

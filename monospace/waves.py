@@ -202,3 +202,34 @@ class ThirdWave(DotsWave):
                         monospace.powerup_delay1,
                         monospace.powerup_double_blasters]
         self.num_rewards = 2
+
+
+class ThirdWaveRocket(DotsWave):
+    """Custom wave for the second one of the game."""
+    bg_color = SDL_Color(45, 0, 0, 255)
+
+    def __init__(self):
+        super().__init__()
+
+        self.enemy_threshold_range = 50, 200
+        self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+        self.dots_threshold_range = 50, 150
+        self.dots_rows = 2
+        self.dots_columns_range = 1, 4
+        self.dots_speed = 7
+
+        self.enemies = [self.spawn_rocket]
+        self.enemy_chances = [1]
+
+        self.rewards = [monospace.powerup_add_blaster,
+                        monospace.powerup_delay1,
+                        monospace.powerup_shield]
+        self.num_rewards = 3
+
+    def spawn_rocket(self, world):
+        """Spawn special rockets."""
+        num = random.choice((1, 2))
+
+        for _ in range(num):
+            speed = random.choices((3, 6, 10), (3, 1, 1))[0]
+            monospace.spawn_rocket(world, speed)

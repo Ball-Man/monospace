@@ -183,7 +183,7 @@ class RollEnemy(Enemy):
 
 class RocketEnemy(Enemy):
     total_life = 5
-    reward = 2
+    reward = 3
 
     def __init__(self):
         super().__init__()
