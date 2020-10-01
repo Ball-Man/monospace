@@ -49,7 +49,7 @@ requirements = python3,sdl2,pysdl2,esper,jnius
 presplash.filename = %(source.dir)s/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = %(source.dir)s/icon.png
 
 # (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
 orientation = portrait
