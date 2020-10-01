@@ -64,6 +64,12 @@ class MenuWorldHandle(desper.Handle):
         w.create_entity(monospace.HaltMusic())
         monospace.apply_options(self.res['db']['current'].get())
 
+        # My name
+        name = self.res['str'][monospace.current_lang].get_texture('ballman')
+        w.create_entity(
+            name,
+            dsdl.Position(30, monospace.LOGICAL_HEIGHT - name.h))
+
         return w
 
 

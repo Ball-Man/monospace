@@ -14,6 +14,8 @@
     "retry": {"text": "retry", "font": "timenspace", "color": "000000ff"},
     "menu": {"text": "menu", "font": "timenspace", "color": "000000ff"},
     "highscore": {"text": "high score:", "font": "timenspace"},
-    "newrecord": {"text": "new record!", "font": "timenspace"}
+    "newrecord": {"text": "new record!", "font": "timenspace"},
+
+    "ballman": {"text": "Francesco Mistri 2020", "font": "courierprime"}
   }
 }
