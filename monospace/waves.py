@@ -146,22 +146,13 @@ class SecondWaveRoll(DotsWave):
         self.dots_speed = 7
 
         self.enemies = [
-            lambda world: self.spawn_roll(world)]
+            lambda world: monospace.spawn_roll(world, 3)]
         self.enemy_chances = [1]
 
         self.rewards = [monospace.powerup_add_blaster,
                         monospace.powerup_delay1,
                         monospace.powerup_double_blasters]
         self.num_rewards = 1
-
-    def spawn_roll(self, world):
-        text = monospace.model.res['text']['enemies']['roll'].get()
-        pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
-        world.create_entity(
-            dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
-            dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
-            dsdl.Velocity(0, 3),
-            text, monospace.RollEnemy())
 
 
 class SecondWaveShooter(DotsWave):
@@ -178,24 +169,13 @@ class SecondWaveShooter(DotsWave):
         self.dots_speed = 7
 
         self.enemies = [
-            lambda world: self.spawn_shooter(world)]
+            monospace.spawn_shooter]
         self.enemy_chances = [1]
 
         self.rewards = [monospace.powerup_add_blaster,
                         monospace.powerup_delay1,
                         monospace.powerup_double_blasters]
         self.num_rewards = 2
-
-    def spawn_shooter(self, world):
-        text = monospace.model.res['text']['enemies']['shooter'].get()
-        pos_x = random.choice((-60, monospace.LOGICAL_WIDTH + 60))
-        pos_y = random.randint(text.h, monospace.LOGICAL_HEIGHT // 3)
-        world.create_entity(
-            dsdl.Position(pos_x, pos_y, offset=dsdl.Offset.CENTER),
-            dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
-            dsdl.Velocity(),
-            text, monospace.ShooterEnemy(),
-            dsdl.Animation(7, 2, oneshot=True, run=False))
 
 
 class ThirdWave(DotsWave):
@@ -210,52 +190,15 @@ class ThirdWave(DotsWave):
         self.dots_threshold_range = 50, 150
         self.dots_rows = 2
         self.dots_columns_range = 1, 4
-        self.dots_speed = 9
+        self.dots_speed = 8
 
         self.enemies = [
-            lambda world: self.spawn_roll(world),
-            lambda world: self.spawn_shooter(world),
-            lambda world: self.spawn_rocket(world)]
+            lambda world: monospace.spawn_roll(world, 3),
+            monospace.spawn_shooter,
+            lambda world: monospace.spawn_rocket(world, 4)]
         self.enemy_chances = [10, 10, 1]
 
         self.rewards = [monospace.powerup_add_blaster,
                         monospace.powerup_delay1,
                         monospace.powerup_double_blasters]
         self.num_rewards = 2
-
-    def spawn_dot(self, world, x, y=-50):
-        """Spawn a dot enemy at given position."""
-        world.create_entity(
-            dsdl.Position(x, y),
-            dsdl.BoundingBox(w=50, h=50), dsdl.Velocity(0, 7),
-            monospace.model.res['text']['enemies']['dot'].get(),
-            dsdl.Animation(2, 60), monospace.DotEnemy())
-
-    def spawn_shooter(self, world):
-        text = monospace.model.res['text']['enemies']['shooter'].get()
-        pos_x = random.choice((-60, monospace.LOGICAL_WIDTH + 60))
-        pos_y = random.randint(text.h, monospace.LOGICAL_HEIGHT // 3)
-        world.create_entity(
-            dsdl.Position(pos_x, pos_y, offset=dsdl.Offset.CENTER),
-            dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
-            dsdl.Velocity(),
-            text, monospace.ShooterEnemy(),
-            dsdl.Animation(7, 2, oneshot=True, run=False))
-
-    def spawn_roll(self, world):
-        text = monospace.model.res['text']['enemies']['roll'].get()
-        pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
-        world.create_entity(
-            dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
-            dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
-            dsdl.Velocity(0, 3),
-            text, monospace.RollEnemy())
-
-    def spawn_rocket(self, world):
-        text = monospace.model.res['text']['enemies']['rocket'].get()
-        pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
-        world.create_entity(
-            dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
-            dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
-            dsdl.Velocity(0, 4),
-            text, monospace.RocketEnemy())
