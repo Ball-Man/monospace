@@ -62,9 +62,18 @@ class ButtonProcessor(esper.Processor):
         else:
             pressed = False
 
-        mouse_x = mouse_x.value * monospace.LOGICAL_WIDTH_RATIO
-        mouse_y = mouse_y.value * monospace.LOGICAL_WIDTH_RATIO
+        win_w, win_h = ctypes.c_int(0), ctypes.c_int(0)
+        SDL_GetWindowSize(monospace.model.window, win_w, win_h)
 
+        mouse_x = mouse_x.value * monospace.LOGICAL_WIDTH_RATIO
+        mouse_y = mouse_y.value * monospace.LOGICAL_HEIGHT / win_h.value
+
+        # print('window', win_w, win_h)
+        # print('display mode', monospace.DISPLAY_MODE)
+
+        # print('ratio', monospace.LOGICAL_WIDTH_RATIO,
+        #       'width', monospace.LOGICAL_WIDTH, 'height',
+        #       monospace.LOGICAL_HEIGHT, 'mouse', mouse_x, mouse_y)
         for en, (bbox, button) in self.world.get_components(
                 dsdl.BoundingBox, Button):
 
