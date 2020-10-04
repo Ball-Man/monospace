@@ -160,6 +160,7 @@ class GameProcessor(esper.Processor):
         """
         # Clear all the enemies
         for en, enemy in self.world.get_component(monospace.Enemy):
+            enemy.dead = True
             enemy.spawn_particles()
             self.world.delete_entity(en)
 
@@ -180,12 +181,13 @@ class EntityCleanerProcessor(esper.Processor):
     def process(self, _):
         for en, _ in self.world.get_component(ShipBullet):
             position = self.world.component_for_entity(en, dsdl.Position)
-            if position.y <= 50:
+            if position.y <= 50 and self.world.entity_exists(en):
                 self.world.delete_entity(en)
 
         for en, _ in self.world.get_component(monospace.Enemy):
             position = self.world.component_for_entity(en, dsdl.Position)
-            if position.y > monospace.LOGICAL_HEIGHT + 50:
+            if position.y > monospace.LOGICAL_HEIGHT + 50 \
+               and self.world.entity_exists(en):
                 self.world.delete_entity(en)
 
 
@@ -472,8 +474,9 @@ class ShipBullet(desper.OnAttachListener):
 
         Override to change the behaviour of the bullet.
         """
-        self.world.delete_entity(self.entity)
-        self.hit = True
+        if self.world.entity_exists(self.entity):
+            self.world.delete_entity(self.entity)
+            self.hit = True
 
 
 class DriftingShipBullet(ShipBullet, desper.AbstractComponent):

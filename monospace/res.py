@@ -89,6 +89,7 @@ class GameWorldHandle(desper.Handle):
         w.add_processor(dsdl.ScreenClearerProcessor(), -2)
         w.add_processor(monospace.GameProcessor())
         w.add_processor(desper.AbstractProcessor())
+        w.add_processor(monospace.EnemyProcessor())
         w.add_processor(dsdl.VelocityProcessor())
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(dsdl.CollisionCircleProcessor())

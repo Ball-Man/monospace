@@ -4,8 +4,49 @@ import random
 import monospace
 import dsdl
 import desper
+import esper
 from sdl2 import *
 from sdl2.sdlmixer import *
+
+
+ENEMY_HASH = None
+
+
+class EnemyProcessor(esper.Processor):
+
+    def __init__(self):
+        global ENEMY_HASH
+        ENEMY_HASH = dsdl.SpatialHash(
+            monospace.LOGICAL_WIDTH, monospace.LOGICAL_HEIGHT, 100)
+
+    def process(self, model):
+        for en, enemy in self.world.get_component(Enemy):
+            bbox = self.world.try_component(en, dsdl.BoundingBox)
+
+            if bbox is not None:
+                ENEMY_HASH.update((enemy, bbox))
+
+        # Check for collision with a bullet
+        for en, bullet in self.world.get_component(monospace.ShipBullet):
+            if bullet.hit:
+                continue
+
+            bbox = self.world.try_component(en, dsdl.BoundingBox)
+
+            enemies = set()
+            if bbox is not None:
+                enemies = ENEMY_HASH.get_from_bbox(bbox)
+
+            for enemy, enemy_bbox in enemies:
+                if enemy.dead or bullet.hit:
+                    continue
+
+                if bbox.overlaps(enemy_bbox):
+                    enemy.cur_life -= bullet.damage
+                    bullet.die()
+
+                    if enemy.cur_life <= 0:
+                        enemy.die()
 
 
 class Enemy(desper.Controller):
@@ -19,35 +60,28 @@ class Enemy(desper.Controller):
         self.death_sound = \
             monospace.model.res['chunks']['enemies']['death1'].get()
         self.dead = False
-        self.res = None
 
         self.bonuses = monospace.BonusDelay(), None
         self.bonuses_chances = 1, 80
 
-    def update(self, entity, world, model):
-        # Check for collision with a bullet
-        if self.res is None:
-            self.res = model.res
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+        self.bbox = self.get(dsdl.BoundingBox)
+        self.position = self.get(dsdl.Position)
+        self.texture = self.get(ctypes.POINTER(SDL_Texture))
 
-        for en, bullet in world.get_component(monospace.ShipBullet):
-            if bullet.hit or self.dead:
-                continue
-
-            bbox = world.component_for_entity(en, dsdl.BoundingBox)
-
-            if bbox.overlaps(self.get(dsdl.BoundingBox)):
-                self.cur_life -= bullet.damage
-                bullet.die()
-
-                if self.cur_life <= 0:
-                    self.die()
+    def update(self, *args):
+        pass
 
     def die(self):
         """Default method used for enemy destruction.
 
         Override to change the behaviour of the enemy.
         """
-        self.world.delete_entity(self.entity)
+        if self.dead:
+            return
+
+        ENEMY_HASH.remove((self, self.bbox))
         self.dead = True
 
         game = self.world.get_processor(monospace.GameProcessor)
@@ -60,13 +94,16 @@ class Enemy(desper.Controller):
 
         self.spawn_bonus()
 
+        if self.world.entity_exists(self.entity):
+            self.world.delete_entity(self.entity)
+
     def spawn_bonus(self):
         """Spawn a bonus for the player, maybe."""
         powerup = random.choices(self.bonuses, self.bonuses_chances)[0]
         if powerup is None:
             return
 
-        pos = self.get(dsdl.Position)
+        pos = self.position
         text = monospace.model.res['text']['powerups']['blank'].get()
         offset = pos.get_offset(text.w, text.h)
         enemy_text = self.get(ctypes.POINTER(SDL_Texture))
@@ -88,8 +125,8 @@ class DotEnemy(Enemy):
 
     def spawn_particles(self):
         """Spawn death particles for the death."""
-        texture = self.get(ctypes.POINTER(SDL_Texture))
-        position = self.get(dsdl.Position)
+        texture = self.texture
+        position = self.position
         offset = position.get_offset(texture.w, texture.h)
         for _ in range(random.randrange(4, 8)):
             angle = math.radians(random.randrange(0, 360))

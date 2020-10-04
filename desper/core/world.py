@@ -227,6 +227,15 @@ class AbstractWorld(esper.World):
 
         raise KeyError
 
+    def entity_exists(self, entity: int) -> bool:
+        """Check if a specific entity exists.
+        Empty entities(with no components) and dead entities(destroyed
+        by delete_entity) will not count as existent ones.
+        :param entity: The Entity ID to check existance for.
+        :return: True if the entity exists, False otherwise.
+        """
+        return entity in self._entities and entity not in self._dead_entities
+
     def try_component(self, entity, component_type):
         """Try to get a single component type for an Entity.
 
