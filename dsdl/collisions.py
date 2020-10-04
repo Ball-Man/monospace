@@ -1,3 +1,5 @@
+import math
+import functools
 import dsdl
 
 
@@ -133,3 +135,83 @@ def check_collisions(collider1, collider2):
         dic[type2] = (collider2, )
 
     return collision_functions[frozenset((type1, type2))](dic)
+
+
+class SpatialHash:
+    """Data structure for optimized collision detection.
+
+    It stores couples (Object, BoundingBox) in a grid.
+    """
+
+    def __init__(self, width, height, grid_size):
+        self.grid_size = grid_size
+        self.width = width
+        self.height = height
+        self.num_columns = math.ceil(width / grid_size)
+        self.num_rows = math.ceil(height / grid_size)
+        self._grid = []
+        for x in range(self.num_columns):
+            col = []
+            self._grid.append(col)
+            for y in range(self.num_rows):
+                col.append(set())
+
+        self._population = {}       # (Object, BoundingBox): {(x, y), ...}
+
+    def update(self, couple):
+        """Add object to the grid, if not present.
+
+        If already present, update its position.
+        """
+        if couple not in self._population:
+            self._population.add(couple)
+
+        bbox = couple[1]
+        new_pos = set()
+        x1 = bbox.x // self.grid_size
+        y1 = bbox.y // self.grid_size
+        x2 = (bbox.x + bbox.w) // self.grid_size
+        y2 = (bbox.y + bbox.h) // self.grid_size
+
+        # New population set
+        new_pos.add((x1, y1))
+        new_pos.add((x1, y2))
+        new_pos.add((x2, y1))
+        new_pos.add((x2, y2))
+
+        # Remove from previous locations
+        for pos in self._population.get(couple, {}) - new_pos:
+            self._grid[pos[0]][pos[1]].remove(couple)
+
+        # Add to new locations
+        for pos in new_pos - self._population.get(couple, {}):
+            self._grid[pos[0]][pos[1]].add(couple)
+
+        # Update population
+        self._population[couple] = new_pos
+
+    def remove(self, couple):
+        """Remove an object from the grid, if present."""
+        pop = self._population.get(couple, {})
+        for pos in pop:
+            self._grid[pos[0]][pos[1]].remove(couple)
+
+        pop.remove(couple)
+
+    def get(self, x, y):
+        """Get the content of the cell of (non hashed) x, y."""
+        if x > self.width or y > self.height or x < 0 or y < 0:
+            return {}
+
+        return self._grid[x // self.grid_size][y // self.grid_size]
+
+    def get_from_bbox(self, bbox):
+        """Get the content of all the cells where a bbox intersects."""
+        x1 = bbox.x
+        x2 = bbox.x + bbox.w
+        y1 = bbox.y
+        y2 = bbox.y + bbox.h
+        points = ((x1, y1), (x1, y2), (x2, y1), (x2, y2))
+
+        return functools.reduce(lambda s, x: s.union(x),
+                                (self.get(*p) for p in points))
