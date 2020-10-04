@@ -49,7 +49,7 @@ class EnemyProcessor(esper.Processor):
                         enemy.die()
 
 
-class Enemy(desper.Controller):
+class Enemy(desper.OnAttachListener):
     """Base component class for enemies."""
     total_life = 1
     reward = 1
@@ -65,13 +65,12 @@ class Enemy(desper.Controller):
         self.bonuses_chances = 1, 80
 
     def on_attach(self, en, world):
-        super().on_attach(en, world)
-        self.bbox = self.get(dsdl.BoundingBox)
-        self.position = self.get(dsdl.Position)
-        self.texture = self.get(ctypes.POINTER(SDL_Texture))
-
-    def update(self, *args):
-        pass
+        self.world = world
+        self.entity = en
+        self.bbox = world.try_component(en, dsdl.BoundingBox)
+        self.position = world.try_component(en, dsdl.Position)
+        self.texture = world.try_component(en, ctypes.POINTER(SDL_Texture))
+        self.velocity = world.try_component(en, dsdl.Velocity)
 
     def die(self):
         """Default method used for enemy destruction.
@@ -143,7 +142,7 @@ class DotEnemy(Enemy):
             )
 
 
-class RollEnemy(Enemy):
+class RollEnemy(Enemy, desper.AbstractComponent):
     """Roll enemy controller."""
     hor_speed = 6
     total_life = 1
@@ -157,13 +156,11 @@ class RollEnemy(Enemy):
         self._old_velocity = 0
 
     def update(self, en, world, model):
-        super().update(en, world, model)
-
         self.timer -= 1
 
-        position = self.get(dsdl.Position)
-        texture = self.get(ctypes.POINTER(SDL_Texture))
-        velocity = self.get(dsdl.Velocity)
+        position = self.position
+        texture = self.texture
+        velocity = self.velocity
         offset = position.get_offset(texture.w, texture.h)
 
         # Manage direction changes
@@ -200,8 +197,8 @@ class RollEnemy(Enemy):
 
     def spawn_particles(self):
         """Spawn death particles for the death."""
-        texture = self.get(ctypes.POINTER(SDL_Texture))
-        position = self.get(dsdl.Position)
+        texture = self.texture
+        position = self.position
         offset = position.get_offset(texture.w, texture.h)
         for _ in range(random.randrange(4, 8)):
             angle = math.radians(random.randrange(0, 360))
@@ -228,8 +225,8 @@ class RocketEnemy(Enemy):
             monospace.model.res['chunks']['enemies']['death2'].get()
 
     def particles_coroutine(self):
-        texture = self.get(ctypes.POINTER(SDL_Texture))
-        position = self.get(dsdl.Position)
+        texture = self.texture
+        position = self.position
         offset = position.get_offset(texture.w, texture.h)
 
         # Spawn particles three times in time
@@ -254,11 +251,11 @@ class RocketEnemy(Enemy):
 
     def spawn_particles(self):
         """Spawn death particles for the death."""
-        self.processor(desper.CoroutineProcessor).start(
+        self.world.get_processor(desper.CoroutineProcessor).start(
             self.particles_coroutine())
 
 
-class ShooterEnemy(Enemy):
+class ShooterEnemy(Enemy, desper.AbstractComponent):
     """An enemy that takes aim and shoots you."""
     total_life = 2
     HORIZONTAL_SPEED = 3
@@ -290,26 +287,27 @@ class ShooterEnemy(Enemy):
             30, (0, 5), (10, 10, dsdl.Offset.BOTTOM_CENTER), world,
             animation=(2, 5))
 
-    def update(self, *args):
-        super().update(*args)
+        self.animation = world.try_component(en, dsdl.Animation)
 
+    def update(self, *args):
         # If aligned with the ship horizontally, stop and start shooting
         if (not self._shooting
-            and abs(self.get(dsdl.Position).x - self.target_x)
+            and abs(self.position.x - self.target_x)
                 < self.HORIZONTAL_SPEED):
-            self.get(dsdl.Position).x = self.target_x
-            self.get(dsdl.Velocity).x = 0
+            self.position.x = self.target_x
+            self.velocity.x = 0
             self._shooting = True
 
-            anim = self.get(dsdl.Animation)
+            anim = self.animation
             if anim.cur_frame == 0:
                 anim.run = True
 
         if self._shooting and not self._shot:
-            pos = self.get(dsdl.Position)
+            pos = self.position
             self._shot = self.blaster.shoot(pos.x, pos.y)
             if self._shot:
-                self.processor(desper.CoroutineProcessor).start(self.target())
+                self.world.get_processor(desper.CoroutineProcessor) \
+                    .start(self.target())
                 # Feedback sound
                 Mix_PlayChannel(
                     -1, monospace.model.res['chunks']['enemies']['shot'].get(),
@@ -331,16 +329,16 @@ class ShooterEnemy(Enemy):
 
     def set_speed(self):
         try:
-            self.get(dsdl.Velocity).x = math.copysign(
+            self.velocity.x = math.copysign(
                 self.HORIZONTAL_SPEED,
-                self.target_x - self.get(dsdl.Position).x)
+                self.target_x - self.position.x)
         except Exception:
             pass
 
     def spawn_particles(self):
         """Spawn death particles for the death."""
-        texture = self.get(ctypes.POINTER(SDL_Texture))
-        position = self.get(dsdl.Position)
+        texture = self.texture
+        position = self.position
         offset = position.get_offset(texture.w, texture.h)
         for _ in range(random.randrange(4, 8)):
             angle = math.radians(
@@ -358,7 +356,7 @@ class ShooterEnemy(Enemy):
             )
 
 
-class SphereEnemy(Enemy):
+class SphereEnemy(Enemy, desper.AbstractComponent):
     """Stealth enemy that is hard to spot."""
     total_life = 4
     reward = 2
@@ -371,13 +369,11 @@ class SphereEnemy(Enemy):
         self.death_sound = \
             monospace.model.res['chunks']['enemies']['death3'].get()
 
-        self.get(dsdl.Position).alpha = self.BASE_ALPHA
+        self.position.alpha = self.BASE_ALPHA
         self._sin_time = 0
 
     def update(self, *args):
-        super().update(*args)
-
-        pos = self.get(dsdl.Position)
+        pos = self.position
 
         # Rotate
         pos.rot = (pos.rot + 1) % 360
@@ -388,7 +384,7 @@ class SphereEnemy(Enemy):
                      * math.sin(self._sin_time * 1 / 50))
 
     def spawn_particles(self):
-        pos = self.get(dsdl.Position)
+        pos = self.position
 
         sides = 5
         mag = 3
