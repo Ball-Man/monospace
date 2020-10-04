@@ -150,41 +150,43 @@ class SpatialHash:
         self.num_columns = math.ceil(width / grid_size)
         self.num_rows = math.ceil(height / grid_size)
         self._grid = []
-        for x in range(self.num_columns):
+        for x in range(self.num_columns + 1):
             col = []
             self._grid.append(col)
-            for y in range(self.num_rows):
+            for y in range(self.num_rows + 1):
                 col.append(set())
 
         self._population = {}       # (Object, BoundingBox): {(x, y), ...}
+
+        print(self.num_rows, self.num_columns)
 
     def update(self, couple):
         """Add object to the grid, if not present.
 
         If already present, update its position.
         """
-        if couple not in self._population:
-            self._population.add(couple)
-
         bbox = couple[1]
+        if bbox.x is None or bbox.y is None:
+            return
+
         new_pos = set()
-        x1 = bbox.x // self.grid_size
-        y1 = bbox.y // self.grid_size
-        x2 = (bbox.x + bbox.w) // self.grid_size
-        y2 = (bbox.y + bbox.h) // self.grid_size
+        x1 = int(bbox.x // self.grid_size)
+        y1 = int(bbox.y // self.grid_size)
+        x2 = int((bbox.x + bbox.w) // self.grid_size)
+        y2 = int((bbox.y + bbox.h) // self.grid_size)
 
         # New population set
-        new_pos.add((x1, y1))
-        new_pos.add((x1, y2))
-        new_pos.add((x2, y1))
-        new_pos.add((x2, y2))
+        positions = (x1, y1), (x1, y2), (x1, y2), (x2, y2)
+        for pos in positions:
+            if (0 <= pos[0] <= self.num_columns
+                    and 0 <= pos[1] <= self.num_rows):
+                new_pos.add(pos)
 
         # Remove from previous locations
-        for pos in self._population.get(couple, {}) - new_pos:
-            self._grid[pos[0]][pos[1]].remove(couple)
-
+        for pos in self._population.get(couple, set()) - new_pos:
+            self._grid[pos[0]][pos[1]].discard(couple)
         # Add to new locations
-        for pos in new_pos - self._population.get(couple, {}):
+        for pos in new_pos - self._population.get(couple, set()):
             self._grid[pos[0]][pos[1]].add(couple)
 
         # Update population
@@ -192,21 +194,24 @@ class SpatialHash:
 
     def remove(self, couple):
         """Remove an object from the grid, if present."""
-        pop = self._population.get(couple, {})
+        pop = self._population.get(couple, set())
         for pos in pop:
-            self._grid[pos[0]][pos[1]].remove(couple)
+            self._grid[pos[0]][pos[1]].discard(couple)
 
-        pop.remove(couple)
+        pop.discard(couple)
 
     def get(self, x, y):
         """Get the content of the cell of (non hashed) x, y."""
         if x > self.width or y > self.height or x < 0 or y < 0:
-            return {}
+            return set()
 
-        return self._grid[x // self.grid_size][y // self.grid_size]
+        return self._grid[int(x // self.grid_size)][int(y // self.grid_size)]
 
     def get_from_bbox(self, bbox):
         """Get the content of all the cells where a bbox intersects."""
+        if bbox.x is None or bbox.y is None:
+            return set()
+
         x1 = bbox.x
         x2 = bbox.x + bbox.w
         y1 = bbox.y
