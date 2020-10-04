@@ -105,7 +105,7 @@ class Enemy(desper.OnAttachListener):
         pos = self.position
         text = monospace.model.res['text']['powerups']['blank'].get()
         offset = pos.get_offset(text.w, text.h)
-        enemy_text = self.get(ctypes.POINTER(SDL_Texture))
+        enemy_text = self.texture
         self.world.create_entity(
             monospace.PowerupBox(powerup),
             dsdl.Position(pos.x - offset[0] + enemy_text.w // 2,
