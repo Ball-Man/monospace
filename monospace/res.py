@@ -229,16 +229,29 @@ class OptionsWorldHandle(desper.Handle):
             monospace.Button(monospace.OptionToggler('sfx')),
             monospace.Option('sfx'))
 
+        # Sfx setting
+        w.create_entity(
+            dsdl.Position(offset_x, 300),
+            self.res['str'][monospace.current_lang].get_texture('ratio'))
+
+        w.create_entity(
+            dsdl.Position(monospace.LOGICAL_WIDTH - offset_x - off_text.w / 2,
+                          300 + off_text.h / 2, dsdl.Offset.CENTER),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=off_text.w, h=off_text.h),
+            monospace.Button(monospace.OptionSequencer('movement_ratio',
+                                                       0, 3)),
+            monospace.SequencedOption('movement_ratio'))
+
         save_text = self.res['str'][monospace.current_lang].get_texture('save')
         save_width = save_text.w + 30
         save_height = save_text.h + 30
         w.create_entity(
             monospace.Button(
                 monospace.split_button_action(self.res['menu_world'], wait=0)),
-            dsdl.Position(offset_x + save_width / 2, 300 + save_height / 2,
+            dsdl.Position(offset_x + save_width / 2, 400 + save_height / 2,
                           offset=dsdl.Offset.CENTER),
             save_text,
-            dsdl.FillRectangle(offset_x, 300, save_width, save_height,
+            dsdl.FillRectangle(offset_x, 400, save_width, save_height,
                                SDL_Color()),
             dsdl.BoundingBox(dsdl.Offset.CENTER, save_width, save_height)
             )

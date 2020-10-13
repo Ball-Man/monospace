@@ -224,6 +224,36 @@ class Option(desper.OnAttachListener):
         OPTIONS_SETTERS[self.option_name](value)
 
 
+class SequencedOption(desper.OnAttachListener):
+    """Set the option initial state, queried from the db."""
+
+    def __init__(self, option_name):
+        self.option_name = option_name
+
+    def on_attach(self, en, world):
+        res = monospace.model.res
+        c = res['db']['current'].get().cursor()
+
+        c.execute(OPTION_GET_QUERY, (self.option_name,))
+        value = next(c)[0]
+
+        comps = []
+        bbox = world.try_component(en, dsdl.BoundingBox)
+        pos = world.try_component(en, dsdl.Position)
+        offset = pos.get_offset(bbox.w, bbox.h)
+        comps.append(res['str'][monospace.current_lang] \
+            .get_texture(self.option_name + str(value)))
+        comps.append(dsdl.FillRectangle(pos.x - offset[0],
+                                        pos.y - offset[1], bbox.w, bbox.h,
+                                        SDL_Color()))
+
+        for comp in comps:
+            world.add_component(en, comp)
+
+        # Actually apply option
+        OPTIONS_SETTERS[self.option_name](value)
+
+
 class OptionToggler:
     """Callable instances used as actions for Buttons."""
 
@@ -294,6 +324,38 @@ class OptionToggler:
             self._coroutine = proc.start(coroutine_toggle_off())
 
 
+class OptionSequencer:
+    """Callable instances for options with multiple values."""
+
+    def __init__(self, option_name, min_, max_):
+        self.option_name = option_name
+        self.min = min_
+        self.max = max_
+
+    def __call__(self, en, world, model):
+        db = model.res['db']['current'].get()
+        c = db.cursor()
+        c.execute(OPTION_GET_QUERY, (self.option_name,))
+
+        value = (next(c)[0] + 1)
+        if value > self.max:
+            value = self.min
+        c.execute(OPTION_UPDATE_QUERY, (value, self.option_name))
+        db.commit()
+
+        # Actually apply option
+        OPTIONS_SETTERS[self.option_name](value)
+
+        # Update texture
+        world.add_component(
+            en, model.res['str'][monospace.current_lang] \
+                     .get_texture(self.option_name + str(value))
+        )
+
+        # Feedback sound
+        Mix_PlayChannel(-1, model.res['chunks']['toggle'].get(), 0)
+
+
 def apply_options(db):
     """Apply all options from the db. Useful at startup."""
     c = db.cursor()
@@ -313,4 +375,10 @@ def set_sfx(val):
     Mix_Volume(-1, 0 * (1 - val) + MIX_MAX_VOLUME * val)
 
 
-OPTIONS_SETTERS = {'music': set_music, 'sfx': set_sfx}
+def set_movement_ratio(val):
+    """Update movement ratio for the ship."""
+    monospace.Ship.drag_ratio = 1 + val / 10
+
+
+OPTIONS_SETTERS = {
+    'music': set_music, 'sfx': set_sfx, 'movement_ratio': set_movement_ratio}

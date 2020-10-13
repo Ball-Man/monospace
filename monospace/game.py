@@ -193,6 +193,7 @@ class EntityCleanerProcessor(esper.Processor):
 
 class Ship(desper.Controller):
     """Main ship controller."""
+    drag_ratio = 1.0
 
     def __init__(self, position, bbox):
         super().__init__()
@@ -241,9 +242,11 @@ class Ship(desper.Controller):
 
         if self._drag:
             self.position.x += ((mouse_x.value - self._old_x)
-                                * monospace.LOGICAL_WIDTH_RATIO)
+                                * monospace.LOGICAL_WIDTH_RATIO
+                                * self.drag_ratio)
             self.position.y += ((mouse_y.value - self._old_y)
-                                * monospace.LOGICAL_WIDTH_RATIO)
+                                * monospace.LOGICAL_WIDTH_RATIO
+                                * self.drag_ratio)
             self._old_x, self._old_y = mouse_x.value, mouse_y.value
 
         self._old_pressing = pressing

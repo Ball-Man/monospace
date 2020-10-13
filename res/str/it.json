@@ -4,6 +4,7 @@
     "quit": { "text": "esci", "font": "timenspace", "color": "000000ff" },
     "music": {"text": "musica", "font": "timenspace"},
     "sfx": {"text": "suoni", "font": "timenspace"},
+    "ratio": {"text": "sensibilita'", "font": "timenspace"},
     "save": {"text": "salva", "font": "timenspace", "color": "000000ff"},
     "options": {"text": "opzioni", "font": "timenspace"},
     "retry": {"text": "riprova", "font": "timenspace", "color": "000000ff"},
