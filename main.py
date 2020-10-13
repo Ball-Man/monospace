@@ -1,5 +1,4 @@
 import __main__
-import shutil
 import os.path as pt
 from sdl2 import *
 from sdl2.sdlimage import *
@@ -12,7 +11,6 @@ import dsdl
 try:
     window_style = SDL_WINDOW_FULLSCREEN
 
-    from android.storage import app_storage_path
     from android import loadingscreen
     loadingscreen.hide_loading_screen()
 
@@ -27,8 +25,6 @@ desper.options['resource_extensions'] = False
 
 CURRENT_DB_NAME = 'current.db'
 CURRENT_DB_RES = 'current'
-
-APP_DB_PATH = app_storage_path() if monospace.on_android else None
 
 
 def main():
@@ -80,19 +76,15 @@ def main():
     model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
     model.res['death_world'] = monospace.DeathWorldHandle(model.res)
 
-    # Generate db if empty or version is obsolete
-    db_filename = model.res['db']['main'].filename
-    if monospace.on_android:
-        new_db_filename = pt.join(APP_DB_PATH, CURRENT_DB_NAME)
-    else:
-        db_dirname = pt.dirname(db_filename)
-        new_db_filename = pt.join(db_dirname, CURRENT_DB_NAME)
+    # Initialize migration module
+    monospace.migration.main_db_path = model.res['db']['main'].filename
 
-    if not pt.isfile(new_db_filename):
-        print('Current db not found, instantiating')
-        shutil.copy2(db_filename, new_db_filename)
+    # Create new db if necessary
+    cur_db_filename = monospace.dump_main_db()
+    model.res['db'][CURRENT_DB_RES] = monospace.DBHandle(cur_db_filename)
 
-    model.res['db'][CURRENT_DB_RES] = monospace.DBHandle(new_db_filename)
+    # Migrate db if necessary
+    monospace.upgrade_db(model.res['db'][CURRENT_DB_RES].get())
 
     # Apply options
     monospace.apply_options(model.res['db'][CURRENT_DB_RES].get())
