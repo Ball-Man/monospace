@@ -294,6 +294,7 @@ class DeathWorldHandle(desper.Handle):
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(monospace.ButtonProcessor())
         w.add_processor(desper.CoroutineProcessor())
+        w.add_processor(monospace.MainMenuBackProcessor())
 
         # Entities
         # Create entities
