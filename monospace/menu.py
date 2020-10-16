@@ -159,7 +159,14 @@ class Button:
 
 
 def split_button_action(world_handle, speed=30, wait=30):
-    """Split button animation and change world with the given world."""
+    """Split button animation and change world with the given world.
+
+    If the given world_handle is None, switch to the last world.
+    """
+
+    # If None is given as room handle, go to the last one
+    if world_handle is None:
+        world_handle = monospace.model.last_world_handle
 
     def start_action(en, world: esper.World, model: desper.GameModel):
         """Action for the game start Button."""

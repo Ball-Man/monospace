@@ -179,6 +179,19 @@ class PauseWorldHandle(desper.Handle):
                                       dsdl.Offset.CENTER)
                         )
 
+        # Options button
+        w.create_entity(
+            monospace.Button(lambda e, w, m: m.switch(m.res['options_world'],
+                                                      True)),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=400,
+                             h=100),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2,
+                          monospace.LOGICAL_HEIGHT - 100,
+                          dsdl.Offset.CENTER),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('options')
+            )
+
         w.create_entity(monospace.PauseMusic())
 
         return w
@@ -233,7 +246,7 @@ class OptionsWorldHandle(desper.Handle):
             monospace.Button(monospace.OptionToggler('sfx')),
             monospace.Option('sfx'))
 
-        # Sfx setting
+        # Movement ratio setting
         w.create_entity(
             dsdl.Position(offset_x, 300),
             self.res['str'][monospace.current_lang].get_texture('ratio'))
@@ -251,7 +264,7 @@ class OptionsWorldHandle(desper.Handle):
         save_height = save_text.h + 30
         w.create_entity(
             monospace.Button(
-                monospace.split_button_action(self.res['menu_world'], wait=0)),
+                monospace.split_button_action(None, wait=0)),
             dsdl.Position(offset_x + save_width / 2, 400 + save_height / 2,
                           offset=dsdl.Offset.CENTER),
             save_text,
