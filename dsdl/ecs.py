@@ -12,9 +12,17 @@ class EventHandlerProcessor(esper.Processor):
     def process(self, model, *args):
         event = SDL_Event()
         while SDL_PollEvent(ctypes.byref(event)) != 0:
-            if event.type == SDL_QUIT:
+            if event.type == SDL_FINGERDOWN:
+                dsdl.finger_id_down(event.tfinger.fingerId, event.tfinger)
+            elif event.type == SDL_FINGERUP:
+                dsdl.finger_id_up(event.tfinger.fingerId)
+            elif event.type == SDL_FINGERMOTION:
+                dsdl.finger_id_update(event.tfinger.fingerId, event.tfinger)
+            elif event.type == SDL_QUIT:
                 model.quit = True
                 break
+
+        # print(dsdl.finger_stack)
 
 
 class TextureRendererProcessor(esper.Processor):

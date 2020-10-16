@@ -223,6 +223,10 @@ class Ship(desper.Controller):
         self.bonuses = set()
         self.default_blaster = None
 
+        # Select movement type(based on current platform)
+        self.movement_method = self.touch_movement if monospace.on_android \
+            else self.mouse_movement
+
     def on_attach(self, en, world):
         super().on_attach(en, world)
 
@@ -237,28 +241,7 @@ class Ship(desper.Controller):
         self.blasters.append(copy.copy(self.default_blaster))
 
     def update(self, en, world, model):
-        mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
-        pressing = (SDL_GetMouseState(ctypes.byref(mouse_x),
-                                      ctypes.byref(mouse_y))
-                    & SDL_BUTTON(SDL_BUTTON_LEFT))
-
-        # Start drag
-        if pressing and not self._old_pressing:
-            self._drag = True
-            self._old_x, self._old_y = mouse_x.value, mouse_y.value
-        elif not pressing and self._old_pressing:   # Stop drag
-            self._drag = False
-
-        if self._drag:
-            self.position.x += ((mouse_x.value - self._old_x)
-                                * monospace.LOGICAL_WIDTH_RATIO
-                                * self.drag_ratio)
-            self.position.y += ((mouse_y.value - self._old_y)
-                                * monospace.LOGICAL_WIDTH_RATIO
-                                * self.drag_ratio)
-            self._old_x, self._old_y = mouse_x.value, mouse_y.value
-
-        self._old_pressing = pressing
+        self.movement_method()
 
         # Don't move outside borders
         self.position.x = max(min(self.position.x, monospace.LOGICAL_WIDTH), 0)
@@ -294,6 +277,49 @@ class Ship(desper.Controller):
         enemy = self.check_collisions(monospace.Enemy)
         if enemy is not None:
             self.die()
+
+    def mouse_movement(self):
+        """Movement update managed by mouse(mainly for desktop)."""
+        mouse_x, mouse_y = ctypes.c_int(), ctypes.c_int()
+        pressing = (SDL_GetMouseState(ctypes.byref(mouse_x),
+                                      ctypes.byref(mouse_y))
+                    & SDL_BUTTON(SDL_BUTTON_LEFT))
+
+        # Start drag
+        if pressing and not self._old_pressing:
+            self._drag = True
+            self._old_x, self._old_y = mouse_x.value, mouse_y.value
+        elif not pressing and self._old_pressing:   # Stop drag
+            self._drag = False
+
+        if self._drag:
+            self.position.x += ((mouse_x.value - self._old_x)
+                                * monospace.LOGICAL_WIDTH_RATIO
+                                * self.drag_ratio)
+            self.position.y += ((mouse_y.value - self._old_y)
+                                * monospace.LOGICAL_WIDTH_RATIO
+                                * self.drag_ratio)
+            self._old_x, self._old_y = mouse_x.value, mouse_y.value
+
+        self._old_pressing = pressing
+
+    def touch_movement(self):
+        """Movement update managed by multitouch(mainly for android)."""
+        if len(dsdl.finger_stack) > 0:
+            dx = dsdl.fingers[dsdl.finger_stack[0]].dx
+            dy = dsdl.fingers[dsdl.finger_stack[0]].dy
+            if math.isnan(dx):
+                dx = 0
+            if math.isnan(dy):
+                dy = 0
+
+            self.position.x += (dx
+                                * monospace.LOGICAL_WIDTH
+                                * self.drag_ratio)
+            self.position.y += (dy
+                                * monospace.LOGICAL_HEIGHT
+                                * self.drag_ratio)
+
 
     def check_collisions(self, component_type):
         """Check for collisions with a component_type(bbox).
