@@ -107,12 +107,20 @@ class Bonus:
 class BonusDelay(Bonus):
     """Bonus that speeds up fire rate for a limited time."""
     FACTOR = 2 / 3
+    DURATION = 360
 
     def __init__(self):
+        self.charges = 1        # Add 1 for each stacked delay bonus
         self._original_delays = []
         self._coroutine = None
 
     def __call__(self, ship: monospace.Ship):
+        # If there's already a delay bonus on the ship, stack the charge
+        for bonus in ship.bonuses:
+            if type(bonus) is BonusDelay:
+                bonus.charges += 1
+                return
+
         super().__call__(ship)
 
         def bonus_coroutine(ship_ref):
@@ -126,7 +134,11 @@ class BonusDelay(Bonus):
                     monospace.MIN_BULLET_DELAY,
                     int(blaster.bullet_delay * self.FACTOR))
 
-            yield 360
+            # Wait, based on how many charges
+            charge = 0
+            while charge < self.charges:
+                yield self.DURATION
+                charge += 1
 
             self.revert(ship_ref(), False)
 
