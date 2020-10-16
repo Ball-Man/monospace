@@ -46,7 +46,8 @@ class MenuWorldHandle(desper.Handle):
             )
 
         w.create_entity(
-            monospace.Button(lambda e, w, m: m.switch(m.res['options_world'])),
+            monospace.Button(lambda e, w, m: m.switch(m.res['options_world'],
+                                                      True)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
                              h=start_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, 400,
@@ -201,6 +202,7 @@ class OptionsWorldHandle(desper.Handle):
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(monospace.ButtonProcessor())
         w.add_processor(desper.CoroutineProcessor())
+        w.add_processor(monospace.BackWorldProcessor())
 
         offset_x = 30
         off_text = \

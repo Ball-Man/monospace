@@ -53,6 +53,24 @@ class MainQuitProcessor(esper.Processor):
         self._old_pressed = self.keys[dsdl.SCANCODE_BACK]
 
 
+class BackWorldProcessor(esper.Processor):
+    """ECS system that returns to the last world."""
+
+    def __init__(self):
+        super().__init__()
+        self.keys = SDL_GetKeyboardState(None)
+
+        # Prevent immediate trigger
+        self._old_pressed = True
+
+    def process(self, model):
+        if self.keys[dsdl.SCANCODE_BACK] and not self._old_pressed \
+           and model.last_world_handle is not None:
+            model.switch(model.last_world_handle, True)
+
+        self._old_pressed = self.keys[dsdl.SCANCODE_BACK]
+
+
 class HaltMusic(desper.OnAttachListener):
     """Halt music on attach."""
 
