@@ -43,6 +43,8 @@ class GameProcessor(esper.Processor):
                       monospace.FifthWave(),
                       monospace.InfWave()]
 
+        self.keys = SDL_GetKeyboardState(None)
+
     def process(self, model):
         if self.model is None:
             self.model = model
@@ -67,6 +69,9 @@ class GameProcessor(esper.Processor):
                     and self._next_wave_coroutine is None):
                 self._next_wave_coroutine = coroutines.start(
                     self.next_wave())
+
+        if self.keys[SDL_SCANCODE_ESCAPE]:
+            monospace.pause_game(0, self.world, monospace.model)
 
     def spawn_rewards(self):
         yield 120

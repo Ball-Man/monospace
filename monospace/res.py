@@ -23,6 +23,7 @@ class MenuWorldHandle(desper.Handle):
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(monospace.ButtonProcessor())
         w.add_processor(desper.CoroutineProcessor())
+        w.add_processor(monospace.MainQuitProcessor())
 
         #w.add_processor(dsdl.BoundingBoxRendererProcessor())
 
@@ -163,6 +164,7 @@ class PauseWorldHandle(desper.Handle):
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(monospace.ButtonProcessor())
         w.add_processor(desper.CoroutineProcessor())
+        w.add_processor(monospace.PauseBackProcessor())
 
         # Entities
         resume_text = self.res['text']['resume'].get()

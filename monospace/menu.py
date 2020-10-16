@@ -14,6 +14,45 @@ OPTION_GET_QUERY = 'SELECT `value` FROM `options` WHERE `option_name`=?'
 OPTION_UPDATE_QUERY = 'UPDATE `options` SET `value`=? WHERE `option_name`=?'
 
 
+class PauseBackProcessor(esper.Processor):
+    """ECS system that unpauses on back button press."""
+
+    def __init__(self):
+        super().__init__()
+        self.keys = SDL_GetKeyboardState(None)
+
+        # Prevent immediate trigger
+        self._old_pressed = True
+
+    def process(self, model):
+        for en, (btn, text) in self.world.get_components(
+                Button, ctypes.POINTER(SDL_Texture)):
+            # Check if it's the resume button
+            if text is model.res['text']['resume'].get() \
+                and not self._old_pressed \
+                    and self.keys[SDL_SCANCODE_ESCAPE]:
+                btn.action(en, self.world, model)
+
+        self._old_pressed = self.keys[SDL_SCANCODE_ESCAPE]
+
+
+class MainQuitProcessor(esper.Processor):
+    """ECS system that quits on back button press."""
+
+    def __init__(self):
+        super().__init__()
+        self.keys = SDL_GetKeyboardState(None)
+
+        # Prevent immediate trigger
+        self._old_pressed = True
+
+    def process(self, model):
+        if self.keys[SDL_SCANCODE_ESCAPE] and not self._old_pressed:
+            model.quit = True
+
+        self._old_pressed = self.keys[SDL_SCANCODE_ESCAPE]
+
+
 class HaltMusic(desper.OnAttachListener):
     """Halt music on attach."""
 
