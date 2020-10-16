@@ -169,6 +169,10 @@ class GameProcessor(esper.Processor):
             enemy.spawn_particles()
             self.world.delete_entity(en)
 
+        # Clear all enemy bullets
+        for en, _ in self.world.get_component(monospace.EnemyBullet):
+            self.world.delete_entity(en)
+
         # Clear all the bonuses
         for en, _ in self.world.get_component(PowerupBox):
             self.world.delete_entity(en)
