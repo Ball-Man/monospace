@@ -30,10 +30,10 @@ class PauseBackProcessor(esper.Processor):
             # Check if it's the resume button
             if text is model.res['text']['resume'].get() \
                 and not self._old_pressed \
-                    and self.keys[SDL_SCANCODE_ESCAPE]:
+                    and self.keys[dsdl.SCANCODE_BACK]:
                 btn.action(en, self.world, model)
 
-        self._old_pressed = self.keys[SDL_SCANCODE_ESCAPE]
+        self._old_pressed = self.keys[dsdl.SCANCODE_BACK]
 
 
 class MainQuitProcessor(esper.Processor):
@@ -47,10 +47,10 @@ class MainQuitProcessor(esper.Processor):
         self._old_pressed = True
 
     def process(self, model):
-        if self.keys[SDL_SCANCODE_ESCAPE] and not self._old_pressed:
+        if self.keys[dsdl.SCANCODE_BACK] and not self._old_pressed:
             model.quit = True
 
-        self._old_pressed = self.keys[SDL_SCANCODE_ESCAPE]
+        self._old_pressed = self.keys[dsdl.SCANCODE_BACK]
 
 
 class HaltMusic(desper.OnAttachListener):

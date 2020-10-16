@@ -70,7 +70,7 @@ class GameProcessor(esper.Processor):
                 self._next_wave_coroutine = coroutines.start(
                     self.next_wave())
 
-        if self.keys[SDL_SCANCODE_ESCAPE]:
+        if self.keys[dsdl.SCANCODE_BACK]:
             monospace.pause_game(0, self.world, monospace.model)
 
     def spawn_rewards(self):
