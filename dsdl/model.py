@@ -17,4 +17,11 @@ class SDLGameModel(desper.GameModel):
         if SDLGameModel.default_renderer is None:
             SDLGameModel.default_renderer = self.renderer
 
+        self.last_world_handle = None
+
         super().__init__(dirs, importer_dict)
+
+    def switch(self, room_handle, reset=False):
+        self.last_world_handle = self.current_world_handle
+
+        super().switch(room_handle, reset)
