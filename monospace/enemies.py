@@ -18,8 +18,13 @@ class EnemyProcessor(esper.Processor):
         global ENEMY_HASH
         ENEMY_HASH = dsdl.SpatialHash(
             monospace.LOGICAL_WIDTH, monospace.LOGICAL_HEIGHT, 100)
+        self.coroutine_proc = None
 
     def process(self, model):
+        if self.coroutine_proc is None:
+            self.coroutine_proc = \
+                self.world.get_processor(desper.CoroutineProcessor)
+
         for en, enemy in self.world.get_component(Enemy):
             bbox = self.world.try_component(en, dsdl.BoundingBox)
 
@@ -41,12 +46,15 @@ class EnemyProcessor(esper.Processor):
                 if enemy.dead or bullet.hit:
                     continue
 
+                # If hit
                 if bbox.overlaps(enemy_bbox):
                     enemy.cur_life -= bullet.damage
                     bullet.die()
 
                     if enemy.cur_life <= 0:
                         enemy.die()
+                    else:
+                        self.coroutine_proc.start(enemy.blink())
 
 
 class Enemy(desper.OnAttachListener):
@@ -117,6 +125,12 @@ class Enemy(desper.OnAttachListener):
 
     def spawn_particles(self):
         pass
+
+    def blink(self):
+        """Coroutine for blinking when hit."""
+        self.position.alpha = 127
+        yield 6
+        self.position.alpha = 255
 
 
 class DotEnemy(Enemy):
@@ -397,6 +411,13 @@ class SphereEnemy(Enemy, desper.AbstractComponent):
                 dsdl.Position(pos.x, pos.y),
                 monospace.model.res['text']['part']['circle'].get(),
                 dsdl.Velocity(math.cos(angle) * mag, math.sin(angle) * mag))
+
+    def blink(self):
+        """Coroutine for blinking when hit."""
+        prev_alpha = self.position.alpha
+        self.position.alpha = 255
+        yield 6
+        self.position.alpha = prev_alpha
 
 
 # Spawn functions
