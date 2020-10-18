@@ -68,6 +68,7 @@ class Enemy(desper.OnAttachListener):
         self.death_sound = \
             monospace.model.res['chunks']['enemies']['death1'].get()
         self.dead = False
+        self.blinking = False
 
         self.bonuses = monospace.BonusDelay(), None
         self.bonuses_chances = 1, 80
@@ -128,9 +129,14 @@ class Enemy(desper.OnAttachListener):
 
     def blink(self):
         """Coroutine for blinking when hit."""
+        if self.blinking:
+            return
+
+        self.blinking = True
         self.position.alpha = 127
         yield 6
         self.position.alpha = 255
+        self.blinking = False
 
 
 class DotEnemy(Enemy):
@@ -414,10 +420,15 @@ class SphereEnemy(Enemy, desper.AbstractComponent):
 
     def blink(self):
         """Coroutine for blinking when hit."""
+        if self.blinking:
+            return
+
+        self.blinking = True
         prev_alpha = self.position.alpha
         self.position.alpha = 255
         yield 6
         self.position.alpha = prev_alpha
+        self.blinking = False
 
 
 # Spawn functions
