@@ -305,7 +305,8 @@ class Ship(desper.Controller):
 
     def touch_movement(self):
         """Movement update managed by multitouch(mainly for android)."""
-        if len(dsdl.finger_stack) > 0:
+        if len(dsdl.finger_stack) > 0 \
+           and dsdl.fingers[dsdl.finger_stack[0]].moving:
             dx = dsdl.fingers[dsdl.finger_stack[0]].dx
             dy = dsdl.fingers[dsdl.finger_stack[0]].dy
             if math.isnan(dx):

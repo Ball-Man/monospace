@@ -10,6 +10,8 @@ class EventHandlerProcessor(esper.Processor):
     """Processor for events from SDL(quit on SDL_Quit)."""
 
     def process(self, model, *args):
+        # Initialize
+        dsdl.reset_fingers()
         event = SDL_Event()
         while SDL_PollEvent(ctypes.byref(event)) != 0:
             if event.type == SDL_FINGERDOWN:
