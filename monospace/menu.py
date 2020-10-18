@@ -127,7 +127,7 @@ class ButtonProcessor(esper.Processor):
     """Processor that manages button presses."""
 
     def __init__(self):
-        self._old_pressed = False
+        self._old_pressed = True
 
     def process(self, model):
         mouse_x, mouse_y = ctypes.c_int(0), ctypes.c_int(0)
