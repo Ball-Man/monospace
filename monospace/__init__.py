@@ -10,6 +10,7 @@ from .enemies import *
 from .menu import *
 from .score import *
 from .migration import *
+from .ship_selection import *
 
 import sdl2 as _sdl
 

@@ -60,7 +60,8 @@ class MenuWorldHandle(desper.Handle):
         ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 2,
                                  monospace.LOGICAL_HEIGHT / 10 * 9,
                                  offset=dsdl.Offset.CENTER)
-        w.create_entity(ship_pos, self.res['text']['ship'].get())
+        w.create_entity(ship_pos, self.res['text']['ships']['default'].get(),
+                        monospace.ShipSelector())
 
         # Apply options
         w.create_entity(monospace.HaltMusic())
@@ -110,7 +111,7 @@ class GameWorldHandle(desper.Handle):
                                  offset=dsdl.Offset.CENTER)
         ship_bbox = dsdl.BoundingBox(dsdl.Offset.CENTER, 64, 64)
         w.create_entity(monospace.Ship(ship_pos, ship_bbox), ship_pos,
-                        ship_bbox, self.res['text']['ship'].get())
+                        ship_bbox, self.res['text']['ships']['default'].get())
 
         # Pause button
         pause_text = self.res['text']['pause'].get()

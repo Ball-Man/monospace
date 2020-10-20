@@ -240,6 +240,9 @@ class Ship(desper.Controller):
             (10, 10, (5, 40)), world)
         self.blasters.append(copy.copy(self.default_blaster))
 
+        # Set selected texture
+        world.add_component(en, monospace.get_selected_ship_texture())
+
     def update(self, en, world, model):
         self.movement_method()
 
