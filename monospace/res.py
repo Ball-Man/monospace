@@ -21,6 +21,7 @@ class MenuWorldHandle(desper.Handle):
         w.add_processor(dsdl.TextureRendererProcessor(), -1)
         w.add_processor(dsdl.ScreenClearerProcessor(), -2)
         w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(dsdl.VelocityProcessor())
         w.add_processor(monospace.ButtonProcessor())
         w.add_processor(desper.CoroutineProcessor())
         w.add_processor(monospace.MainQuitProcessor())
@@ -56,12 +57,33 @@ class MenuWorldHandle(desper.Handle):
                 .get_texture('options')
             )
 
-        # Ship
+        # Ship selection
+        ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 5 * 4,
+                                 monospace.LOGICAL_HEIGHT / 10 * 9,
+                                 offset=dsdl.Offset.CENTER)
+        w.create_entity(ship_pos,
+                        monospace.SelectionShip(),
+                        monospace.Button(monospace.select_ship),
+                        dsdl.Velocity(),
+                        dsdl.BoundingBox(dsdl.Offset.CENTER, 100, 100))
+
+        ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 5,
+                                 monospace.LOGICAL_HEIGHT / 10 * 9,
+                                 offset=dsdl.Offset.CENTER)
+        w.create_entity(ship_pos,
+                        monospace.SelectionShip(),
+                        monospace.Button(monospace.select_ship),
+                        dsdl.Velocity(),
+                        dsdl.BoundingBox(dsdl.Offset.CENTER, 100, 100))
+
         ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 2,
                                  monospace.LOGICAL_HEIGHT / 10 * 9,
                                  offset=dsdl.Offset.CENTER)
         w.create_entity(ship_pos, self.res['text']['ships']['default'].get(),
-                        monospace.ShipSelector())
+                        monospace.ShipSelector(), monospace.SelectionShip(),
+                        monospace.Button(monospace.select_ship),
+                        dsdl.Velocity(),
+                        dsdl.BoundingBox(dsdl.Offset.CENTER, 100, 100))
 
         # Apply options
         w.create_entity(monospace.HaltMusic())
