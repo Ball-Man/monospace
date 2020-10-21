@@ -60,7 +60,7 @@ class MenuWorldHandle(desper.Handle):
         # Ship selection
         ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 5 * 4,
                                  monospace.LOGICAL_HEIGHT / 10 * 9,
-                                 offset=dsdl.Offset.CENTER)
+                                 offset=dsdl.Offset.CENTER, alpha=127)
         w.create_entity(ship_pos,
                         monospace.SelectionShip(),
                         monospace.Button(monospace.select_ship),
@@ -69,7 +69,7 @@ class MenuWorldHandle(desper.Handle):
 
         ship_pos = dsdl.Position(monospace.LOGICAL_WIDTH // 5,
                                  monospace.LOGICAL_HEIGHT / 10 * 9,
-                                 offset=dsdl.Offset.CENTER)
+                                 offset=dsdl.Offset.CENTER, alpha=127)
         w.create_entity(ship_pos,
                         monospace.SelectionShip(),
                         monospace.Button(monospace.select_ship),

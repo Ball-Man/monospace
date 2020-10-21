@@ -75,6 +75,8 @@ def select_ship(en, world, model):
     ships_en = set(field[0] for field in world.get_component(SelectionShip))
     ships_vel = [world.component_for_entity(e, dsdl.Velocity)
                  for e in ships_en]
+    ships_pos = [world.component_for_entity(e, dsdl.Position)
+                 for e in ships_en]
 
     # Exit if this ship is already selected
     if int(selected_pos.x) == monospace.LOGICAL_WIDTH // 2:
@@ -114,9 +116,13 @@ def select_ship(en, world, model):
     # Add the new ship to the data structures
     ships_en.add(new_en)
     ships_vel.append(new_vel)
+    ships_pos.append(new_pos)
 
     def coroutine():
         """Animation."""
+        for pos in ships_pos:
+            pos.alpha = 127
+
         while int(selected_pos.x) != monospace.LOGICAL_WIDTH // 2:
             if abs(selected_pos.x - monospace.LOGICAL_WIDTH // 2) \
                < abs(selected_vel.x):
@@ -124,6 +130,8 @@ def select_ship(en, world, model):
                     vel.x = 0
                 selected_pos.x = monospace.LOGICAL_WIDTH // 2
             yield
+
+        selected_pos.alpha = 255
         # Stop all the ships and delete the useless ones
         for vel in ships_vel:
             vel.x = 0
