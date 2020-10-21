@@ -29,6 +29,8 @@ class MenuWorldHandle(desper.Handle):
         #w.add_processor(dsdl.BoundingBoxRendererProcessor())
 
         # Create entities
+        w.create_entity(monospace.EventChecker())
+
         start_width = 400
         start_height = 100
         pos_y = 300
@@ -63,7 +65,7 @@ class MenuWorldHandle(desper.Handle):
                                  offset=dsdl.Offset.CENTER, alpha=127)
         w.create_entity(ship_pos,
                         monospace.SelectionShip(),
-                        monospace.Button(monospace.select_ship),
+                        monospace.Button(monospace.SelectShipAction()),
                         dsdl.Velocity(),
                         dsdl.BoundingBox(dsdl.Offset.CENTER, 100, 100))
 
@@ -72,7 +74,7 @@ class MenuWorldHandle(desper.Handle):
                                  offset=dsdl.Offset.CENTER, alpha=127)
         w.create_entity(ship_pos,
                         monospace.SelectionShip(),
-                        monospace.Button(monospace.select_ship),
+                        monospace.Button(monospace.SelectShipAction()),
                         dsdl.Velocity(),
                         dsdl.BoundingBox(dsdl.Offset.CENTER, 100, 100))
 
@@ -81,7 +83,7 @@ class MenuWorldHandle(desper.Handle):
                                  offset=dsdl.Offset.CENTER)
         w.create_entity(ship_pos, self.res['text']['ships']['default'].get(),
                         monospace.ShipSelector(), monospace.SelectionShip(),
-                        monospace.Button(monospace.select_ship),
+                        monospace.Button(monospace.SelectShipAction()),
                         dsdl.Velocity(),
                         dsdl.BoundingBox(dsdl.Offset.CENTER, 100, 100))
 
