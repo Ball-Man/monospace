@@ -78,7 +78,6 @@ class ShipSelector(desper.OnAttachListener):
                 world.delete_entity(ship)
 
 
-
 # class ShipSelectionProcessor(esper.Processor):
 #     """ECS system for the ship selection in the main menu."""
 
@@ -97,7 +96,7 @@ class SelectShipAction:
     It processes the selection of a ship.
     """
 
-    ANIMATION_SPEED = 10
+    ANIMATION_SPEED = 15
 
     def __call__(self, en, world, model):
         """Action for a Button, when a ship is selected by touching it."""
