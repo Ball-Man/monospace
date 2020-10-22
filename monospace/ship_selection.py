@@ -13,7 +13,8 @@ CURRENT_EVENTS_QUERY = \
      "AND date(strftime('%Y', date('now')) || '-' || `to_month` "
      "|| '-' || `to_day`)")
 CUR_EVENT_SHIPS_QUERY = \
-    ("SELECT `ships`.`name`, `unlocked` FROM `ships` INNER JOIN `event_ships` "
+    ("SELECT `ships`.`name`, `unlocked`, `events`.`name` "
+     "FROM `ships` INNER JOIN `event_ships` "
      "ON `ships`.`name`=`ship_name` INNER JOIN `events` "
      "ON `events`.`id`=`event_id`"
      "WHERE date('now') BETWEEN date(strftime('%Y', date('now')) "
@@ -183,14 +184,25 @@ class SelectShipAction:
             world.get_processor(desper.CoroutineProcessor).start(coroutine())
 
 
-class EventChecker(desper.OnAttachListener):
+class EventChecker(desper.AbstractComponent):
     """Component that checks for events.
 
     So far, it only checks for events in order to reward for ship
     events."""
 
-    def on_attach(self, *args):
-        db = monospace.model.res['db']['current'].get()
-        for name, unlocked in (db.cursor().execute(CUR_EVENT_SHIPS_QUERY)):
-            db.cursor().execute(UNLOCK_SHIP_QUERY, (name,))
-            print('unlocked event ship', name)
+    def update(self, en, world, model):
+        # Check for active events and unlock ships if necessary
+        res = model.res
+        db = model.res['db']['current'].get()
+        for name, unlocked, event_name \
+                in (db.cursor().execute(CUR_EVENT_SHIPS_QUERY)):
+            if not unlocked:
+                db.cursor().execute(UNLOCK_SHIP_QUERY, (name,))
+                db.commit()
+                print('unlocked event ship', name)
+
+                model.switch(
+                    monospace.UnlockedWorldHandle(res, name, event_name), True)
+
+        # Self destruct after the check
+        world.delete_entity(en)

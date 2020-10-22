@@ -20,6 +20,7 @@ class MenuWorldHandle(desper.Handle):
         w.add_processor(dsdl.FillRectangleRenderProcessor(), -0.5)
         w.add_processor(dsdl.TextureRendererProcessor(), -1)
         w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(desper.AbstractProcessor())
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(dsdl.VelocityProcessor())
         w.add_processor(monospace.ButtonProcessor())
