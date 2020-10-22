@@ -9,6 +9,10 @@
     "options": {"text": "opzioni", "font": "timenspace"},
     "retry": {"text": "riprova", "font": "timenspace", "color": "000000ff"},
     "highscore": {"text": "high score:", "font": "timenspace"},
-    "newrecord": {"text": "nuovo record!", "font": "timenspace"}
-  }
+    "newrecord": {"text": "nuovo record!", "font": "timenspace"},
+
+    "halloween": {"text": "Si', Halloween!", "font": "timenspace"},
+    "unlocked": {"text": "Hai sbloccato:", "font": "timenspace"},
+    "halloween_ship": {"text": "La BatShip", "font": "timenspace", "color": "cc8400ff"}
+    }
 }

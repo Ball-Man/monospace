@@ -366,6 +366,68 @@ class DeathWorldHandle(desper.Handle):
         return w
 
 
+class UnlockedWorldHandle(desper.Handle):
+    """Handle that generates a world with a message for unlockables."""
+
+    def __init__(self, res, unlocked_item, event=None):
+        super().__init__()
+
+        self.unlocked_item = unlocked_item
+        self.event = event
+        self.res = res
+
+    def _load(self):
+        w = desper.AbstractWorld()
+
+        # Processors
+        w.add_processor(dsdl.EventHandlerProcessor(), 10)
+        w.add_processor(dsdl.FillRectangleRenderProcessor(), -0.5)
+        w.add_processor(dsdl.TextureRendererProcessor(), -1)
+        w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(desper.CoroutineProcessor())
+        w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(monospace.ButtonProcessor())
+        w.add_processor(monospace.MainMenuBackProcessor())
+
+        # Entities
+        base_y = 50
+        base_x = 50
+
+        w.create_entity(
+            dsdl.Position(base_x, base_y),
+            self.res['str'][monospace.current_lang].get_texture('unlocked'))
+
+        w.create_entity(
+            dsdl.Position(base_x, base_y + 100),
+            self.res['str'][monospace.current_lang]
+                .get_texture(self.unlocked_item))
+
+        if self.event is not None:
+            w.create_entity(
+                dsdl.Position(base_x, base_y + 200),
+                self.res['str'][monospace.current_lang]
+                    .get_texture(self.event))
+
+        button_width = 250
+        button_height = 100
+        button_y = monospace.LOGICAL_HEIGHT - 150 + button_height / 2
+        w.create_entity(
+            monospace.Button(
+                monospace.split_button_action(self.res['menu_world'], wait=0)),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=button_width,
+                             h=button_height),
+            dsdl.Position(base_x + button_width / 2, button_y,
+                          dsdl.Offset.CENTER),
+            dsdl.FillRectangle(base_x,
+                               button_y - button_height / 2, button_width,
+                               button_height, SDL_Color()),
+            monospace.model.res['str'][monospace.current_lang]
+                .get_texture('ok')
+            )
+
+        return w
+
+
 def get_db_importer():
     return desper.get_resource_importer('db', ('.db'))
 

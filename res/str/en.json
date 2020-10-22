@@ -20,6 +20,11 @@
     "menu": {"text": "menu", "font": "timenspace", "color": "000000ff"},
     "highscore": {"text": "high score:", "font": "timenspace"},
     "newrecord": {"text": "new record!", "font": "timenspace"},
+    "ok": {"text": "Ok", "font": "timenspace", "color": "000000ff"},
+
+    "halloween": {"text": "Yay, Halloween!", "font": "timenspace"},
+    "unlocked": {"text": "You unlocked:", "font": "timenspace"},
+    "halloween_ship": {"text": "The BatShip", "font": "timenspace", "color": "cc8400ff"},
 
     "ballman": {"text": "Francesco Mistri 2020", "font": "courierprime"}
   }
