@@ -15,7 +15,7 @@ main_db_path = None
 
 APP_DB_PATH = app_storage_path() if monospace.on_android else None
 
-MAIN_DB_VERSION = 2      # PRAGMA user_version
+MAIN_DB_VERSION = 3      # PRAGMA user_version
 
 GET_VER_QUERY = 'PRAGMA user_version'
 SET_VER_QUERY = 'PRAGMA user_version=?'
@@ -122,7 +122,23 @@ def add_ships_and_events(db):
     db.commit()
 
 
+def add_username(db):
+    """Add 'username' column to the options table.
+
+    Also add a 'username_added' to manage initial setup.
+    """
+    cursor = db.cursor()
+
+    cursor.execute("INSERT INTO `options`(`option_name`, `value`) "
+                   "VALUES('username', 'AAA')")
+    cursor.execute("INSERT INTO `options`(`option_name`, `value`) "
+                   "VALUES('username_added', 0)")
+
+    db.commit()
+
+
 VERSION_UPGRADES = {
     1: add_movement_ratio,
-    2: add_ships_and_events
+    2: add_ships_and_events,
+    3: add_username
 }
