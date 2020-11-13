@@ -75,6 +75,7 @@ def main():
     model.res['pause_world'] = monospace.PauseWorldHandle(model.res)
     model.res['options_world'] = monospace.OptionsWorldHandle(model.res)
     model.res['death_world'] = monospace.DeathWorldHandle(model.res)
+    model.res['name_world'] = monospace.NameSelectionWorldHandle(model.res)
 
     # Initialize migration module
     monospace.migration.main_db_path = model.res['db']['main'].filename

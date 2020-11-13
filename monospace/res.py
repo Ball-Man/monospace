@@ -429,6 +429,68 @@ class UnlockedWorldHandle(desper.Handle):
         return w
 
 
+class NameSelectionWorldHandle(desper.Handle):
+    """Handle that generates a world for the name selection."""
+
+    def __init__(self, res):
+        super().__init__()
+        self.res = res
+
+    def _load(self):
+        w = desper.AbstractWorld()
+
+        # Processors
+        w.add_processor(dsdl.EventHandlerProcessor(), 10)
+        w.add_processor(dsdl.FillRectangleRenderProcessor(), -0.5)
+        w.add_processor(dsdl.TextureRendererProcessor(), -1)
+        w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(desper.CoroutineProcessor())
+        w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(monospace.ButtonProcessor())
+        w.add_processor(monospace.NameSelectorProcessor())
+        #w.add_processor(monospace.BackWorldProcessor())
+
+        #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
+
+        # Text
+        pos_y = 60
+        w.create_entity(
+            dsdl.Position(monospace.LOGICAL_WIDTH / 2, pos_y,
+                          dsdl.Offset.CENTER),
+            self.res['str'][monospace.current_lang] \
+                .get_texture('username'))
+
+        # Username text
+        pos_y += 300
+        x_dist = 150
+        pos_x = monospace.LOGICAL_WIDTH / 2 - x_dist
+        for i in range(3):
+            w.create_entity(dsdl.Position(pos_x, pos_y, dsdl.Offset.CENTER),
+                            monospace.CharSelector(i))
+
+            pos_x += x_dist
+
+        # Ok button
+        pos_y += 300
+        ok_text = monospace.model.res['str'][monospace.current_lang] \
+            .get_texture('ok')
+        ok_width = ok_text.w + 20
+        ok_height = ok_text.h + 20
+
+        w.create_entity(
+            monospace.Button(monospace.ok_name_action),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=ok_width,
+                             h=ok_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
+                          dsdl.Offset.CENTER),
+            dsdl.FillRectangle(monospace.LOGICAL_WIDTH // 2 - ok_width / 2,
+                               pos_y - ok_height / 2, ok_width,
+                               ok_height, SDL_Color()),
+            ok_text)
+
+        return w
+
+
 def get_db_importer():
     return desper.get_resource_importer('db', ('.db'))
 

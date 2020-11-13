@@ -11,6 +11,7 @@ from .menu import *
 from .score import *
 from .migration import *
 from .ship_selection import *
+from .leaderboard import *
 
 import sdl2 as _sdl
 

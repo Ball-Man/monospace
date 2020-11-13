@@ -5,6 +5,7 @@ from .model import *
 from .ecs import *
 from .collisions import *
 from .finger import *
+from .akeyboard import *
 
 try:
     import android

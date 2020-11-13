@@ -462,5 +462,11 @@ def set_movement_ratio(val):
     monospace.Ship.drag_ratio = 1 + val / 10
 
 
+def set_username(val):
+    """Update current username."""
+    monospace.leaderboard.username = list(val)
+
+
 OPTIONS_SETTERS = {
-    'music': set_music, 'sfx': set_sfx, 'movement_ratio': set_movement_ratio}
+    'music': set_music, 'sfx': set_sfx, 'movement_ratio': set_movement_ratio,
+    'username': set_username}
