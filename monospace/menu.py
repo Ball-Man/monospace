@@ -65,8 +65,8 @@ class BackWorldProcessor(esper.Processor):
 
     def process(self, model):
         if self.keys[dsdl.SCANCODE_BACK] and not self._old_pressed \
-           and model.last_world_handle is not None:
-            model.switch(model.last_world_handle, True)
+           and len(model.world_handle_stack) > 0:
+            model.pop_switch(True)
 
         self._old_pressed = self.keys[dsdl.SCANCODE_BACK]
 
@@ -82,9 +82,9 @@ class MainMenuBackProcessor(esper.Processor):
         self._old_pressed = True
 
     def process(self, model):
-        if self.keys[dsdl.SCANCODE_BACK] and not self._old_pressed \
-           and model.last_world_handle is not None:
-            model.switch(model.res['menu_world'], True)
+        if self.keys[dsdl.SCANCODE_BACK] and not self._old_pressed:
+            model.world_handle_stack.clear()
+            model.switch(model.res['menu_world'], True, True)
 
         self._old_pressed = self.keys[dsdl.SCANCODE_BACK]
 
@@ -176,15 +176,12 @@ class Button:
         self.action = action
 
 
-def split_button_action(world_handle, speed=30, wait=30):
+def split_button_action(world_handle, speed=30, wait=30, stack=False,
+                        reset_stack=False):
     """Split button animation and change world with the given world.
 
     If the given world_handle is None, switch to the last world.
     """
-
-    # If None is given as room handle, go to the last one
-    if world_handle is None:
-        world_handle = monospace.model.last_world_handle
 
     def start_action(en, world: esper.World, model: desper.GameModel):
         """Action for the game start Button."""
@@ -215,7 +212,14 @@ def split_button_action(world_handle, speed=30, wait=30):
 
                 if rec2.x > monospace.LOGICAL_WIDTH:
                     yield wait
-                    model.switch(world_handle, reset=True)
+
+                    # If None is given as room handle, go to the last one
+                    if world_handle is None:
+                        model.pop_switch(True)
+                    else:
+                        if reset_stack:
+                            model.world_handle_stack.clear()
+                        model.switch(world_handle, reset=True, stack=stack)
 
                 yield
 
@@ -230,7 +234,7 @@ def pause_game(en, world: esper.World, model: desper.GameModel):
         world.get_component(monospace.Ship)[0][1]._drag = False
         # Sound feedback
         Mix_PlayChannel(-1, model.res['chunks']['button'].get(), 0)
-        model.switch(model.res['pause_world'])
+        model.switch(model.res['pause_world'], stack=True)
     except IndexError:
         pass
 
@@ -267,7 +271,7 @@ def resume_game(en, world: esper.World, model: desper.GameModel):
 
         # Sound feedback
         Mix_PlayChannel(-1, model.res['chunks']['button'].get(), 0)
-        model.switch(model.res['game_world'], True)
+        model.pop_switch(True)
 
     world.get_processor(desper.CoroutineProcessor).start(
         coroutine()

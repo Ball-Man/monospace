@@ -324,7 +324,6 @@ class Ship(desper.Controller):
                                 * monospace.LOGICAL_HEIGHT
                                 * self.drag_ratio)
 
-
     def check_collisions(self, component_type):
         """Check for collisions with a component_type(bbox).
 
@@ -438,7 +437,7 @@ class Ship(desper.Controller):
             # Set temporary score for next room
             monospace.score.temp_score = self.processor(GameProcessor).score
             model = monospace.model
-            model.switch(model.res['death_world'], True)
+            model.switch(model.res['death_world'], True, stack=True)
 
         self.processor(desper.CoroutineProcessor).start(coroutine())
 

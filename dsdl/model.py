@@ -1,3 +1,4 @@
+from collections import deque
 import desper
 from sdl2 import *
 
@@ -17,11 +18,16 @@ class SDLGameModel(desper.GameModel):
         if SDLGameModel.default_renderer is None:
             SDLGameModel.default_renderer = self.renderer
 
-        self.last_world_handle = None
+        self.world_handle_stack = deque()
 
         super().__init__(dirs, importer_dict)
 
-    def switch(self, room_handle, reset=False):
-        self.last_world_handle = self.current_world_handle
+    def switch(self, room_handle, reset=False, stack=False):
+        if stack:
+            self.world_handle_stack.append(room_handle)
 
         super().switch(room_handle, reset)
+
+    def pop_switch(self, reset=False):
+        self.world_handle_stack.pop().clear()
+        self.switch(self.world_handle_stack[-1], reset=reset)

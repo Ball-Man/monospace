@@ -37,7 +37,8 @@ class MenuWorldHandle(desper.Handle):
         pos_y = 300
         w.create_entity(
             monospace.Button(
-                monospace.split_button_action(self.res['game_world'])),
+                monospace.split_button_action(self.res['game_world'],
+                                              stack=True)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
                              h=start_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
@@ -51,7 +52,7 @@ class MenuWorldHandle(desper.Handle):
 
         w.create_entity(
             monospace.Button(lambda e, w, m: m.switch(m.res['options_world'],
-                                                      True)),
+                                                      True, True)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=start_width,
                              h=start_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, 400,
@@ -208,7 +209,7 @@ class PauseWorldHandle(desper.Handle):
         # Options button
         w.create_entity(
             monospace.Button(lambda e, w, m: m.switch(m.res['options_world'],
-                                                      True)),
+                                                      True, True)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=400,
                              h=100),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2,
@@ -331,7 +332,7 @@ class DeathWorldHandle(desper.Handle):
         pos_y = monospace.LOGICAL_HEIGHT - retry_height - 150
         w.create_entity(
             monospace.Button(
-                monospace.split_button_action(self.res['game_world'])),
+                monospace.split_button_action(None)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=retry_width,
                              h=retry_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
@@ -349,7 +350,9 @@ class DeathWorldHandle(desper.Handle):
         pos_y = monospace.LOGICAL_HEIGHT - menu_height - 30
         w.create_entity(
             monospace.Button(
-                monospace.split_button_action(self.res['menu_world'])),
+                monospace.split_button_action(self.res['menu_world'],
+                                              stack=True,
+                                              reset_stack=True)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=menu_width,
                              h=menu_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
