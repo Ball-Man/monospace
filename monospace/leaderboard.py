@@ -98,8 +98,6 @@ def ok_name_action(en, world, model: dsdl.SDLGameModel):
     Hide keyboard(eventually) and set internal username(and switch
     world ofc).
     """
-    SDL_StopTextInput()
-
     # Update db
     db = model.res['db']['current'].get()
     cur = db.cursor()
@@ -107,4 +105,4 @@ def ok_name_action(en, world, model: dsdl.SDLGameModel):
     cur.execute(monospace.OPTION_UPDATE_QUERY, (''.join(username), 'username'))
     db.commit()
 
-    monospace.split_button_action(model.last_world_handle)(en, world, model)
+    monospace.split_button_action(None, wait=0)(en, world, model)

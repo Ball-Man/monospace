@@ -22,7 +22,7 @@
     "newrecord": {"text": "new record!", "font": "timenspace"},
     "ok": {"text": "Ok", "font": "timenspace", "color": "000000ff"},
     "username": {"text": "Username", "font": "timenspace"},
-    "set_name": {"text": "Set username", "font": "timenspace", "color": "000000ff"},
+    "set_name": {"text": "Username", "font": "timenspace", "color": "000000ff"},
 
     "halloween": {"text": "Yay, Halloween!", "font": "timenspace"},
     "unlocked": {"text": "You unlocked:", "font": "timenspace"},

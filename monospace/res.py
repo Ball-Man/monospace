@@ -248,54 +248,80 @@ class OptionsWorldHandle(desper.Handle):
         off_text = \
             self.res['str'][monospace.current_lang].get_texture('off')
 
+        pos_y = 100
+
         # Entities
         # Music setting
         w.create_entity(
-            dsdl.Position(offset_x, 100),
+            dsdl.Position(offset_x, pos_y),
             self.res['str'][monospace.current_lang].get_texture('music'))
 
         w.create_entity(
             dsdl.Position(monospace.LOGICAL_WIDTH - offset_x - off_text.w / 2,
-                          100 + off_text.h / 2, dsdl.Offset.CENTER),
+                          pos_y + off_text.h / 2, dsdl.Offset.CENTER),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=off_text.w, h=off_text.h),
             monospace.Button(monospace.OptionToggler('music')),
             monospace.Option('music'))
 
+        pos_y += 100
+
         # Sfx setting
         w.create_entity(
-            dsdl.Position(offset_x, 200),
+            dsdl.Position(offset_x, pos_y),
             self.res['str'][monospace.current_lang].get_texture('sfx'))
 
         w.create_entity(
             dsdl.Position(monospace.LOGICAL_WIDTH - offset_x - off_text.w / 2,
-                          200 + off_text.h / 2, dsdl.Offset.CENTER),
+                          pos_y + off_text.h / 2, dsdl.Offset.CENTER),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=off_text.w, h=off_text.h),
             monospace.Button(monospace.OptionToggler('sfx')),
             monospace.Option('sfx'))
 
+        pos_y += 100
+
         # Movement ratio setting
         w.create_entity(
-            dsdl.Position(offset_x, 300),
+            dsdl.Position(offset_x, pos_y),
             self.res['str'][monospace.current_lang].get_texture('ratio'))
 
         w.create_entity(
             dsdl.Position(monospace.LOGICAL_WIDTH - offset_x - off_text.w / 2,
-                          300 + off_text.h / 2, dsdl.Offset.CENTER),
+                          pos_y + off_text.h / 2, dsdl.Offset.CENTER),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=off_text.w, h=off_text.h),
             monospace.Button(monospace.OptionSequencer('movement_ratio',
                                                        0, 3)),
             monospace.SequencedOption('movement_ratio'))
 
+        pos_y += 100
+
+        # Set username
+        us_text = self.res['str'][monospace.current_lang] \
+            .get_texture('set_name')
+        us_width = us_text.w + 30
+        us_height = us_text.h + 30
+        w.create_entity(
+            dsdl.Position(offset_x + us_width / 2, pos_y + us_height / 2,
+                          dsdl.Offset.CENTER),
+            dsdl.FillRectangle(offset_x, pos_y, us_width, us_height,
+                               SDL_Color()),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=us_width, h=us_height),
+            monospace.Button(monospace.split_button_action(
+                self.res['name_world'], wait=0, stack=True)),
+            us_text)
+
+        pos_y += 200
+
+        # Save button
         save_text = self.res['str'][monospace.current_lang].get_texture('save')
         save_width = save_text.w + 30
         save_height = save_text.h + 30
         w.create_entity(
             monospace.Button(
                 monospace.split_button_action(None, wait=0)),
-            dsdl.Position(offset_x + save_width / 2, 400 + save_height / 2,
+            dsdl.Position(offset_x + save_width / 2, pos_y + save_height / 2,
                           offset=dsdl.Offset.CENTER),
             save_text,
-            dsdl.FillRectangle(offset_x, 400, save_width, save_height,
+            dsdl.FillRectangle(offset_x, pos_y, save_width, save_height,
                                SDL_Color()),
             dsdl.BoundingBox(dsdl.Offset.CENTER, save_width, save_height)
             )
@@ -451,7 +477,7 @@ class NameSelectionWorldHandle(desper.Handle):
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(monospace.ButtonProcessor())
         w.add_processor(monospace.NameSelectorProcessor())
-        #w.add_processor(monospace.BackWorldProcessor())
+        w.add_processor(monospace.BackWorldProcessor())
 
         #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
 
