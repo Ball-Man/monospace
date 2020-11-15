@@ -85,7 +85,8 @@ class DeathScoreManager(desper.OnAttachListener):
             # Render actual highschore
             # If there's no space, shift vertically the score
             if (res['str'][monospace.current_lang].get_texture('highscore').w
-                    + hs_surf.contents.w + 2 * 30 >= monospace.LOGICAL_WIDTH):
+                    + hs_surf.contents.w + 2 * 30 + 50
+                    >= monospace.LOGICAL_WIDTH):
                 highscore_y += 100
 
             world.create_entity(
