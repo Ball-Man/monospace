@@ -201,7 +201,8 @@ class EventChecker(desper.AbstractComponent):
                 print('unlocked event ship', name)
 
                 model.switch(
-                    monospace.UnlockedWorldHandle(res, name, event_name), True)
+                    monospace.UnlockedWorldHandle(res, name, event_name), True,
+                    stack=True)
 
         # Self destruct after the check
         world.delete_entity(en)

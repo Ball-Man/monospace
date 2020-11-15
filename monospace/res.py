@@ -31,6 +31,7 @@ class MenuWorldHandle(desper.Handle):
 
         # Create entities
         w.create_entity(monospace.EventChecker())
+        w.create_entity(monospace.UsernameChecker())
 
         start_width = 400
         start_height = 100
@@ -417,7 +418,7 @@ class UnlockedWorldHandle(desper.Handle):
         w.add_processor(desper.CoroutineProcessor())
         w.add_processor(dsdl.BoundingBoxProcessor())
         w.add_processor(monospace.ButtonProcessor())
-        w.add_processor(monospace.MainMenuBackProcessor())
+        w.add_processor(monospace.BackWorldProcessor())
 
         # Entities
         base_y = 50
@@ -443,7 +444,7 @@ class UnlockedWorldHandle(desper.Handle):
         button_y = monospace.LOGICAL_HEIGHT - 150 + button_height / 2
         w.create_entity(
             monospace.Button(
-                monospace.split_button_action(self.res['menu_world'], wait=0)),
+                monospace.split_button_action(None, wait=0)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=button_width,
                              h=button_height),
             dsdl.Position(base_x + button_width / 2, button_y,

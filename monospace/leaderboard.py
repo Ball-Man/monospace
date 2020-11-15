@@ -73,6 +73,24 @@ class CharSelector(desper.OnAttachListener):
                 res['text']['arrow_up'].get())
 
 
+class UsernameChecker(desper.AbstractComponent):
+    """Check if the username has been selected.
+
+    If it's not, ask the user for the username input.
+    """
+
+    def update(self, en, world, model):
+        res = model.res
+        db = res['db']['current'].get()
+        user_added = next(db.cursor().execute(monospace.OPTION_GET_QUERY,
+                                              ('username_added',)))[0]
+        if not user_added:
+            # Set username
+            model.switch(res['name_world'], reset=True, stack=True)
+
+        world.delete_entity(en)
+
+
 def character_button(index, add=1):
     """Getter for an action, based on index.
 
