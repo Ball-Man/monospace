@@ -2,11 +2,14 @@
 import math
 import json
 import copy
+import threading
+import ctypes
 import dsdl
 import monospace
 import pygmiscores
 import desper
 import esper
+import requests
 from sdl2 import *
 from sdl2.sdlttf import *
 
@@ -126,6 +129,93 @@ def ok_name_action(en, world, model: dsdl.SDLGameModel):
     db.commit()
 
     monospace.split_button_action(None, wait=0)(en, world, model)
+
+
+def leaderboard_action(en, world, model: dsdl.SDLGameModel):
+    """Action for the Leaderboard button.
+
+    Change world to the leaderboard one.
+    Make the leaderboard request on a separate thread and render it
+    on screen.
+    """
+    model.switch(model.res['lead_world'], stack=True)
+    world = model.current_world
+
+    scores: pygmiscores.Scores = model.res['sc_hooks']['main'].get()
+
+    def coroutine():
+        result = None
+
+        def list_thread():
+            nonlocal result
+            try:
+                result = scores.list_parsed(perpage=5,
+                                            include_username=''.join(username))
+            except requests.ConnectionError:
+                result = {'status': 'Error'}
+
+        list_thread = threading.Thread(target=list_thread)
+        list_thread.start()
+
+        # Wait for the thread
+        while list_thread.is_alive():
+            yield
+
+        # Generate leaderboard
+        x = 50
+        if result['status'] == 200:
+            y = 150
+            inc_y = 80
+            for i, score in enumerate(result['scores']):
+                # Names
+                surf = TTF_RenderUTF8_Blended(
+                    model.res['fonts']['timenspace_sm'].get(),
+                    score['username'].encode(),
+                    SDL_Color())
+                text = SDL_CreateTextureFromSurface(model.renderer, surf)
+                world.create_entity(dsdl.Position(x, y), text)
+
+                # Points
+                surf = TTF_RenderUTF8_Blended(
+                    model.res['fonts']['timenspace_sm'].get(),
+                    str(score['score']).encode(),
+                    SDL_Color())
+                text = SDL_CreateTextureFromSurface(model.renderer, surf)
+                world.create_entity(
+                    dsdl.Position(monospace.LOGICAL_WIDTH - x
+                                  - surf.contents.w, y),
+                    text)
+
+                y += inc_y
+
+            if result['playerScore'] is not None:
+                # Your name
+                surf = TTF_RenderUTF8_Blended(
+                        model.res['fonts']['timenspace_sm'].get(),
+                        result['playerScore']['username'].encode(),
+                        SDL_Color())
+                text = SDL_CreateTextureFromSurface(model.renderer, surf)
+                world.create_entity(
+                    dsdl.Position(x, monospace.LOGICAL_HEIGHT - 100), text)
+
+                # Your score
+                surf = TTF_RenderUTF8_Blended(
+                        model.res['fonts']['timenspace_sm'].get(),
+                        str(result['playerScore']['score']).encode(),
+                        SDL_Color())
+                text = SDL_CreateTextureFromSurface(model.renderer, surf)
+                world.create_entity(
+                    dsdl.Position(monospace.LOGICAL_WIDTH - x
+                                  - surf.contents.w,
+                                  monospace.LOGICAL_HEIGHT - 100), text)
+
+        else:       # If an error occurred
+            world.create_entity(
+                model.res['str'][monospace.current_lang] \
+                    .get_texture('error'),
+                dsdl.Position(x, 150))
+
+    world.get_processor(desper.CoroutineProcessor).start(coroutine())
 
 
 # Resource

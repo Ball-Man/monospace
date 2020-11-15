@@ -21,8 +21,12 @@
     "highscore": {"text": "high score:", "font": "timenspace"},
     "newrecord": {"text": "new record!", "font": "timenspace"},
     "ok": {"text": "Ok", "font": "timenspace", "color": "000000ff"},
+
     "username": {"text": "Set username", "font": "timenspace"},
     "set_name": {"text": "Username", "font": "timenspace", "color": "000000ff"},
+    "leaderboard": {"text": "Leaderboard", "font": "timenspace"},
+    "submit_score": {"text": "Submit score", "font": "timenspace"},
+    "error": {"text": "Error", "font": "timenspace"},
 
     "halloween": {"text": "Yay, Halloween!", "font": "timenspace"},
     "unlocked": {"text": "You unlocked:", "font": "timenspace"},

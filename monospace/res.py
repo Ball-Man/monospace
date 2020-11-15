@@ -353,6 +353,35 @@ class DeathWorldHandle(desper.Handle):
         # Entities
         # Create entities
 
+        # Send score button
+        sub_width = 600
+        sub_height = 100
+        pos_y = monospace.LOGICAL_HEIGHT - sub_height - 390
+        w.create_entity(
+            monospace.Button(
+                monospace.split_button_action(None)),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=sub_width,
+                             h=sub_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
+                          dsdl.Offset.CENTER),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('submit_score')
+            )
+
+        # Leaderboard button
+        lead_width = 600
+        lead_height = 100
+        pos_y = monospace.LOGICAL_HEIGHT - lead_height - 270
+        w.create_entity(
+            monospace.Button(monospace.leaderboard_action),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=lead_width,
+                             h=lead_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
+                          dsdl.Offset.CENTER),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('leaderboard')
+            )
+
         # Retry button
         retry_width = 400
         retry_height = 100
@@ -504,6 +533,48 @@ class NameSelectionWorldHandle(desper.Handle):
         pos_y += 300
         ok_text = monospace.model.res['str'][monospace.current_lang] \
             .get_texture('ok')
+        ok_width = ok_text.w + 20
+        ok_height = ok_text.h + 20
+
+        w.create_entity(
+            monospace.Button(monospace.ok_name_action),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=ok_width,
+                             h=ok_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
+                          dsdl.Offset.CENTER),
+            dsdl.FillRectangle(monospace.LOGICAL_WIDTH // 2 - ok_width / 2,
+                               pos_y - ok_height / 2, ok_width,
+                               ok_height, SDL_Color()),
+            ok_text)
+
+        return w
+
+
+class LeaderboardWorldHandle(desper.Handle):
+    """Handle that generates a world for the name selection."""
+
+    def __init__(self, res):
+        super().__init__()
+        self.res = res
+
+    def _load(self):
+        w = desper.AbstractWorld()
+
+        # Processors
+        w.add_processor(dsdl.EventHandlerProcessor(), 10)
+        w.add_processor(dsdl.FillRectangleRenderProcessor(), -0.5)
+        w.add_processor(dsdl.TextureRendererProcessor(), -1)
+        w.add_processor(dsdl.ScreenClearerProcessor(), -2)
+        w.add_processor(desper.CoroutineProcessor())
+        w.add_processor(dsdl.BoundingBoxProcessor())
+        w.add_processor(monospace.ButtonProcessor())
+        w.add_processor(monospace.BackWorldProcessor())
+
+        #w.add_processor(dsdl.BoundingBoxRendererProcessor(), -1.5)
+
+        # Ok button
+        pos_y = 60
+        ok_text = self.res['str'][monospace.current_lang].get_texture('ok')
         ok_width = ok_text.w + 20
         ok_height = ok_text.h + 20
 
