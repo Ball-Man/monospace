@@ -64,6 +64,7 @@ def main():
         .add_rule(monospace.get_db_importer(), monospace.DBHandle) \
         .add_rule(dsdl.get_chunk_importer(), dsdl.ChunkHandle) \
         .add_rule(dsdl.get_mus_importer(), dsdl.MusicHandle) \
+        .add_rule(monospace.get_score_importer(), monospace.ScoresHandle) \
         .build()
 
     dirs = [pt.join(pt.dirname(pt.abspath(__main__.__file__)), 'res')]

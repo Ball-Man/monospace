@@ -1,8 +1,10 @@
 """Name selection and leaderboard management."""
 import math
+import json
 import copy
 import dsdl
 import monospace
+import pygmiscores
 import desper
 import esper
 from sdl2 import *
@@ -124,3 +126,22 @@ def ok_name_action(en, world, model: dsdl.SDLGameModel):
     db.commit()
 
     monospace.split_button_action(None, wait=0)(en, world, model)
+
+
+# Resource
+def get_score_importer():
+    return desper.get_resource_importer('sc_hooks', ('.json'))
+
+
+class ScoresHandle(desper.Handle):
+    """Handle for pygmiscores.Scores."""
+
+    def __init__(self, filename):
+        super().__init__()
+        self.filename = filename
+
+    def _load(self):
+        with open(self.filename) as file:
+            dic = json.load(file)
+
+        return pygmiscores.Scores(game_id=dic['game_id'], secret=dic['secret'])
