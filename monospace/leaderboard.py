@@ -131,14 +131,15 @@ def ok_name_action(en, world, model: dsdl.SDLGameModel):
     monospace.split_button_action(None, wait=0)(en, world, model)
 
 
-def leaderboard_action(en, world, model: dsdl.SDLGameModel, submit=False):
+def leaderboard_action(en, world, model: dsdl.SDLGameModel, submit=False,
+                       reset=False):
     """Action for the Leaderboard button.
 
     Change world to the leaderboard one.
     Make the leaderboard request on a separate thread and render it
     on screen.
     """
-    model.switch(model.res['lead_world'], stack=True)
+    model.switch(model.res['lead_world'], reset=reset, stack=True)
     world = model.current_world
 
     scores: pygmiscores.Scores = model.res['sc_hooks']['main'].get()

@@ -69,7 +69,8 @@ class MenuWorldHandle(desper.Handle):
         lead_height = 100
         pos_y = 200
         w.create_entity(
-            monospace.Button(monospace.leaderboard_action),
+            monospace.Button(
+                lambda *args: monospace.leaderboard_action(*args, reset=True)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=lead_width,
                              h=lead_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
