@@ -33,6 +33,7 @@ class MenuWorldHandle(desper.Handle):
         w.create_entity(monospace.EventChecker())
         w.create_entity(monospace.UsernameChecker())
 
+        # Start button
         start_width = 400
         start_height = 100
         pos_y = 300
@@ -51,6 +52,7 @@ class MenuWorldHandle(desper.Handle):
                 .get_texture('start')
             )
 
+        # Options button
         w.create_entity(
             monospace.Button(lambda e, w, m: m.switch(m.res['options_world'],
                                                       True, True)),
@@ -60,6 +62,20 @@ class MenuWorldHandle(desper.Handle):
                           dsdl.Offset.CENTER),
             monospace.model.res['str'][monospace.current_lang] \
                 .get_texture('options')
+            )
+
+        # Leaderboard button
+        lead_width = 600
+        lead_height = 100
+        pos_y = 500
+        w.create_entity(
+            monospace.Button(monospace.leaderboard_action),
+            dsdl.BoundingBox(dsdl.Offset.CENTER, w=lead_width,
+                             h=lead_height),
+            dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,
+                          dsdl.Offset.CENTER),
+            monospace.model.res['str'][monospace.current_lang] \
+                .get_texture('leaderboard')
             )
 
         # Ship selection
