@@ -131,7 +131,7 @@ def ok_name_action(en, world, model: dsdl.SDLGameModel):
     monospace.split_button_action(None, wait=0)(en, world, model)
 
 
-def leaderboard_action(en, world, model: dsdl.SDLGameModel):
+def leaderboard_action(en, world, model: dsdl.SDLGameModel, submit=False):
     """Action for the Leaderboard button.
 
     Change world to the leaderboard one.
@@ -149,10 +149,23 @@ def leaderboard_action(en, world, model: dsdl.SDLGameModel):
         def list_thread():
             nonlocal result
             try:
-                result = scores.list_parsed(perpage=5,
-                                            include_username=''.join(username))
+                results = []
+
+                # Submit current score if requested
+                if submit:
+                    results.append(scores.add(username=''.join(username),
+                                        score=monospace.score.last_score,
+                                        mode=pygmiscores.SubmitMode.HIGHER))
+                results.append(
+                    scores.list_parsed(perpage=5,
+                                       include_username=''.join(username)))
+
+                if not all(result['status'] == 200 for result in results):
+                    raise requests.ConnectionError()
             except requests.ConnectionError:
                 result = {'status': 'Error'}
+            else:
+                result = results[-1]
 
         list_thread = threading.Thread(target=list_thread)
         list_thread.start()
@@ -162,6 +175,7 @@ def leaderboard_action(en, world, model: dsdl.SDLGameModel):
             yield
 
         # Generate leaderboard
+        print('status', result['status'])
         x = 50
         if result['status'] == 200:
             y = 150

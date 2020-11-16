@@ -359,7 +359,7 @@ class DeathWorldHandle(desper.Handle):
         pos_y = monospace.LOGICAL_HEIGHT - sub_height - 390
         w.create_entity(
             monospace.Button(
-                monospace.split_button_action(None)),
+                lambda *args: monospace.leaderboard_action(*args, True)),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=sub_width,
                              h=sub_height),
             dsdl.Position(monospace.LOGICAL_WIDTH // 2, pos_y,

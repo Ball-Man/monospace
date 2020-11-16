@@ -12,6 +12,7 @@ TOT_SCORE_ADD_QUERY = ("UPDATE `scores` SET `value`=`value`+? "
                        + " WHERE `type`='total'")
 
 temp_score = None
+last_score = None
 
 
 def get_high_score(db):
@@ -44,10 +45,13 @@ class DeathScoreManager(desper.OnAttachListener):
     """Component for score management."""
 
     def on_attach(self, en, world):
-        global temp_score
+        global temp_score, last_score
 
         if temp_score is None:
             return
+
+        last_score = temp_score
+        print('dd last score', last_score)
 
         res = monospace.model.res
         db = res['db']['current'].get()
