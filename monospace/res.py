@@ -67,7 +67,7 @@ class MenuWorldHandle(desper.Handle):
         # Leaderboard button
         lead_width = 600
         lead_height = 100
-        pos_y = 500
+        pos_y = 200
         w.create_entity(
             monospace.Button(monospace.leaderboard_action),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=lead_width,
