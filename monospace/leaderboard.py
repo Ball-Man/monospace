@@ -120,10 +120,32 @@ def ok_name_action(en, world, model: dsdl.SDLGameModel):
 
     Hide keyboard(eventually) and set internal username(and switch
     world ofc).
+
+    If this is the first time the username is set, instantly submit
+    the high score(if present). This automatically sends the high scores
+    for people that had a previous version(when the leaderboard didn't
+    exist). WARNING: no retransmission on fail.
     """
+
+    def submit(highscore):
+        scores = model.res['sc_hooks']['main'].get()
+        try:
+            scores.add(username=''.join(username),
+                       score=highscore,
+                       mode=pygmiscores.SubmitMode.HIGHER)
+        except requests.ConnectionError:
+            print('Error submitting high score')
+
     # Update db
     db = model.res['db']['current'].get()
     cur = db.cursor()
+    added = next(cur.execute(monospace.OPTION_GET_QUERY,
+                             ('username_added',)))[0]
+    if not added:       # Submit high score
+        high = next(cur.execute(monospace.HIGH_SCORE_GET_QUERY))[0]
+        if high > 0:
+            threading.Thread(target=submit, args=(high,)).start()
+
     cur.execute(monospace.OPTION_UPDATE_QUERY, (True, 'username_added'))
     cur.execute(monospace.OPTION_UPDATE_QUERY, (''.join(username), 'username'))
     db.commit()
