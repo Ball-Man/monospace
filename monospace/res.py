@@ -307,7 +307,7 @@ class OptionsWorldHandle(desper.Handle):
                           pos_y + off_text.h / 2, dsdl.Offset.CENTER),
             dsdl.BoundingBox(dsdl.Offset.CENTER, w=off_text.w, h=off_text.h),
             monospace.Button(monospace.OptionSequencer('movement_ratio',
-                                                       0, 3)),
+                                                       0, 4)),
             monospace.SequencedOption('movement_ratio'))
 
         pos_y += 100

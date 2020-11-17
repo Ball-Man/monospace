@@ -12,6 +12,7 @@
     "movement_ratio1": {"text": "1", "font": "timenspace", "color": "000000ff"},
     "movement_ratio2": {"text": "2", "font": "timenspace", "color": "000000ff"},
     "movement_ratio3": {"text": "3", "font": "timenspace", "color": "000000ff"},
+    "movement_ratio4": {"text": "4", "font": "timenspace", "color": "000000ff"},
     "on": {"text": "on", "font": "timenspace", "color": "000000ff"},
     "off": {"text": "off", "font": "timenspace"},
     "save": {"text": "save", "font": "timenspace", "color": "000000ff"},
