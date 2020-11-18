@@ -613,6 +613,13 @@ class PowerupBox(desper.OnAttachListener):
 
         self.apply_texture()
 
+        # Move inside world if spawned outside
+        self.text = world.component_for_entity(en, ctypes.POINTER(SDL_Texture))
+        self.pos = world.component_for_entity(en, dsdl.Position)
+        if self.outside_world:
+            world.get_processor(desper.CoroutineProcessor) \
+                .start(self.drag_in())
+
     def apply(self, ship):
         """Apply the incapsulated powerup to the given ship.
 
@@ -643,3 +650,18 @@ class PowerupBox(desper.OnAttachListener):
         self.world.add_component(
             self.en,
             monospace.model.res['text']['powerups'][text_name].get())
+
+    @property
+    def outside_world(self):
+        return not (self.text.w / 2 < self.pos.x
+                    < monospace.LOGICAL_WIDTH - self.text.w / 2)
+
+    @property
+    def drag_in_dir(self):
+        return 1 if self.pos.x - self.text.w / 2 < 0 else -1
+
+    def drag_in(self):
+        """Coroutine, move the box inside the room."""
+        while self.outside_world:
+            self.pos.x += 2 * self.drag_in_dir
+            yield
