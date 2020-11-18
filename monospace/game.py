@@ -87,6 +87,15 @@ class GameProcessor(esper.Processor):
         self._next_wave_coroutine = None
         self._state = GameState.WAVE
 
+        # Marker for the last wave
+        if self.is_infinite_wave:
+            text_surface = TTF_RenderText_Blended(
+                self.model.res['fonts']['timenspace_sm'].get(),
+                b'INF', SDL_Color())
+            text = SDL_CreateTextureFromSurface(
+                self.model.renderer, text_surface)
+            self.world.create_entity(dsdl.Position(30, 30), text)
+
         def change_color_coroutine():
             proc = self.world.get_processor(dsdl.ScreenClearerProcessor)
             start_color = copy.copy(proc.color)
@@ -109,6 +118,10 @@ class GameProcessor(esper.Processor):
         self.world.get_processor(desper.CoroutineProcessor).start(
             change_color_coroutine())
 
+    @property
+    def is_infinite_wave(self):
+        return math.isinf(self.WAVE_THRESHOLDS[self._cur_threshold])
+
     def score_up(self, value):
         """Add some value to the current score.
 
@@ -130,9 +143,15 @@ class GameProcessor(esper.Processor):
         if self.score >= self.WAVE_THRESHOLDS[self._cur_threshold]:
             self.change_to_reward()
 
-        # Create new texture
+        # Score to show on screen
+        pos_y = 50
         shown_score = max(
             self.WAVE_THRESHOLDS[self._cur_threshold] - self.score, 0)
+        if self.is_infinite_wave:   # At the last wave show total score
+            shown_score = self.score
+            pos_y = 70
+
+        # Create new texture
         text_surface = TTF_RenderText_Blended(
             self.model.res['fonts']['timenspace'].get(),
             str(shown_score).encode(), SDL_Color())
@@ -141,7 +160,7 @@ class GameProcessor(esper.Processor):
 
         # Add entity
         self._cached_entity = self.world.create_entity(
-            self._cached_texture, dsdl.Position(30, 50))
+            self._cached_texture, dsdl.Position(30, pos_y))
 
         # Cleanup
         SDL_FreeSurface(text_surface)
