@@ -290,7 +290,7 @@ class FifthWave(DotsWave):
         self.num_rewards = 2
 
 
-class InfWave(DotsWave):
+class SixthWave(DotsWave):
     """Custom wave for the second one of the game."""
     bg_color = SDL_Color(0, 0, 0, 255)
 
@@ -300,7 +300,7 @@ class InfWave(DotsWave):
         self.enemy_threshold_range = 80, 120
         self._enemy_threshold = random.randint(*self.enemy_threshold_range)
         self.dots_threshold_range = 50, 100
-        self.dots_rows = 3
+        self.dots_rows = 2
         self.dots_columns_range = 2, 4
         self.dots_speed = 9
 
@@ -313,3 +313,11 @@ class InfWave(DotsWave):
 
         self.rewards = [monospace.powerup_add_blaster]
         self.num_rewards = 1
+
+    def spawn_dot(self, world, x, y=-50):
+        """Spawn stronger dot enemy at given position."""
+        world.create_entity(
+            dsdl.Position(x, y),
+            dsdl.BoundingBox(w=50, h=50), dsdl.Velocity(0, self.dots_speed),
+            monospace.model.res['text']['enemies']['dot2'].get(),
+            dsdl.Animation(2, 60), monospace.Dot2Enemy())

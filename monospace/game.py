@@ -42,7 +42,7 @@ class GameProcessor(esper.Processor):
                                      monospace.ThirdWaveRocket())),
                       monospace.FourthWave(),
                       monospace.FifthWave(),
-                      monospace.InfWave()]
+                      monospace.SixthWave()]
 
         self.keys = SDL_GetKeyboardState(None)
 

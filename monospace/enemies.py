@@ -162,6 +162,11 @@ class DotEnemy(Enemy):
             )
 
 
+class Dot2Enemy(DotEnemy):
+    """Stronger dot enemy controller."""
+    total_life = 2
+
+
 class RollEnemy(Enemy, desper.AbstractComponent):
     """Roll enemy controller."""
     hor_speed = 6
