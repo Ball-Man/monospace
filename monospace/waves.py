@@ -174,7 +174,7 @@ class SecondWaveShooter(DotsWave):
 
         self.rewards = [monospace.powerup_add_blaster,
                         monospace.powerup_delay1,
-                        monospace.powerup_double_blasters]
+                        monospace.powerup_quick]
         self.num_rewards = 2
 
 

@@ -13,6 +13,7 @@ from sdl2.sdlmixer import *
 
 
 DEFAULT_BULLET_SPEED = 15
+MAX_BULLET_SPEED = 25
 DEFAULT_BULLET_DELAY = 30
 MIN_BULLET_DELAY = 7
 
@@ -602,6 +603,7 @@ class PowerupBox(desper.OnAttachListener):
             monospace.powerup_shield: 'shield_',
             monospace.powerup_delay1: 'delay1',
             monospace.powerup_add_blaster: 'add_blaster',
+            monospace.powerup_quick: 'quick'
         }
 
         self.powerup_applier = powerup_applier

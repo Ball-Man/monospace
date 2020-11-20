@@ -1,5 +1,6 @@
 """Powerup functions, used inside PowerupBox instances."""
 import copy
+import math
 import weakref
 import dsdl
 import desper
@@ -84,6 +85,16 @@ def powerup_delay1(ship: monospace.Ship):
             ship.blasters)
         min_blaster.bullet_delay = max(
             monospace.MIN_BULLET_DELAY, min_blaster.bullet_delay // 3 * 2)
+
+
+def powerup_quick(ship: monospace.Ship):
+    """Increase speed of bullets."""
+
+    for blaster in ship.blasters:
+        blaster.bullet_velocity = (
+            blaster.bullet_velocity[0],
+            blaster.bullet_velocity[1]
+            + math.copysign(5, blaster.bullet_velocity[1]))
 
 
 # Random bonus during the game
