@@ -240,6 +240,11 @@ class RollEnemy(Enemy, desper.AbstractComponent):
             )
 
 
+class Roll2Enemy(RollEnemy):
+    """Stronger version of RollEnemy."""
+    total_life = 2
+
+
 class RocketEnemy(Enemy):
     total_life = 5
     reward = 3
@@ -278,6 +283,11 @@ class RocketEnemy(Enemy):
         """Spawn death particles for the death."""
         self.world.get_processor(desper.CoroutineProcessor).start(
             self.particles_coroutine())
+
+
+class Rocket2Enemy(RocketEnemy):
+    """Stronger version of RocketEnemy."""
+    total_life = 9
 
 
 class ShooterEnemy(Enemy, desper.AbstractComponent):
@@ -461,6 +471,17 @@ def spawn_roll(world, speed):
         text, monospace.RollEnemy())
 
 
+def spawn_roll2(world, speed):
+    """Spawn a roll2 enemy with the given vertical speed."""
+    text = monospace.model.res['text']['enemies']['roll2'].get()
+    pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
+    world.create_entity(
+        dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
+        dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
+        dsdl.Velocity(0, speed),
+        text, monospace.Roll2Enemy())
+
+
 def spawn_rocket(world, speed):
     """Spawn a rocket enemy with the given vertical speed."""
     text = monospace.model.res['text']['enemies']['rocket'].get()
@@ -470,6 +491,18 @@ def spawn_rocket(world, speed):
         dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
         dsdl.Velocity(0, speed),
         text, monospace.RocketEnemy())
+
+
+def spawn_rocket2(world, speed):
+    """Spawn a rocket2 enemy with the given vertical speed."""
+    text = monospace.model.res['text']['enemies']['rocket2'].get()
+    pos_x = random.randint(text.w // 8, monospace.LOGICAL_WIDTH - text.w // 8)
+    world.create_entity(
+        dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
+        dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
+        dsdl.Velocity(0, speed),
+        text, monospace.Rocket2Enemy(),
+        dsdl.Animation(frames=8, delay=5))
 
 
 def spawn_sphere(world, speed):
