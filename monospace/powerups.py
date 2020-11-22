@@ -2,6 +2,7 @@
 import copy
 import math
 import weakref
+import random
 import dsdl
 import desper
 import monospace
@@ -95,6 +96,16 @@ def powerup_quick(ship: monospace.Ship):
             blaster.bullet_velocity[0],
             blaster.bullet_velocity[1]
             + math.copysign(5, blaster.bullet_velocity[1]))
+
+
+def powerup_help(ship: monospace.Ship):
+    """Spawn a MiniShip to help the player."""
+    ship.world.create_entity(
+        monospace.MiniShip(),
+        dsdl.Position(offset=dsdl.Offset.CENTER, size_x=0.5, size_y=0.5),
+        monospace.model.res['text']['ships'] \
+            [random.choice(monospace.ship_selection.owned_ships)] \
+            .get())
 
 
 # Random bonus during the game

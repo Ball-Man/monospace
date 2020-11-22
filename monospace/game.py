@@ -590,6 +590,65 @@ class PowerShield(desper.Controller):
                 world.delete_entity(en)
 
 
+class MiniShip(desper.Controller):
+    """Mini helper ship."""
+
+    def __init__(self):
+        super().__init__()
+
+        self._time = 0
+        self._base_y = monospace.LOGICAL_HEIGHT / 4 * 3
+        self.flight_h = random.randrange(monospace.LOGICAL_HEIGHT // 6,
+                                         monospace.LOGICAL_HEIGHT // 4) / 2
+
+        self._base_x = monospace.LOGICAL_WIDTH / 2
+        self.flight_w = random.randrange(monospace.LOGICAL_WIDTH // 4,
+                                         monospace.LOGICAL_WIDTH // 1.2) / 2
+
+        self.yfactor = random.randint(1, 3)
+
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+
+        self.blaster = Blaster(
+            (0, 0), ShipBullet,
+            monospace.model.res['text']['ship_bullet'].get(), 0,
+            (0, -DEFAULT_BULLET_SPEED),
+            (10, 10, (5, 40)), world)
+
+        self.position = self.get(dsdl.Position)
+
+        # Start shooting
+        self.processor(desper.CoroutineProcessor).start(self.shoot_coroutine())
+
+    def shoot_coroutine(self):
+        """Shoot every once in a while."""
+        while self.world.entity_exists(self.entity):
+            yield random.randint(50, 120)
+            self.shoot()
+
+            if random.randint(0, 2) == 0:       # Sometimes shoot twice
+                yield 10
+                self.shoot()
+
+            if random.randint(0, 18) == 0:   # Rarely shoot a third time
+                yield 10
+                self.shoot()
+
+    def shoot(self):
+        self.blaster.shoot(self.position.x, self.position.y)
+        Mix_PlayChannel(-1,
+                        monospace.model.res['chunks']['shot'].get(),
+                        0)
+
+    def update(self, *args):
+        self.position.y = self._base_y \
+            + self.flight_h * math.sin(self._time * self.yfactor)
+        self.position.x = self._base_x \
+            + self.flight_w * math.cos(self._time)
+        self._time += math.pi / 160
+
+
 class PowerupBox(desper.OnAttachListener):
     """Proxy component for a power function."""
 
@@ -603,7 +662,8 @@ class PowerupBox(desper.OnAttachListener):
             monospace.powerup_shield: 'shield_',
             monospace.powerup_delay1: 'delay1',
             monospace.powerup_add_blaster: 'add_blaster',
-            monospace.powerup_quick: 'quick'
+            monospace.powerup_quick: 'quick',
+            monospace.powerup_help: 'help'
         }
 
         self.powerup_applier = powerup_applier
