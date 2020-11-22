@@ -200,8 +200,7 @@ class ThirdWave(DotsWave):
         self.enemy_chances = [10, 10, 1]
 
         self.rewards = [monospace.powerup_add_blaster,
-                        monospace.powerup_delay1,
-                        monospace.powerup_double_blasters]
+                        monospace.powerup_delay1]
         self.num_rewards = 2
 
 
@@ -252,7 +251,7 @@ class FourthWave(DotsWave):
 
         self.enemies = [
             lambda world: monospace.spawn_roll(world, 3),
-            monospace.spawn_shooter,
+            lambda world: monospace.spawn_shooter(world, 7),
             lambda world: monospace.spawn_rocket(world, 4),
             lambda world: monospace.spawn_sphere(world, 4)]
         self.enemy_chances = [3, 3, 2, 4]
@@ -279,15 +278,14 @@ class FifthWave(DotsWave):
 
         self.enemies = [
             lambda world: monospace.spawn_roll(world, 3),
-            monospace.spawn_shooter,
+            lambda world: monospace.spawn_shooter(world, 8),
             lambda world: monospace.spawn_rocket(world, 4),
             lambda world: monospace.spawn_sphere(world, 4)]
         self.enemy_chances = [1, 1, 1, 1]
 
-        self.rewards = [monospace.powerup_add_blaster,
-                        monospace.powerup_delay1,
-                        monospace.powerup_double_blasters,
-                        monospace.powerup_drift]
+        self.rewards = [monospace.powerup_delay1,
+                        monospace.powerup_drift,
+                        monospace.powerup_help]
         self.num_rewards = 2
 
 
@@ -306,9 +304,9 @@ class SixthWave(DotsWave):
         self.dots_speed = 9
 
         self.enemies = [
-            lambda world: monospace.spawn_roll(world, 3),
-            monospace.spawn_shooter,
-            lambda world: monospace.spawn_rocket(world, 4),
+            lambda world: monospace.spawn_roll(world, 4),
+            lambda world: monospace.spawn_shooter(world, 9),
+            lambda world: monospace.spawn_rocket(world, 5),
             lambda world: monospace.spawn_sphere(world, 4)]
         self.enemy_chances = [1, 1, 1, 1]
 
@@ -330,6 +328,13 @@ class SeventhWave(SixthWave):
 
     def __init__(self):
         super().__init__()
+
+        self.enemy_threshold_range = 50, 100
+        self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+        self.dots_threshold_range = 40, 80
+        self.dots_rows = 2
+        self.dots_columns_range = 2, 4
+        self.dots_speed = 10
 
         self.enemies = [
             lambda world: monospace.spawn_roll2(world, 3),
