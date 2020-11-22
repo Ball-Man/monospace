@@ -295,12 +295,13 @@ class ShooterEnemy(Enemy, desper.AbstractComponent):
     total_life = 2
     HORIZONTAL_SPEED = 3
 
-    def __init__(self):
+    def __init__(self, shot_speed=5):
         super().__init__()
         self.death_sound = \
             monospace.model.res['chunks']['enemies']['death2'].get()
         self._shooting = False
         self._shot = False
+        self._shot_speed = 5
         self.target_x = 0
 
     def on_attach(self, en, world):
@@ -319,8 +320,8 @@ class ShooterEnemy(Enemy, desper.AbstractComponent):
         self.blaster = monospace.Blaster(
             (0, 0), monospace.EnemyBullet,
             monospace.model.res['text']['enemies']['bullet'].get(),
-            30, (0, 5), (10, 10, dsdl.Offset.BOTTOM_CENTER), world,
-            animation=(2, 5))
+            30, (0, self._shot_speed), (10, 10, dsdl.Offset.BOTTOM_CENTER),
+            world, animation=(2, 5))
 
         self.animation = world.try_component(en, dsdl.Animation)
 
@@ -447,7 +448,7 @@ class SphereEnemy(Enemy, desper.AbstractComponent):
 
 
 # Spawn functions
-def spawn_shooter(world):
+def spawn_shooter(world, shot_speed=5):
     """Spawn a shooter enemy."""
     text = monospace.model.res['text']['enemies']['shooter'].get()
     pos_x = random.choice((-60, monospace.LOGICAL_WIDTH + 60))
@@ -456,7 +457,7 @@ def spawn_shooter(world):
         dsdl.Position(pos_x, pos_y, offset=dsdl.Offset.CENTER),
         dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
         dsdl.Velocity(),
-        text, monospace.ShooterEnemy(),
+        text, monospace.ShooterEnemy(shot_speed=shot_speed),
         dsdl.Animation(7, 2, oneshot=True, run=False))
 
 
