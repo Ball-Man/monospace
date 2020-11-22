@@ -174,7 +174,8 @@ class SecondWaveShooter(DotsWave):
 
         self.rewards = [monospace.powerup_add_blaster,
                         monospace.powerup_delay1,
-                        monospace.powerup_quick]
+                        monospace.powerup_quick,
+                        monospace.powerup_help]
         self.num_rewards = 2
 
 
@@ -311,7 +312,7 @@ class SixthWave(DotsWave):
             lambda world: monospace.spawn_sphere(world, 4)]
         self.enemy_chances = [1, 1, 1, 1]
 
-        self.rewards = [monospace.powerup_add_blaster]
+        self.rewards = [monospace.powerup_quick, monospace.powerup_help]
         self.num_rewards = 1
 
     def spawn_dot(self, world, x, y=-50):
@@ -321,3 +322,21 @@ class SixthWave(DotsWave):
             dsdl.BoundingBox(w=50, h=50), dsdl.Velocity(0, self.dots_speed),
             monospace.model.res['text']['enemies']['dot2'].get(),
             dsdl.Animation(2, 60), monospace.Dot2Enemy())
+
+
+class SeventhWave(SixthWave):
+    """Custom wave for the second one of the game."""
+    bg_color = SDL_Color(50, 50, 50, 255)
+
+    def __init__(self):
+        super().__init__()
+
+        self.enemies = [
+            lambda world: monospace.spawn_roll2(world, 3),
+            lambda world: monospace.spawn_shooter(world, 12),
+            lambda world: monospace.spawn_rocket2(world, 4),
+            lambda world: monospace.spawn_sphere(world, 4)]
+        self.enemy_chances = [1, 1, 1, 1]
+
+        self.rewards = [monospace.powerup_quick, monospace.powerup_help]
+        self.num_rewards = 1

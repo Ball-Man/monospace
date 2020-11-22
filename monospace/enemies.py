@@ -301,7 +301,7 @@ class ShooterEnemy(Enemy, desper.AbstractComponent):
             monospace.model.res['chunks']['enemies']['death2'].get()
         self._shooting = False
         self._shot = False
-        self._shot_speed = 5
+        self._shot_speed = shot_speed
         self.target_x = 0
 
     def on_attach(self, en, world):
