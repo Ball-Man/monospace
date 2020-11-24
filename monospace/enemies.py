@@ -285,9 +285,43 @@ class RocketEnemy(Enemy):
             self.particles_coroutine())
 
 
-class Rocket2Enemy(RocketEnemy):
-    """Stronger version of RocketEnemy."""
+class Rocket2Enemy(RocketEnemy, desper.AbstractComponent):
+    """Stronger version of RocketEnemy.
+
+    Move towards the player.
+    """
     total_life = 9
+
+    def on_attach(self, en, world):
+        super().on_attach(en, world)
+
+        self.world = world
+        self.entity = en
+        self.position = world.component_for_entity(en, dsdl.Position)
+        self.chase = False
+
+        try:
+            self.target = world.get_components(
+                monospace.Ship, dsdl.Position)[0][1][1]
+        except Exception:       # Probably an IndexError
+            self.target = self.position
+
+        world.get_processor(desper.CoroutineProcessor) \
+            .start(self.chase_timer())
+
+    def chase_timer(self):
+        yield 60
+
+        while self.world.entity_exists(self.entity):
+            self.chase = True
+            yield random.randint(30, 70)
+            self.chase = False
+            yield random.randint(30, 70)
+
+    def update(self, *args):
+        if self.chase and abs(self.position.x - self.target.x) > 10:
+            self.position.x += math.copysign(2,
+                                             self.target.x - self.position.x)
 
 
 class ShooterEnemy(Enemy, desper.AbstractComponent):
