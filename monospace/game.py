@@ -21,7 +21,7 @@ MIN_BULLET_DELAY = 7
 class GameProcessor(esper.Processor):
     """Main game logic(enemy waves, powerup spawns etc.)."""
 
-    WAVE_THRESHOLDS = [50, 100, 250, 400, 600, 800, math.inf]
+    WAVE_THRESHOLDS = [50, 100, 250, 400, 600, 800, 1000, math.inf]
     score = 0
 
     def __init__(self):
@@ -43,7 +43,8 @@ class GameProcessor(esper.Processor):
                       monospace.FourthWave(),
                       monospace.FifthWave(),
                       monospace.SixthWave(),
-                      monospace.SeventhWave()]
+                      monospace.SeventhWave(),
+                      monospace.InfWave()]
 
         self.keys = SDL_GetKeyboardState(None)
 

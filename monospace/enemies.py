@@ -481,6 +481,11 @@ class SphereEnemy(Enemy, desper.AbstractComponent):
         self.blinking = False
 
 
+class Sphere2Enemy(SphereEnemy):
+    """Stronger SphereEnemy variant."""
+    total_life = 7
+
+
 # Spawn functions
 def spawn_shooter(world, shot_speed=5):
     """Spawn a shooter enemy."""
@@ -543,6 +548,17 @@ def spawn_rocket2(world, speed):
 def spawn_sphere(world, speed):
     """Spawn a sphere enemy with the given vertical speed."""
     text = monospace.model.res['text']['enemies']['sphere'].get()
+    pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
+    world.create_entity(
+        dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),
+        dsdl.BoundingBox(w=50, h=50, offset=dsdl.Offset.CENTER),
+        dsdl.Velocity(0, speed),
+        text, monospace.SphereEnemy())
+
+
+def spawn_sphere2(world, speed):
+    """Spawn a sphere2 enemy with the given vertical speed."""
+    text = monospace.model.res['text']['enemies']['sphere2'].get()
     pos_x = random.randint(text.w, monospace.LOGICAL_WIDTH - text.w)
     world.create_entity(
         dsdl.Position(pos_x, -text.h, offset=dsdl.Offset.CENTER),

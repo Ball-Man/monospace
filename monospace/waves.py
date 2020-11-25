@@ -324,7 +324,7 @@ class SixthWave(DotsWave):
 
 class SeventhWave(SixthWave):
     """Custom wave for the second one of the game."""
-    bg_color = SDL_Color(50, 50, 50, 255)
+    bg_color = SDL_Color(30, 30, 30, 255)
 
     def __init__(self):
         super().__init__()
@@ -337,11 +337,37 @@ class SeventhWave(SixthWave):
         self.dots_speed = 10
 
         self.enemies = [
-            lambda world: monospace.spawn_roll2(world, 3),
+            lambda world: monospace.spawn_roll2(world, 4),
             lambda world: monospace.spawn_shooter(world, 12),
-            lambda world: monospace.spawn_rocket2(world, 4),
-            lambda world: monospace.spawn_sphere(world, 4)]
+            lambda world: monospace.spawn_rocket2(world, 5),
+            lambda world: monospace.spawn_sphere2(world, 4)]
         self.enemy_chances = [1, 1, 1, 1]
 
-        self.rewards = [monospace.powerup_quick, monospace.powerup_help]
+        self.rewards = [monospace.powerup_delay1]
+        self.num_rewards = 1
+
+
+class InfWave(SixthWave):
+    """Custom wave for the second one of the game."""
+    bg_color = SDL_Color(0, 0, 0, 255)
+
+    def __init__(self):
+        super().__init__()
+
+        self.enemy_threshold_range = 50, 80
+        self._enemy_threshold = random.randint(*self.enemy_threshold_range)
+        self.dots_threshold_range = 40, 70
+        self.dots_rows = 3
+        self.dots_columns_range = 2, 4
+        self.dots_speed = 10
+
+        self.enemies = [
+            lambda world: monospace.spawn_roll2(world, 3),
+            lambda world: monospace.spawn_shooter(world, 15),
+            lambda world: monospace.spawn_rocket2(world,
+                                                  random.randint(5, 10)),
+            lambda world: monospace.spawn_sphere2(world, 7)]
+        self.enemy_chances = [1, 1, 1, 1]
+
+        self.rewards = [monospace.powerup_delay1]
         self.num_rewards = 1
