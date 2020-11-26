@@ -356,16 +356,16 @@ class InfWave(SixthWave):
 
         self.enemy_threshold_range = 50, 80
         self._enemy_threshold = random.randint(*self.enemy_threshold_range)
-        self.dots_threshold_range = 40, 70
+        self.dots_threshold_range = 30, 70
         self.dots_rows = 3
         self.dots_columns_range = 2, 4
-        self.dots_speed = 10
+        self.dots_speed = 11
 
         self.enemies = [
             lambda world: monospace.spawn_roll2(world, 3),
             lambda world: monospace.spawn_shooter(world, 15),
             lambda world: monospace.spawn_rocket2(world,
-                                                  random.randint(5, 10)),
+                                                  random.randint(6, 14)),
             lambda world: monospace.spawn_sphere2(world, 7)]
         self.enemy_chances = [1, 1, 1, 1]
 
