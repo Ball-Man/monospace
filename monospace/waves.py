@@ -149,8 +149,7 @@ class SecondWaveRoll(DotsWave):
             lambda world: monospace.spawn_roll(world, 3)]
         self.enemy_chances = [1]
 
-        self.rewards = [monospace.powerup_add_blaster,
-                        monospace.powerup_delay1,
+        self.rewards = [monospace.powerup_delay1,
                         monospace.powerup_double_blasters]
         self.num_rewards = 1
 
@@ -172,7 +171,7 @@ class SecondWaveShooter(DotsWave):
             monospace.spawn_shooter]
         self.enemy_chances = [1]
 
-        self.rewards = [monospace.powerup_add_blaster,
+        self.rewards = [monospace.powerup_double_blasters,
                         monospace.powerup_delay1,
                         monospace.powerup_quick,
                         monospace.powerup_help]

@@ -71,7 +71,7 @@ class Enemy(desper.OnAttachListener):
         self.blinking = False
 
         self.bonuses = monospace.BonusDelay(), None
-        self.bonuses_chances = 1, 80
+        self.bonuses_chances = 1, 250
 
     def on_attach(self, en, world):
         self.world = world
