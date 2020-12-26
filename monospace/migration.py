@@ -15,7 +15,7 @@ main_db_path = None
 
 APP_DB_PATH = app_storage_path() if monospace.on_android else None
 
-MAIN_DB_VERSION = 3      # PRAGMA user_version
+MAIN_DB_VERSION = 4      # PRAGMA user_version
 
 GET_VER_QUERY = 'PRAGMA user_version'
 SET_VER_QUERY = 'PRAGMA user_version=?'
@@ -137,8 +137,28 @@ def add_username(db):
     db.commit()
 
 
+def add_christmas(db):
+    """Add christmas event and ship."""
+    cursor = db.cursor()
+
+    # Add event
+    cursor.execute(
+        "INSERT INTO `events`"
+        "(`name`, `from_month`, `from_day`, `to_month`, `to_day`) "
+        "VALUES('christmas', 12, 8, 12, 31)")
+
+    # Add ship
+    cursor.execute(
+        "INSERT INTO `ships`(`name`, `unlocked`) "
+        "VALUES('christmas_ship', 0)")
+    cursor.execute(
+        "INSERT INTO `event_ships`(`ship_name`, `event_id`) "
+        "VALUES('christmas_ship', 2)")
+
+
 VERSION_UPGRADES = {
     1: add_movement_ratio,
     2: add_ships_and_events,
-    3: add_username
+    3: add_username,
+    4: add_christmas
 }

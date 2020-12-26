@@ -9,18 +9,22 @@ OWNED_SHIPS_QUERY = 'SELECT `name` FROM `ships` WHERE `unlocked`=1'
 CURRENT_EVENTS_QUERY = \
     ("SELECT `id`, `name` FROM `events` "
      "WHERE date('now') BETWEEN date(strftime('%Y', date('now')) "
-     "|| '-' || `from_month` || '-' || `from_day`) "
-     "AND date(strftime('%Y', date('now')) || '-' || `to_month` "
-     "|| '-' || `to_day`)")
+     "|| '-' || substr('0' || `from_month`, -2, 2) || '-' "
+     "|| substr('0' || `from_day`, -2, 2)) "
+     "AND date(strftime('%Y', date('now')) || '-' "
+     "|| substr('0' || `to_month`, -2, 2) "
+     "|| '-' || substr('0' || `to_day`, -2, 2))")
 CUR_EVENT_SHIPS_QUERY = \
     ("SELECT `ships`.`name`, `unlocked`, `events`.`name` "
      "FROM `ships` INNER JOIN `event_ships` "
      "ON `ships`.`name`=`ship_name` INNER JOIN `events` "
-     "ON `events`.`id`=`event_id`"
+     "ON `events`.`id`=`event_id` "
      "WHERE date('now') BETWEEN date(strftime('%Y', date('now')) "
-     "|| '-' || `from_month` || '-' || `from_day`) "
-     "AND date(strftime('%Y', date('now')) || '-' || `to_month` "
-     "|| '-' || `to_day`)")
+     "|| '-' || substr('0' || `from_month`, -2, 2) || '-' "
+     "|| substr('0' || `from_day`, -2, 2)) "
+     "AND date(strftime('%Y', date('now')) || '-' "
+     "|| substr('0' || `to_month`, -2, 2) "
+     "|| '-' || substr('0' || `to_day`, -2, 2))")
 UNLOCK_SHIP_QUERY = "UPDATE `ships` SET `unlocked`=1 WHERE `name`=?"
 SELECTOR_Y_FACTOR = 1 / 10
 SELECTOR_X_FACTOR = 1 / 5

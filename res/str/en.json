@@ -32,6 +32,8 @@
     "halloween": {"text": "Yay, Halloween!", "font": "timenspace"},
     "unlocked": {"text": "You unlocked:", "font": "timenspace"},
     "halloween_ship": {"text": "The BatShip", "font": "timenspace", "color": "cc8400ff"},
+    "christmas": {"text": "Merry Christmas!", "font": "timenspace_sm"},
+    "christmas_ship": {"text": "The TannenShip", "font": "timenspace", "color": "eb3434ff"},
 
     "ballman": {"text": "Francesco Mistri 2020", "font": "courierprime"}
   }
