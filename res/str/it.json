@@ -11,8 +11,16 @@
     "highscore": {"text": "high score:", "font": "timenspace"},
     "newrecord": {"text": "nuovo record!", "font": "timenspace"},
 
+    "username": {"text": "Imposta username", "font": "timenspace"},
+    "set_name": {"text": "Username", "font": "timenspace", "color": "000000ff"},
+    "leaderboard": {"text": "Classifica", "font": "timenspace"},
+    "submit_score": {"text": "Invia punteggio", "font": "timenspace"},
+    "error": {"text": "Errore", "font": "timenspace"},
+
     "halloween": {"text": "Si', Halloween!", "font": "timenspace"},
     "unlocked": {"text": "Hai sbloccato:", "font": "timenspace"},
-    "halloween_ship": {"text": "La BatShip", "font": "timenspace", "color": "cc8400ff"}
+    "halloween_ship": {"text": "La BatShip", "font": "timenspace", "color": "cc8400ff"},
+    "christmas": {"text": "Buon Natale!", "font": "timenspace_sm"},
+    "christmas_ship": {"text": "La TannenShip", "font": "timenspace", "color": "eb3434ff"}
     }
 }
