@@ -4,6 +4,10 @@ An android Python3 game project, using desper + SDL2
 ### The game
 A modern reinterpretation of the great classic space invaders. Destroy aliens until the target score is 0, receive a powerup, repeat.
 
+#### How to play
+Drag on the screen to move the ship (touching the ship directly is not required). Autofire is always on. Drag the ship on a box to automatically collect and use the corresponding powerup.
+On win/unix machines, use the mouse as if it was your finger.
+
 ### Why
 Mainly an experiment, testing SDL on android coupled with my library [desper](https://github.com/Ball-Man/desper).
 
